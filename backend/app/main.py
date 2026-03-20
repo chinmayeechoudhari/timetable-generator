@@ -9,6 +9,10 @@ from app.api.timeslots import router as timeslots_router
 from app.api.teacher_availabilities import (
     router as teacher_availabilities_router,
 )
+from app.api.teacher_subjects import (
+    router as teacher_subjects_router,
+)
+from app.api.generate import router as generate_router
 
 app = FastAPI(title="Timetable Generator API", version="1.0.0")
 
@@ -31,3 +35,5 @@ app.include_router(classes_router)
 app.include_router(subjects_router)
 app.include_router(timeslots_router)
 app.include_router(teacher_availabilities_router)
+app.include_router(teacher_subjects_router)
+app.include_router(generate_router)
