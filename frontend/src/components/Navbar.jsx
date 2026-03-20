@@ -4,19 +4,19 @@ const NAV = [
   {
     section: 'Data Entry',
     items: [
-      { to: '/teachers',            label: 'Teachers',         icon: '👤' },
-      { to: '/rooms',               label: 'Rooms',            icon: '🚪' },
-      { to: '/classes',             label: 'Classes',          icon: '🏫' },
-      { to: '/subjects',            label: 'Subjects',         icon: '📚' },
-      { to: '/timeslots',           label: 'Time Slots',       icon: '🕐' },
-      { to: '/teacher-subjects',    label: 'Teacher Subjects', icon: '🔗' },
-      { to: '/teacher-availability',label: 'Availability',     icon: '📅' },
+      { to: '/teachers',             label: 'Teachers',         icon: '👤' },
+      { to: '/rooms',                label: 'Rooms',            icon: '🚪' },
+      { to: '/classes',              label: 'Classes',          icon: '🏫' },
+      { to: '/subjects',             label: 'Subjects',         icon: '📚' },
+      { to: '/timeslots',            label: 'Time Slots',       icon: '🕐' },
+      { to: '/teacher-subjects',     label: 'Teacher Subjects', icon: '🔗' },
+      { to: '/teacher-availability', label: 'Availability',     icon: '📅' },
     ]
   },
   {
     section: 'Generate',
     items: [
-      { to: '/generate',  label: 'Generate', icon: '⚡' },
+      { to: '/generate',  label: 'Generate',  icon: '⚡' },
       { to: '/timetable', label: 'Timetable', icon: '📊' },
     ]
   }
@@ -27,43 +27,64 @@ export default function Navbar() {
 
   return (
     <div style={{
-      width: '220px',
+      width: '230px',
       minHeight: '100vh',
-      background: '#0f0f0f',
-      borderRight: '1px solid #1e1e1e',
-      padding: '0',
+      background: '#1a1a2e',
       flexShrink: 0,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      boxShadow: '2px 0 12px rgba(0,0,0,0.15)'
     }}>
 
-      {/* Logo */}
+      {/* Logo block */}
       <div style={{
-        padding: '24px 20px 20px',
-        borderBottom: '1px solid #1e1e1e'
+        padding: '28px 20px 22px',
+        borderBottom: '1px solid rgba(255,255,255,0.07)'
       }}>
         <div style={{
-          fontSize: '15px', fontWeight: '700',
-          color: '#e0e0e0', letterSpacing: '-0.3px'
+          fontSize: '20px',
+          fontWeight: '800',
+          letterSpacing: '-0.5px',
+          background: 'linear-gradient(135deg, #a78bfa, #6C63FF)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          lineHeight: 1.2
         }}>
-          Timetable Gen
+          Timetable
         </div>
         <div style={{
-          fontSize: '11px', color: '#444',
-          marginTop: '3px'
+          fontSize: '20px',
+          fontWeight: '800',
+          letterSpacing: '-0.5px',
+          background: 'linear-gradient(135deg, #6C63FF, #4f46e5)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          lineHeight: 1.2
         }}>
-          College Scheduler
+          Generator
+        </div>
+        <div style={{
+          fontSize: '10px',
+          color: 'rgba(255,255,255,0.25)',
+          marginTop: '6px',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase'
+        }}>
+          CP-SAT Scheduler
         </div>
       </div>
 
-      {/* Nav sections */}
-      <div style={{ padding: '12px 10px', flex: 1 }}>
+      {/* Nav items */}
+      <div style={{ padding: '14px 12px', flex: 1, overflowY: 'auto' }}>
         {NAV.map(group => (
-          <div key={group.section} style={{ marginBottom: '8px' }}>
+          <div key={group.section} style={{ marginBottom: '6px' }}>
             <div style={{
-              fontSize: '10px', fontWeight: '600',
-              color: '#3a3a3a', textTransform: 'uppercase',
-              letterSpacing: '0.08em', padding: '8px 10px 4px'
+              fontSize: '9px',
+              fontWeight: '700',
+              color: 'rgba(255,255,255,0.2)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              padding: '10px 8px 4px'
             }}>
               {group.section}
             </div>
@@ -77,31 +98,39 @@ export default function Navbar() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
-                    padding: '8px 10px',
-                    borderRadius: '8px',
+                    padding: '9px 10px',
+                    borderRadius: '10px',
                     textDecoration: 'none',
                     marginBottom: '2px',
                     fontSize: '13px',
                     fontWeight: active ? '600' : '400',
-                    background: active ? '#1a1560' : 'transparent',
-                    color: active ? '#a09aff' : '#555',
-                    transition: 'all 0.15s',
-                    borderLeft: active ? '2px solid #6C63FF' : '2px solid transparent'
+                    background: active
+                      ? 'rgba(108,99,255,0.2)'
+                      : 'transparent',
+                    color: active
+                      ? '#a78bfa'
+                      : 'rgba(255,255,255,0.45)',
+                    borderLeft: active
+                      ? '3px solid #6C63FF'
+                      : '3px solid transparent',
+                    transition: 'all 0.15s'
                   }}
                   onMouseEnter={e => {
                     if (!active) {
-                      e.currentTarget.style.background = '#161616'
-                      e.currentTarget.style.color = '#888'
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                      e.currentTarget.style.color = 'rgba(255,255,255,0.75)'
                     }
                   }}
                   onMouseLeave={e => {
                     if (!active) {
                       e.currentTarget.style.background = 'transparent'
-                      e.currentTarget.style.color = '#555'
+                      e.currentTarget.style.color = 'rgba(255,255,255,0.45)'
                     }
                   }}
                 >
-                  <span style={{ fontSize: '14px' }}>{item.icon}</span>
+                  <span style={{ fontSize: '15px', width: '20px', textAlign: 'center' }}>
+                    {item.icon}
+                  </span>
                   {item.label}
                 </Link>
               )
@@ -110,14 +139,27 @@ export default function Navbar() {
         ))}
       </div>
 
-      {/* Footer */}
+      {/* Bottom badge */}
       <div style={{
-        padding: '16px 20px',
-        borderTop: '1px solid #1e1e1e',
-        fontSize: '11px',
-        color: '#2a2a2a'
+        padding: '14px 20px',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
       }}>
-        CP-SAT Solver · OR-Tools
+        <div style={{
+          width: '8px', height: '8px',
+          borderRadius: '50%',
+          background: '#4ade80',
+          boxShadow: '0 0 6px #4ade80'
+        }} />
+        <span style={{
+          fontSize: '11px',
+          color: 'rgba(255,255,255,0.25)',
+          letterSpacing: '0.04em'
+        }}>
+          OR-Tools · FastAPI · React
+        </span>
       </div>
     </div>
   )
