@@ -66,16 +66,12 @@ def add_lab_room_matching(model, assign, lab_subjects, lab_rooms):
         if s not in lab_subjects and r in lab_rooms:
             model.Add(var == 0)
 
-def add_soft_max_periods_per_day(model, assign, teachers, days, slots_by_day):
-    """S1: soft — teacher should not exceed max_periods_per_day"""
-    # Returns penalty terms to add to the objective
+# ✅ correct
+def add_soft_max_periods_per_day(model, assign, teacher_max, slots_by_day):
     penalties = []
-    for t_id, max_p in teachers.items():
+    for t_id, max_p in teacher_max.items():
         for day, day_slots in slots_by_day.items():
-            day_assigns = [
-                v for (c, s, tt, sl, r), v in assign.items()
-                if tt == t_id and sl in day_slots
-            ]
+            day_assigns = [v for (c,s,tt,sl,r),v in assign.items() if tt==t_id and sl in day_slots]
             if len(day_assigns) > max_p:
                 overflow = model.NewIntVar(0, len(day_assigns), f'overflow_t{t_id}_d{day}')
                 model.Add(overflow >= sum(day_assigns) - max_p)
