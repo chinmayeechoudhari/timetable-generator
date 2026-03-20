@@ -1,224 +1,217 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8000'
+const BASE = 'http://localhost:8000'
 
 export default function SubjectForm() {
+  const [classes, setClasses]         = useState([])
+  const [subjects, setSubjects]       = useState([])
   const [subjectName, setSubjectName] = useState('')
   const [periodsPerWeek, setPeriodsPerWeek] = useState(1)
   const [subjectType, setSubjectType] = useState('theory')
-  const [classId, setClassId] = useState('')
+  const [classId, setClassId]         = useState('')
+  const [message, setMessage]         = useState('')
+  const [error, setError]             = useState('')
 
-  const [subjects, setSubjects] = useState([])
-  const [isLoadingSubjects, setIsLoadingSubjects] = useState(false)
+  useEffect(() => { fetchAll() }, [])
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(null)
-
-  async function fetchSubjects() {
-    setIsLoadingSubjects(true)
-    setError(null)
+  async function fetchAll() {
     try {
-      const res = await axios.get(`${API_BASE_URL}/subjects`)
-      setSubjects(res.data || [])
-    } catch (err) {
-      const detail =
-        err?.response?.data?.detail ||
-        err?.response?.data?.message ||
-        err?.message ||
-        'Failed to fetch subjects'
-      setError(detail)
-    } finally {
-      setIsLoadingSubjects(false)
+      const [cRes, sRes] = await Promise.all([
+        axios.get(`${BASE}/classes`),
+        axios.get(`${BASE}/subjects`),
+      ])
+      setClasses(cRes.data)
+      setSubjects(sRes.data)
+      if (cRes.data.length > 0) setClassId(cRes.data[0].class_id)
+    } catch {
+      setError('Could not load data. Make sure the backend is running.')
     }
   }
-
-  useEffect(() => {
-    fetchSubjects()
-  }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
-
+    setMessage('')
+    setError('')
     try {
-      await axios.post(`${API_BASE_URL}/subjects`, {
-        subject_name: subjectName,
-        periods_per_week: Number(periodsPerWeek),
-        subject_type: subjectType,
-        class_id: Number(classId),
+      await axios.post(`${BASE}/subjects`, {
+        subject_name:     subjectName,
+        periods_per_week: parseInt(periodsPerWeek),
+        subject_type:     subjectType,
+        class_id:         parseInt(classId)
       })
-
+      setMessage(`Subject "${subjectName}" added successfully`)
       setSubjectName('')
       setPeriodsPerWeek(1)
-      setSubjectType('theory')
-      setClassId('')
-      await fetchSubjects()
+      fetchAll()
     } catch (err) {
-      const detail =
-        err?.response?.data?.detail ||
-        err?.response?.data?.message ||
-        err?.message ||
-        'Failed to create subject'
-      setError(detail)
-    } finally {
-      setIsSubmitting(false)
+      setError(err.response?.data?.detail || 'Error adding subject')
     }
   }
 
+  const getClassName = (id) =>
+    classes.find(c => c.class_id === id)?.class_name || `Class ${id}`
+
   return (
-    <div className="w-full max-w-4xl mx-auto mt-10 px-4 pb-10">
-      <div className="rounded-xl border border-purple-200 bg-white/80 p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">Add Subject</h2>
+    <div style={{ maxWidth: '640px' }}>
+      <h2 style={headingStyle}>Add Subject</h2>
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Subject name
-            </label>
-            <input
-              type="text"
-              value={subjectName}
-              onChange={(e) => setSubjectName(e.target.value)}
-              required
-              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200"
-              placeholder="e.g., Mathematics"
-            />
-          </div>
+      <form onSubmit={handleSubmit} style={formStyle}>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Periods per week
-            </label>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Subject name</label>
+          <input
+            value={subjectName}
+            onChange={e => setSubjectName(e.target.value)}
+            placeholder="e.g., Mathematics"
+            style={inputStyle}
+            required
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Periods per week</label>
             <input
               type="number"
+              min="1"
+              max="10"
               value={periodsPerWeek}
-              min={0}
-              step={1}
-              onChange={(e) => setPeriodsPerWeek(e.target.value)}
+              onChange={e => setPeriodsPerWeek(e.target.value)}
+              style={inputStyle}
               required
-              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Subject type
-            </label>
-            <select
-              value={subjectType}
-              onChange={(e) => setSubjectType(e.target.value)}
-              required
-              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200"
-            >
-              <option value="theory">theory</option>
-              <option value="lab">lab</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Class ID
-            </label>
-            <input
-              type="number"
-              value={classId}
-              min={1}
-              step={1}
-              onChange={(e) => setClassId(e.target.value)}
-              required
-              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200"
-              placeholder="e.g., 1"
-            />
-          </div>
-
-          {error ? (
-            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {error}
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Subject type</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {['theory', 'lab'].map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setSubjectType(type)}
+                  style={{
+                    flex: 1, padding: '10px', borderRadius: '8px',
+                    cursor: 'pointer', fontSize: '13px', fontWeight: '600',
+                    transition: 'all 0.2s',
+                    background: subjectType === type ? '#1a1560' : '#111',
+                    border: `1px solid ${subjectType === type ? '#6C63FF' : '#333'}`,
+                    color: subjectType === type ? '#a09aff' : '#666'
+                  }}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </button>
+              ))}
             </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-md bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSubmitting ? 'Creating...' : 'Create subject'}
-          </button>
-        </form>
-      </div>
-
-      <div className="mt-8">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Subjects</h3>
-          <div className="text-sm text-gray-500">
-            {isLoadingSubjects ? 'Loading...' : `${subjects.length} subjects`}
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white/80">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Class</label>
+          <select
+            value={classId}
+            onChange={e => setClassId(e.target.value)}
+            style={selectStyle}
+            required
+          >
+            <option value="">Select class</option>
+            {classes.map(c => (
+              <option key={c.class_id} value={c.class_id}>
+                {c.class_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {message && <div style={successStyle}>{message}</div>}
+        {error   && <div style={errorStyle}>{error}</div>}
+
+        <button type="submit" style={btnStyle}>Create subject</button>
+      </form>
+
+      {subjects.length > 0 && (
+        <div style={{ marginTop: '32px' }}>
+          <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>
+            {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
+          </div>
+          <table style={tableStyle}>
+            <thead>
               <tr>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Subject name
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Periods/week
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Type
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Class ID
-                </th>
+                <th style={thStyle}>Subject</th>
+                <th style={thStyle}>Type</th>
+                <th style={thStyle}>Periods/week</th>
+                <th style={thStyle}>Class</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {subjects.map((s) => (
-                <tr key={s.subject_id ?? `${s.subject_name}-${s.class_id}`}>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {s.subject_name}
+            <tbody>
+              {subjects.map(s => (
+                <tr key={s.subject_id}>
+                  <td style={tdStyle}>{s.subject_name}</td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      padding: '3px 10px', borderRadius: '10px',
+                      fontSize: '11px', fontWeight: '600',
+                      background: s.subject_type === 'lab' ? '#1a1000' : '#0d1a2b',
+                      color: s.subject_type === 'lab' ? '#FF9800' : '#42a5f5'
+                    }}>
+                      {s.subject_type}
+                    </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {s.periods_per_week}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {s.subject_type}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {s.class_id}
-                  </td>
+                  <td style={{ ...tdStyle, textAlign: 'center' }}>{s.periods_per_week}</td>
+                  <td style={tdStyle}>{getClassName(s.class_id)}</td>
                 </tr>
               ))}
-              {subjects.length === 0 && !isLoadingSubjects ? (
-                <tr>
-                  <td
-                    className="px-4 py-6 text-sm text-gray-500"
-                    colSpan="4"
-                  >
-                    No subjects found.
-                  </td>
-                </tr>
-              ) : null}
             </tbody>
           </table>
         </div>
-      </div>
+      )}
     </div>
   )
 }
 
+const headingStyle = {
+  fontSize: '20px', fontWeight: '600',
+  color: '#e0e0e0', marginBottom: '24px'
+}
+const formStyle = {
+  background: '#1a1a1a', borderRadius: '12px',
+  padding: '24px', display: 'flex',
+  flexDirection: 'column', gap: '16px'
+}
+const fieldStyle  = { display: 'flex', flexDirection: 'column', gap: '6px' }
+const labelStyle  = { fontSize: '13px', color: '#aaa', fontWeight: '500' }
+const inputStyle  = {
+  padding: '10px 12px', borderRadius: '8px',
+  border: '1px solid #333', background: '#0f0f0f',
+  color: '#e0e0e0', fontSize: '14px'
+}
+const selectStyle = {
+  padding: '10px 12px', borderRadius: '8px',
+  border: '1px solid #333', background: '#0f0f0f',
+  color: '#e0e0e0', fontSize: '14px', cursor: 'pointer'
+}
+const btnStyle = {
+  padding: '12px', borderRadius: '8px', border: 'none',
+  background: '#6C63FF', color: '#fff', fontSize: '14px',
+  fontWeight: '600', cursor: 'pointer', marginTop: '4px'
+}
+const successStyle = {
+  padding: '10px 14px', borderRadius: '8px',
+  background: '#0d2b1a', color: '#4caf7d', fontSize: '13px'
+}
+const errorStyle = {
+  padding: '10px 14px', borderRadius: '8px',
+  background: '#2b0d0d', color: '#f44336', fontSize: '13px'
+}
+const tableStyle = { width: '100%', borderCollapse: 'collapse', fontSize: '13px' }
+const thStyle = {
+  padding: '8px 12px', background: '#1a1a1a',
+  color: '#666', fontSize: '11px', fontWeight: '600',
+  textTransform: 'uppercase', textAlign: 'left',
+  border: '1px solid #222'
+}
+const tdStyle = {
+  padding: '10px 12px', border: '1px solid #1e1e1e',
+  color: '#ccc', background: '#111'
+}
