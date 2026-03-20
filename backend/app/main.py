@@ -1,6 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.teachers import router as teachers_router
+from app.api.rooms import router as rooms_router
+from app.api.classes import router as classes_router
+from app.api.subjects import router as subjects_router
+from app.api.timeslots import router as timeslots_router
+from app.api.teacher_availabilities import (
+    router as teacher_availabilities_router,
+)
+
 app = FastAPI(title="Timetable Generator API", version="1.0.0")
 
 app.add_middleware(
@@ -14,3 +23,11 @@ app.add_middleware(
 @app.get("/")
 def health_check():
     return {"status": "ok", "message": "Timetable API is running"}
+
+
+app.include_router(teachers_router)
+app.include_router(rooms_router)
+app.include_router(classes_router)
+app.include_router(subjects_router)
+app.include_router(timeslots_router)
+app.include_router(teacher_availabilities_router)
