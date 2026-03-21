@@ -11,7 +11,7 @@ from app.schemas.teacher_availability import (
     TeacherAvailabilityUpdate,
 )
 
-router = APIRouter(prefix="/teacher_availabilities", tags=["teacher_availabilities"])
+router = APIRouter(prefix="/teacher-availabilities", tags=["teacher-availabilities"])
 
 
 def _dump_payload(payload):

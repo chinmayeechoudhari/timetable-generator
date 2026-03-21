@@ -11,7 +11,7 @@ from app.schemas.teacher_subject import (
     TeacherSubjectUpdate,
 )
 
-router = APIRouter(prefix="/teacher-subjects", tags=["teacher_subjects"])
+router = APIRouter(prefix="/teacher-subjects", tags=["teacher-subjects"])
 
 
 def _dump_payload(payload):
