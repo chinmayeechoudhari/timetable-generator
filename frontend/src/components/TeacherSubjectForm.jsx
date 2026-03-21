@@ -1,21 +1,19 @@
-import * as S from '../styles/formStyles'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import * as S from '../styles/formStyles'
 
 const BASE = 'http://localhost:8000'
 
 export default function TeacherSubjectForm() {
-  const [teachers, setTeachers] = useState([])
-  const [subjects, setSubjects] = useState([])
-  const [links, setLinks]       = useState([])
+  const [teachers, setTeachers]   = useState([])
+  const [subjects, setSubjects]   = useState([])
+  const [links, setLinks]         = useState([])
   const [teacherId, setTeacherId] = useState('')
   const [subjectId, setSubjectId] = useState('')
-  const [message, setMessage]   = useState('')
-  const [error, setError]       = useState('')
+  const [message, setMessage]     = useState('')
+  const [error, setError]         = useState('')
 
-  useEffect(() => {
-    fetchAll()
-  }, [])
+  useEffect(() => { fetchAll() }, [])
 
   async function fetchAll() {
     try {
@@ -36,8 +34,7 @@ export default function TeacherSubjectForm() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setMessage('')
-    setError('')
+    setMessage(''); setError('')
     try {
       await axios.post(`${BASE}/teacher-subjects`, {
         teacher_id: parseInt(teacherId),
@@ -51,58 +48,53 @@ export default function TeacherSubjectForm() {
   }
 
   const getTeacherName = (id) =>
-    teachers.find(t => t.teacher_id === id)?.teacher_name || id
-
+    teachers.find(t => t.teacher_id === id)?.teacher_name || `Teacher ${id}`
   const getSubjectName = (id) =>
-    subjects.find(s => s.subject_id === id)?.subject_name || id
+    subjects.find(s => s.subject_id === id)?.subject_name || `Subject ${id}`
 
   return (
-    <div style={{ padding: '32px' }}>
-
+    <div style={{ padding: '48px 56px', minHeight: '100vh' }}>
       <div style={S.card}>
         <h2 style={S.heading}>Assign Subject to Teacher</h2>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div style={S.fieldWrap}>
+          <label style={S.label}>Teacher</label>
+          <select
+            value={teacherId}
+            onChange={e => setTeacherId(e.target.value)}
+            style={S.select}
+            required
+          >
+            <option value="">Select teacher</option>
+            {teachers.map(t => (
+              <option key={t.teacher_id} value={t.teacher_id}>
+                {t.teacher_name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          <div style={S.fieldWrap}>
-            <label style={S.label}>Teacher</label>
-            <select
-              value={teacherId}
-              onChange={e => setTeacherId(e.target.value)}
-              style={S.select}
-              required
-            >
-              <option value="">Select teacher</option>
-              {teachers.map(t => (
-                <option key={t.teacher_id} value={t.teacher_id}>
-                  {t.teacher_name}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div style={S.fieldWrap}>
+          <label style={S.label}>Subject</label>
+          <select
+            value={subjectId}
+            onChange={e => setSubjectId(e.target.value)}
+            style={S.select}
+            required
+          >
+            <option value="">Select subject</option>
+            {subjects.map(s => (
+              <option key={s.subject_id} value={s.subject_id}>
+                {s.subject_name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          <div style={S.fieldWrap}>
-            <label style={S.label}>Subject</label>
-            <select
-              value={subjectId}
-              onChange={e => setSubjectId(e.target.value)}
-              style={S.select}
-              required
-            >
-              <option value="">Select subject</option>
-              {subjects.map(s => (
-                <option key={s.subject_id} value={s.subject_id}>
-                  {s.subject_name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {message && <div style={S.successBox}>{message}</div>}
+        {error   && <div style={S.errorBox}>{error}</div>}
 
-          {message && <div style={S.successBox}>{message}</div>}
-          {error   && <div style={S.errorBox}>{error}</div>}
-
-          <button type="submit" style={S.btn}>Assign subject</button>
-        </form>
+        <button onClick={handleSubmit} style={S.btn}>Assign subject</button>
       </div>
 
       {links.length > 0 && (
@@ -110,7 +102,6 @@ export default function TeacherSubjectForm() {
           <div style={S.tableCount}>
             {links.length} assignment{links.length !== 1 ? 's' : ''}
           </div>
-
           <table style={S.table}>
             <thead>
               <tr>

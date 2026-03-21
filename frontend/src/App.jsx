@@ -13,20 +13,33 @@ import TimetableGrid from './components/TimetableGrid.jsx'
 export default function App() {
   return (
     <BrowserRouter>
-      <div style={{ display: 'flex' }}>
+      <div style={{
+        display: 'flex',
+        height: '100vh',
+        width: '100vw',
+        overflow: 'hidden',
+        background: '#F0F4F8',
+        fontFamily: "'Inter', 'Segoe UI', sans-serif"
+      }}>
         <Navbar />
-        <div style={{ flex: 1, padding: '24px' }}>
+        <div style={{
+          flex: 1,
+          height: '100vh',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          background: '#F0F4F8'
+        }}>
           <Routes>
-            <Route path="/" element={<TeacherForm />} />
-            <Route path="/teachers" element={<TeacherForm />} />
-            <Route path="/rooms" element={<RoomForm />} />
-            <Route path="/classes" element={<ClassForm />} />
-            <Route path="/subjects" element={<SubjectForm />} />
-            <Route path="/timeslots" element={<TimeSlotForm />} />
-            <Route path="/teacher-subjects" element={<TeacherSubjectForm />} />
+            <Route path="/"                     element={<TeacherForm />} />
+            <Route path="/teachers"             element={<TeacherForm />} />
+            <Route path="/rooms"                element={<RoomForm />} />
+            <Route path="/classes"              element={<ClassForm />} />
+            <Route path="/subjects"             element={<SubjectForm />} />
+            <Route path="/timeslots"            element={<TimeSlotForm />} />
+            <Route path="/teacher-subjects"     element={<TeacherSubjectForm />} />
             <Route path="/teacher-availability" element={<TeacherAvailabilityForm />} />
-            <Route path="/generate" element={<GenerateTimetable />} />
-            <Route path="/timetable" element={<TimetableGrid />} />
+            <Route path="/generate"             element={<GenerateTimetable />} />
+            <Route path="/timetable"            element={<TimetableGrid />} />
           </Routes>
         </div>
       </div>

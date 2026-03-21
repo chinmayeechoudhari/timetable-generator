@@ -1,18 +1,18 @@
-import * as S from '../styles/formStyles'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import * as S from '../styles/formStyles'
 
 const BASE = 'http://localhost:8000'
 
 export default function SubjectForm() {
-  const [classes, setClasses]         = useState([])
-  const [subjects, setSubjects]       = useState([])
-  const [subjectName, setSubjectName] = useState('')
+  const [classes, setClasses]               = useState([])
+  const [subjects, setSubjects]             = useState([])
+  const [subjectName, setSubjectName]       = useState('')
   const [periodsPerWeek, setPeriodsPerWeek] = useState(1)
-  const [subjectType, setSubjectType] = useState('theory')
-  const [classId, setClassId]         = useState('')
-  const [message, setMessage]         = useState('')
-  const [error, setError]             = useState('')
+  const [subjectType, setSubjectType]       = useState('theory')
+  const [classId, setClassId]               = useState('')
+  const [message, setMessage]               = useState('')
+  const [error, setError]                   = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -32,8 +32,7 @@ export default function SubjectForm() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setMessage('')
-    setError('')
+    setMessage(''); setError('')
     try {
       await axios.post(`${BASE}/subjects`, {
         subject_name:     subjectName,
@@ -54,12 +53,23 @@ export default function SubjectForm() {
     classes.find(c => c.class_id === id)?.class_name || `Class ${id}`
 
   return (
-    <div style={{ padding: '32px' }}>
-      
-      <div style={S.card}>
-        <h2 style={S.heading}>Add Subject</h2>
+    <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+      {/* Page header */}
+      <div style={{ marginBottom: '20px' }}>
+        <div style={{ fontSize: '18px', fontWeight: '700', color: '#1B2A3B' }}>
+          Subjects
+        </div>
+        <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+          Add subjects and assign them to classes with weekly period count
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        {/* Form card */}
+        <div style={S.card}>
+          <div style={S.heading}>Add Subject</div>
 
           <div style={S.fieldWrap}>
             <label style={S.label}>Subject name</label>
@@ -72,13 +82,11 @@ export default function SubjectForm() {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div style={S.fieldWrap}>
               <label style={S.label}>Periods per week</label>
               <input
-                type="number"
-                min="1"
-                max="10"
+                type="number" min="1" max="10"
                 value={periodsPerWeek}
                 onChange={e => setPeriodsPerWeek(e.target.value)}
                 style={S.input}
@@ -88,7 +96,7 @@ export default function SubjectForm() {
 
             <div style={S.fieldWrap}>
               <label style={S.label}>Subject type</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
                 {['theory', 'lab'].map(type => (
                   <button
                     key={type}
@@ -96,7 +104,7 @@ export default function SubjectForm() {
                     onClick={() => setSubjectType(type)}
                     style={subjectType === type ? S.toggleActive : S.toggleInactive}
                   >
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                    {type === 'theory' ? '📖 Theory' : '🔬 Lab'}
                   </button>
                 ))}
               </div>
@@ -123,53 +131,55 @@ export default function SubjectForm() {
           {message && <div style={S.successBox}>{message}</div>}
           {error   && <div style={S.errorBox}>{error}</div>}
 
-          <button type="submit" style={S.btn}>Create subject</button>
-        </form>
-      </div>
-
-      {subjects.length > 0 && (
-        <div style={{ ...S.tableWrap, maxWidth: '640px' }}>
-          <div style={S.tableCount}>
-            {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
-          </div>
-
-          <table style={S.table}>
-            <thead>
-              <tr>
-                <th style={S.th}>Subject</th>
-                <th style={S.th}>Type</th>
-                <th style={S.th}>Periods/week</th>
-                <th style={S.th}>Class</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subjects.map(s => (
-                <tr key={s.subject_id}>
-                  <td style={S.td}>{s.subject_name}</td>
-                  <td style={S.td}>
-                    <span style={{
-                      padding: '3px 10px',
-                      borderRadius: '10px',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      background: s.subject_type === 'lab' ? '#fff3e0' : '#e3f2fd',
-                      color: s.subject_type === 'lab' ? '#e65100' : '#1565c0'
-                    }}>
-                      {s.subject_type}
-                    </span>
-                  </td>
-                  <td style={{ ...S.td, textAlign: 'center' }}>
-                    {s.periods_per_week}
-                  </td>
-                  <td style={S.td}>
-                    {getClassName(s.class_id)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <button onClick={handleSubmit} style={S.btn}>
+            + Add Subject
+          </button>
         </div>
-      )}
+
+        {/* Table */}
+        {subjects.length > 0 && (
+          <div style={{ flex: 1, minWidth: '320px' }}>
+            <div style={S.tableCount}>
+              {subjects.length} subject{subjects.length !== 1 ? 's' : ''} added
+            </div>
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Subject</th>
+                  <th style={S.th}>Type</th>
+                  <th style={{ ...S.th, textAlign: 'center' }}>Periods/wk</th>
+                  <th style={S.th}>Class</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subjects.map(s => (
+                  <tr key={s.subject_id}>
+                    <td style={{ ...S.td, fontWeight: '600', color: '#1B2A3B' }}>
+                      {s.subject_name}
+                    </td>
+                    <td style={S.td}>
+                      <span style={{
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        background: s.subject_type === 'lab' ? '#FEF3C7' : '#EFF6FF',
+                        color: s.subject_type === 'lab' ? '#92400E' : '#1D4ED8'
+                      }}>
+                        {s.subject_type === 'lab' ? '🔬 Lab' : '📖 Theory'}
+                      </span>
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'center', fontWeight: '700', color: '#2563EB' }}>
+                      {s.periods_per_week}
+                    </td>
+                    <td style={S.td}>{getClassName(s.class_id)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

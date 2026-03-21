@@ -97,7 +97,11 @@ def delete_timeslot(slot_id: int, db: Session = Depends(get_db)) -> TimeSlotRead
         period_number=timeslot.period_number,
     )
 
+    # Clear timetable and availability rows that reference this slot
+    from app.models.models import Timetable, TeacherAvailability
+    db.query(Timetable).filter(Timetable.slot_id == slot_id).delete()
+    db.query(TeacherAvailability).filter(TeacherAvailability.slot_id == slot_id).delete()
+
     db.delete(timeslot)
     db.commit()
     return deleted
-
