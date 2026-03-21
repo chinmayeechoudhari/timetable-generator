@@ -53,73 +53,95 @@ export default function TeacherSubjectForm() {
     subjects.find(s => s.subject_id === id)?.subject_name || `Subject ${id}`
 
   return (
-    <div style={{ padding: '48px 56px', minHeight: '100vh' }}>
-      <div style={S.card}>
-        <h2 style={S.heading}>Assign Subject to Teacher</h2>
+    <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
 
-        <div style={S.fieldWrap}>
-          <label style={S.label}>Teacher</label>
-          <select
-            value={teacherId}
-            onChange={e => setTeacherId(e.target.value)}
-            style={S.select}
-            required
-          >
-            <option value="">Select teacher</option>
-            {teachers.map(t => (
-              <option key={t.teacher_id} value={t.teacher_id}>
-                {t.teacher_name}
-              </option>
-            ))}
-          </select>
+      {/* Page header */}
+      <div style={{ marginBottom: '20px' }}>
+        <div style={{ fontSize: '18px', fontWeight: '700', color: '#1B2A3B' }}>
+          Teacher Subjects
         </div>
-
-        <div style={S.fieldWrap}>
-          <label style={S.label}>Subject</label>
-          <select
-            value={subjectId}
-            onChange={e => setSubjectId(e.target.value)}
-            style={S.select}
-            required
-          >
-            <option value="">Select subject</option>
-            {subjects.map(s => (
-              <option key={s.subject_id} value={s.subject_id}>
-                {s.subject_name}
-              </option>
-            ))}
-          </select>
+        <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+          Assign which teacher teaches which subject
         </div>
-
-        {message && <div style={S.successBox}>{message}</div>}
-        {error   && <div style={S.errorBox}>{error}</div>}
-
-        <button onClick={handleSubmit} style={S.btn}>Assign subject</button>
       </div>
 
-      {links.length > 0 && (
-        <div style={{ ...S.tableWrap, maxWidth: '640px' }}>
-          <div style={S.tableCount}>
-            {links.length} assignment{links.length !== 1 ? 's' : ''}
-          </div>
-          <table style={S.table}>
-            <thead>
-              <tr>
-                <th style={S.th}>Teacher</th>
-                <th style={S.th}>Subject</th>
-              </tr>
-            </thead>
-            <tbody>
-              {links.map((l, i) => (
-                <tr key={i}>
-                  <td style={S.td}>{getTeacherName(l.teacher_id)}</td>
-                  <td style={S.td}>{getSubjectName(l.subject_id)}</td>
-                </tr>
+      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        {/* Form card */}
+        <div style={S.card}>
+          <div style={S.heading}>Assign Subject</div>
+
+          <div style={S.fieldWrap}>
+            <label style={S.label}>Teacher</label>
+            <select
+              value={teacherId}
+              onChange={e => setTeacherId(e.target.value)}
+              style={S.select}
+              required
+            >
+              <option value="">Select teacher</option>
+              {teachers.map(t => (
+                <option key={t.teacher_id} value={t.teacher_id}>
+                  {t.teacher_name}
+                </option>
               ))}
-            </tbody>
-          </table>
+            </select>
+          </div>
+
+          <div style={S.fieldWrap}>
+            <label style={S.label}>Subject</label>
+            <select
+              value={subjectId}
+              onChange={e => setSubjectId(e.target.value)}
+              style={S.select}
+              required
+            >
+              <option value="">Select subject</option>
+              {subjects.map(s => (
+                <option key={s.subject_id} value={s.subject_id}>
+                  {s.subject_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {message && <div style={S.successBox}>{message}</div>}
+          {error   && <div style={S.errorBox}>{error}</div>}
+
+          <button onClick={handleSubmit} style={S.btn}>
+            + Assign Subject
+          </button>
         </div>
-      )}
+
+        {/* Assignments table */}
+        {links.length > 0 && (
+          <div style={{ flex: 1, minWidth: '280px' }}>
+            <div style={S.tableCount}>
+              {links.length} assignment{links.length !== 1 ? 's' : ''} made
+            </div>
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Teacher</th>
+                  <th style={S.th}>Subject</th>
+                </tr>
+              </thead>
+              <tbody>
+                {links.map((l, i) => (
+                  <tr key={i}>
+                    <td style={{ ...S.td, fontWeight: '600', color: '#1B2A3B' }}>
+                      👤 {getTeacherName(l.teacher_id)}
+                    </td>
+                    <td style={S.td}>
+                      📚 {getSubjectName(l.subject_id)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

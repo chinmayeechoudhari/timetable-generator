@@ -1,18 +1,19 @@
-import * as S from '../styles/formStyles'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import * as S from '../styles/formStyles'
 
 const BASE = 'http://localhost:8000'
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 
 export default function TeacherAvailabilityForm() {
-  const [teachers, setTeachers]   = useState([])
-  const [slots, setSlots]         = useState([])
-  const [records, setRecords]     = useState([])
-  const [teacherId, setTeacherId] = useState('')
-  const [slotId, setSlotId]       = useState('')
+  const [teachers, setTeachers]       = useState([])
+  const [slots, setSlots]             = useState([])
+  const [records, setRecords]         = useState([])
+  const [teacherId, setTeacherId]     = useState('')
+  const [slotId, setSlotId]           = useState('')
   const [isAvailable, setIsAvailable] = useState('true')
-  const [message, setMessage]     = useState('')
-  const [error, setError]         = useState('')
+  const [message, setMessage]         = useState('')
+  const [error, setError]             = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -35,8 +36,7 @@ export default function TeacherAvailabilityForm() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setMessage('')
-    setError('')
+    setMessage(''); setError('')
     try {
       await axios.post(`${BASE}/teacher-availabilities`, {
         teacher_id:   parseInt(teacherId),
@@ -58,18 +58,28 @@ export default function TeacherAvailabilityForm() {
     return s ? `${s.day} — Period ${s.period_number}` : `Slot ${id}`
   }
 
-  const sortedSlots = [...slots].sort((a, b) => {
-    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-    return days.indexOf(a.day) - days.indexOf(b.day) || a.period_number - b.period_number
-  })
+  const sortedSlots = [...slots].sort((a, b) =>
+    DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || a.period_number - b.period_number
+  )
 
   return (
-    <div style={{ padding: '32px' }}>
+    <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
 
-      <div style={S.card}>
-        <h2 style={S.heading}>Set Teacher Availability</h2>
+      {/* Page header */}
+      <div style={{ marginBottom: '20px' }}>
+        <div style={{ fontSize: '18px', fontWeight: '700', color: '#1B2A3B' }}>
+          Availability
+        </div>
+        <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+          Mark slots where a teacher is unavailable — all slots available by default
+        </div>
+      </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        {/* Form card */}
+        <div style={S.card}>
+          <div style={S.heading}>Set Availability</div>
 
           <div style={S.fieldWrap}>
             <label style={S.label}>Teacher</label>
@@ -106,22 +116,32 @@ export default function TeacherAvailabilityForm() {
           </div>
 
           <div style={S.fieldWrap}>
-            <label style={S.label}>Availability</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <label style={S.label}>Status</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 type="button"
                 onClick={() => setIsAvailable('true')}
-                style={isAvailable === 'true' ? S.toggleActive : S.toggleInactive}
+                style={{
+                  ...(isAvailable === 'true' ? S.toggleActive : S.toggleInactive),
+                  flex: 1
+                }}
               >
-                Available
+                ✓ Available
               </button>
-
               <button
                 type="button"
                 onClick={() => setIsAvailable('false')}
-                style={isAvailable === 'false' ? S.toggleActive : S.toggleInactive}
+                style={{
+                  ...S.toggleInactive,
+                  flex: 1,
+                  ...(isAvailable === 'false' ? {
+                    border: '1.5px solid #DC2626',
+                    background: '#FEF2F2',
+                    color: '#DC2626'
+                  } : {})
+                }}
               >
-                Not available
+                ✗ Not available
               </button>
             </div>
           </div>
@@ -129,47 +149,63 @@ export default function TeacherAvailabilityForm() {
           {message && <div style={S.successBox}>{message}</div>}
           {error   && <div style={S.errorBox}>{error}</div>}
 
-          <button type="submit" style={S.btn}>Set availability</button>
-        </form>
-      </div>
+          <button onClick={handleSubmit} style={S.btn}>
+            Set Availability
+          </button>
 
-      {records.length > 0 && (
-        <div style={{ ...S.tableWrap, maxWidth: '640px' }}>
-          <div style={S.tableCount}>
-            {records.length} record{records.length !== 1 ? 's' : ''}
+          <div style={{
+            fontSize: '11px', color: '#64748B',
+            background: '#F8FAFC', borderRadius: '6px',
+            padding: '8px 10px', border: '1px solid #E2E8F0',
+            lineHeight: 1.5
+          }}>
+            💡 Only mark unavailable slots. The solver treats all unmarked slots as available.
           </div>
-
-          <table style={S.table}>
-            <thead>
-              <tr>
-                <th style={S.th}>Teacher</th>
-                <th style={S.th}>Time slot</th>
-                <th style={S.th}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {records.map((r, i) => (
-                <tr key={`${r.teacher_id}-${r.slot_id}`}>
-                  <td style={S.td}>{getTeacherName(r.teacher_id)}</td>
-                  <td style={S.td}>{getSlotLabel(r.slot_id)}</td>
-                  <td style={S.td}>
-                    <span style={{
-                      padding: '3px 10px',
-                      borderRadius: '10px',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      background: r.is_available ? '#e8f5e9' : '#fdecea',
-                      color: r.is_available ? '#2e7d32' : '#c62828'
-                    }}>
-                      {r.is_available ? 'Available' : 'Not available'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
-      )}
+
+        {/* Records table */}
+        {records.length > 0 && (
+          <div style={{ flex: 1, minWidth: '280px' }}>
+            <div style={S.tableCount}>
+              {records.length} record{records.length !== 1 ? 's' : ''} set
+            </div>
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Teacher</th>
+                  <th style={S.th}>Time slot</th>
+                  <th style={S.th}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {records.map((r) => (
+                  <tr key={`${r.teacher_id}-${r.slot_id}`}>
+                    <td style={{ ...S.td, fontWeight: '600', color: '#1B2A3B' }}>
+                      {getTeacherName(r.teacher_id)}
+                    </td>
+                    <td style={{ ...S.td, color: '#475569' }}>
+                      {getSlotLabel(r.slot_id)}
+                    </td>
+                    <td style={S.td}>
+                      <span style={{
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        background: r.is_available ? '#F0FDF4' : '#FEF2F2',
+                        color: r.is_available ? '#166534' : '#991B1B',
+                        border: `1px solid ${r.is_available ? '#BBF7D0' : '#FECACA'}`
+                      }}>
+                        {r.is_available ? '✓ Available' : '✗ Unavailable'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
