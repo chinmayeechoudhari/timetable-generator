@@ -132,21 +132,34 @@ export default function TimetableGrid() {
 
   const renderGrid = (fKey, fVal, showTeacher, showClass, showRoom) => (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      
+      {/* HEADER → PERIODS AS COLUMNS */}
       <thead>
         <tr style={{ background: '#F8FAFC' }}>
-          <th style={thStyle}>Period</th>
-          {activeDays.map(day => <th key={day} style={thStyle}>{day}</th>)}
+          <th style={thStyle}>Day</th>
+          {activePeriods.map(period => (
+            <th key={period} style={thStyle}>P{period}</th>
+          ))}
         </tr>
       </thead>
+  
+      {/* BODY → DAYS AS ROWS */}
       <tbody>
-        {activePeriods.map((period, pi) => (
-          <tr key={period} style={{ background: pi % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
-            <td style={periodStyle}>P{period}</td>
-            {activeDays.map(day => {
+        {activeDays.map((day, di) => (
+          <tr key={day} style={{ background: di % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
+  
+            {/* DAY LABEL */}
+            <td style={periodStyle}>{day}</td>
+  
+            {/* PERIOD CELLS */}
+            {activePeriods.map(period => {
               const entry = getCell(fKey, fVal, day, period)
-              const color = entry ? (subjectColors[entry.subject_id] || COLORS[0]) : null
+              const color = entry
+                ? (subjectColors[entry.subject_id] || COLORS[0])
+                : null
+  
               return (
-                <td key={day} style={tdStyle}>
+                <td key={period} style={tdStyle}>
                   {entry ? (
                     <div style={{
                       background: color.bg,
@@ -156,21 +169,26 @@ export default function TimetableGrid() {
                       minHeight: '52px'
                     }}>
                       <div style={{
-                        fontSize: '11px', fontWeight: '700',
-                        color: color.text, marginBottom: '3px'
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        color: color.text,
+                        marginBottom: '3px'
                       }}>
                         {subjects[entry.subject_id] || `S${entry.subject_id}`}
                       </div>
+  
                       {showTeacher && (
                         <div style={{ fontSize: '10px', color: '#475569' }}>
                           👤 {teachers[entry.teacher_id] || `T${entry.teacher_id}`}
                         </div>
                       )}
+  
                       {showClass && (
                         <div style={{ fontSize: '10px', color: '#475569' }}>
                           🏫 {classes[entry.class_id] || `C${entry.class_id}`}
                         </div>
                       )}
+  
                       {showRoom && (
                         <div style={{ fontSize: '10px', color: '#64748B' }}>
                           🚪 {rooms[entry.room_id] || `R${entry.room_id}`}
@@ -179,10 +197,15 @@ export default function TimetableGrid() {
                     </div>
                   ) : (
                     <div style={{
-                      minHeight: '52px', display: 'flex',
-                      alignItems: 'center', justifyContent: 'center',
-                      color: '#CBD5E1', fontSize: '16px'
-                    }}>—</div>
+                      minHeight: '52px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#CBD5E1',
+                      fontSize: '16px'
+                    }}>
+                      —
+                    </div>
                   )}
                 </td>
               )

@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import LandingScreen from './components/LandingScreen'
 import TeacherForm from './components/TeacherForm.jsx'
 import RoomForm from './components/RoomForm.jsx'
 import ClassForm from './components/ClassForm.jsx'
@@ -11,23 +13,33 @@ import GenerateTimetable from './components/GenerateTimetable.jsx'
 import TimetableGrid from './components/TimetableGrid.jsx'
 
 export default function App() {
+  const [enteredApp, setEnteredApp] = useState(false)
+
   return (
     <BrowserRouter>
+      {/* Landing screen sits above everything, unmounts after entry */}
+      {!enteredApp && (
+        <LandingScreen onEnter={() => setEnteredApp(true)} />
+      )}
+
+      {/* Dashboard — rendered underneath, becomes visible after landing fades */}
       <div style={{
-        display: 'flex',
-        height: '100vh',
-        width: '100vw',
-        overflow: 'hidden',
+        display:    'flex',
+        height:     '100vh',
+        width:      '100vw',
+        overflow:   'hidden',
         background: '#F0F4F8',
-        fontFamily: "'Inter', 'Segoe UI', sans-serif"
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        opacity:    enteredApp ? 1 : 0,
+        transition: 'opacity 0.4s ease',
       }}>
         <Navbar />
         <div style={{
-          flex: 1,
-          height: '100vh',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          background: '#F0F4F8'
+          flex:       1,
+          height:     '100vh',
+          overflowY:  'auto',
+          overflowX:  'hidden',
+          background: '#F0F4F8',
         }}>
           <Routes>
             <Route path="/"                     element={<TeacherForm />} />
