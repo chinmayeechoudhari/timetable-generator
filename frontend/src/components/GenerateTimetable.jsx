@@ -5,20 +5,39 @@ import { useNavigate } from 'react-router-dom'
 const BASE = 'http://localhost:8000'
 
 export default function GenerateTimetable() {
-  const [taskId, setTaskId]           = useState(null)
-  const [status, setStatus]           = useState(null)
-  const [result, setResult]           = useState(null)
-  const [error, setError]             = useState(null)
+  const [taskId, setTaskId]             = useState(null)
+  const [status, setStatus]             = useState(null)
+  const [result, setResult]             = useState(null)
+  const [error, setError]               = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [elapsed, setElapsed]         = useState(0)
-  const intervalRef                   = useRef(null)
-  const timerRef                      = useRef(null)
-  const navigate                      = useNavigate()
+  const [elapsed, setElapsed]           = useState(0)
+  const [validation, setValidation]     = useState(null)   // preflight result
+  const [validating, setValidating]     = useState(false)  // loading state
+  const [diagnosis, setDiagnosis]       = useState(null)   // post-failure diagnosis
+  const intervalRef                     = useRef(null)
+  const timerRef                        = useRef(null)
+  const navigate                        = useNavigate()
+
+  // Run preflight check on mount and after each generation attempt
+  async function runValidation() {
+    setValidating(true)
+    try {
+      const res = await axios.get(`${BASE}/validate`)
+      setValidation(res.data)
+    } catch {
+      setValidation(null)
+    } finally {
+      setValidating(false)
+    }
+  }
+
+  useEffect(() => { runValidation() }, [])
 
   async function startGenerate() {
-    setError(null); setResult(null); setStatus(null); setElapsed(0)
+    setError(null); setResult(null); setStatus(null)
+    setElapsed(0); setDiagnosis(null)
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null }
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
+    if (timerRef.current)    { clearInterval(timerRef.current);    timerRef.current = null }
     setIsGenerating(true)
     timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
     try {
@@ -38,15 +57,20 @@ export default function GenerateTimetable() {
       const s = res.data?.status
       setStatus(s)
       if (s === 'done') {
-        setResult(res.data?.result ?? null)
+        const r = res.data?.result ?? null
+        setResult(r)
+        // If solver failed, surface the diagnosis
+        if (r?.status === 'no_solution' && r?.diagnosis) {
+          setDiagnosis(r.diagnosis)
+        }
         clearInterval(intervalRef.current); intervalRef.current = null
-        clearInterval(timerRef.current); timerRef.current = null
+        clearInterval(timerRef.current);    timerRef.current = null
         setIsGenerating(false)
       }
     } catch (err) {
       setError(err?.response?.data?.detail || err?.message || 'Failed to fetch status')
       clearInterval(intervalRef.current); intervalRef.current = null
-      clearInterval(timerRef.current); timerRef.current = null
+      clearInterval(timerRef.current);    timerRef.current = null
       setIsGenerating(false)
     }
   }
@@ -60,7 +84,12 @@ export default function GenerateTimetable() {
     }
   }, [taskId])
 
-  const showRunning = isGenerating && status !== 'done'
+  const showRunning  = isGenerating && status !== 'done'
+  const solverFailed = status === 'done' && result?.status === 'no_solution'
+  const solverOk     = status === 'done' && !solverFailed
+
+  // Generate button is disabled while generating OR if validation has issues
+  const canGenerate  = !isGenerating && (validation?.ready !== false)
 
   return (
     <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
@@ -77,7 +106,7 @@ export default function GenerateTimetable() {
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
 
-        {/* Main card */}
+        {/* ── Main card ── */}
         <div style={{
           background: '#FFFFFF', borderRadius: '10px',
           padding: '24px', width: '100%', maxWidth: '520px',
@@ -96,22 +125,23 @@ export default function GenerateTimetable() {
             display: 'flex', flexDirection: 'column', gap: '8px'
           }}>
             {[
-              { label: 'Algorithm', value: 'CP-SAT (Google OR-Tools)' },
-              { label: 'Constraint type', value: 'Hard + Soft constraints' },
-              { label: 'Solver timeout', value: '60 seconds max' },
-              { label: 'Output', value: 'Saved to database automatically' },
+              { label: 'Algorithm',       value: 'CP-SAT (Google OR-Tools)' },
+              { label: 'Soft constraints', value: 'S1 max periods · S2 no consecutive · S3 even spread' },
+              { label: 'Solver timeout',  value: '60 seconds max' },
+              { label: 'Output',          value: 'Saved to database automatically' },
             ].map(row => (
               <div key={row.label} style={{
-                display: 'flex', justifyContent: 'space-between',
-                fontSize: '12px'
+                display: 'flex', justifyContent: 'space-between', fontSize: '12px'
               }}>
                 <span style={{ color: '#64748B', fontWeight: '500' }}>{row.label}</span>
-                <span style={{ color: '#1B2A3B', fontWeight: '600' }}>{row.value}</span>
+                <span style={{ color: '#1B2A3B', fontWeight: '600', textAlign: 'right', maxWidth: '280px' }}>
+                  {row.value}
+                </span>
               </div>
             ))}
           </div>
 
-          {/* Status display */}
+          {/* Running status */}
           {showRunning && (
             <div style={{
               background: '#EFF6FF', border: '1px solid #BFDBFE',
@@ -120,8 +150,7 @@ export default function GenerateTimetable() {
             }}>
               <div style={{
                 width: '10px', height: '10px', borderRadius: '50%',
-                background: '#2563EB',
-                animation: 'pulse 1s infinite'
+                background: '#2563EB', animation: 'pulse 1s infinite'
               }} />
               <div>
                 <div style={{ fontSize: '13px', fontWeight: '600', color: '#1D4ED8' }}>
@@ -134,7 +163,8 @@ export default function GenerateTimetable() {
             </div>
           )}
 
-          {status === 'done' && (
+          {/* Success */}
+          {solverOk && (
             <div style={{
               background: '#F0FDF4', border: '1px solid #BBF7D0',
               borderRadius: '8px', padding: '12px 14px'
@@ -142,17 +172,57 @@ export default function GenerateTimetable() {
               <div style={{ fontSize: '13px', fontWeight: '700', color: '#166534' }}>
                 ✓ Timetable generated successfully
               </div>
-              {result && (
-                <div style={{ fontSize: '12px', color: '#15803D', marginTop: '4px' }}>
-                  {result.entries_saved
-                    ? `${result.entries_saved} slots assigned`
-                    : 'Solver completed'}
-                  {' '}in {elapsed}s
+              <div style={{ fontSize: '12px', color: '#15803D', marginTop: '4px' }}>
+                {result?.entries_saved
+                  ? `${result.entries_saved} slots assigned`
+                  : 'Solver completed'} in {elapsed}s
+              </div>
+            </div>
+          )}
+
+          {/* Solver failed — show diagnosis */}
+          {solverFailed && (
+            <div style={{
+              background: '#FEF2F2', border: '1px solid #FECACA',
+              borderRadius: '8px', padding: '12px 14px',
+              display: 'flex', flexDirection: 'column', gap: '8px'
+            }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#991B1B' }}>
+                ✗ No solution found
+              </div>
+              {diagnosis ? (
+                <>
+                  <div style={{ fontSize: '12px', color: '#DC2626' }}>
+                    {diagnosis.summary}
+                  </div>
+                  {diagnosis.issues.map((msg, i) => (
+                    <div key={i} style={{
+                      fontSize: '12px', color: '#991B1B',
+                      background: '#FEE2E2', borderRadius: '6px',
+                      padding: '6px 10px'
+                    }}>
+                      ✗ {msg}
+                    </div>
+                  ))}
+                  {diagnosis.warnings.map((msg, i) => (
+                    <div key={i} style={{
+                      fontSize: '12px', color: '#92400E',
+                      background: '#FEF3C7', borderRadius: '6px',
+                      padding: '6px 10px'
+                    }}>
+                      ⚠ {msg}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div style={{ fontSize: '12px', color: '#DC2626' }}>
+                  Constraints may be too tight. Use the checklist on the right to diagnose.
                 </div>
               )}
             </div>
           )}
 
+          {/* General error */}
           {error && (
             <div style={{
               background: '#FEF2F2', border: '1px solid #FECACA',
@@ -161,34 +231,39 @@ export default function GenerateTimetable() {
               <div style={{ fontSize: '13px', fontWeight: '700', color: '#991B1B' }}>
                 ✗ Generation failed
               </div>
-              <div style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px' }}>
-                {error}
-              </div>
+              <div style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px' }}>{error}</div>
             </div>
           )}
 
           {/* Buttons */}
           <button
             onClick={startGenerate}
-            disabled={isGenerating}
+            disabled={!canGenerate}
+            title={validation?.ready === false ? validation.summary : ''}
             style={{
               padding: '10px 16px', borderRadius: '7px', border: 'none',
-              background: isGenerating ? '#93C5FD' : '#2563EB',
+              background: canGenerate ? '#2563EB' : '#93C5FD',
               color: '#FFFFFF', fontSize: '13px', fontWeight: '600',
-              cursor: isGenerating ? 'wait' : 'pointer', width: '100%'
+              cursor: canGenerate ? 'pointer' : 'not-allowed', width: '100%'
             }}
           >
             {isGenerating ? '⚡ Generating...' : '⚡ Generate Timetable'}
           </button>
 
-          {status === 'done' && (
+          {/* Blocked explanation */}
+          {validation?.ready === false && !isGenerating && (
+            <div style={{ fontSize: '11px', color: '#DC2626', textAlign: 'center' }}>
+              Fix the issues in the checklist before generating
+            </div>
+          )}
+
+          {solverOk && (
             <button
               onClick={() => navigate('/timetable')}
               style={{
                 padding: '10px 16px', borderRadius: '7px',
-                border: '1.5px solid #2563EB',
-                background: '#EFF6FF', color: '#1D4ED8',
-                fontSize: '13px', fontWeight: '600',
+                border: '1.5px solid #2563EB', background: '#EFF6FF',
+                color: '#1D4ED8', fontSize: '13px', fontWeight: '600',
                 cursor: 'pointer', width: '100%'
               }}
             >
@@ -197,7 +272,7 @@ export default function GenerateTimetable() {
           )}
         </div>
 
-        {/* Steps guide */}
+        {/* ── Live validation panel ── */}
         <div style={{
           flex: 1, minWidth: '240px',
           background: '#FFFFFF', borderRadius: '10px',
@@ -205,47 +280,87 @@ export default function GenerateTimetable() {
           boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
         }}>
           <div style={{
-            fontSize: '12px', fontWeight: '700', color: '#475569',
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            marginBottom: '14px'
+            display: 'flex', justifyContent: 'space-between',
+            alignItems: 'center', marginBottom: '14px'
           }}>
-            Before generating, make sure you have added:
-          </div>
-          {[
-            { icon: '👤', label: 'Teachers', path: '/teachers' },
-            { icon: '🚪', label: 'Rooms', path: '/rooms' },
-            { icon: '🏫', label: 'Classes', path: '/classes' },
-            { icon: '📚', label: 'Subjects with periods/week', path: '/subjects' },
-            { icon: '🕐', label: 'Time slots configured', path: '/timeslots' },
-            { icon: '🔗', label: 'Teacher-subject links', path: '/teacher-subjects' },
-          ].map((item, i) => (
-            <div
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '8px 10px', borderRadius: '7px',
-                cursor: 'pointer', marginBottom: '4px',
-                transition: 'background 0.12s'
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <div style={{
-                width: '24px', height: '24px', borderRadius: '6px',
-                background: '#EFF6FF', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                fontSize: '13px', flexShrink: 0
-              }}>
-                {item.icon}
-              </div>
-              <span style={{ fontSize: '12px', color: '#475569', fontWeight: '500' }}>
-                {item.label}
-              </span>
-              <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#94A3B8' }}>→</span>
+            <div style={{
+              fontSize: '12px', fontWeight: '700', color: '#475569',
+              textTransform: 'uppercase', letterSpacing: '0.06em'
+            }}>
+              Pre-generation checklist
             </div>
-          ))}
+            <button
+              onClick={runValidation}
+              disabled={validating}
+              style={{
+                fontSize: '11px', color: '#2563EB', background: 'none',
+                border: 'none', cursor: 'pointer', fontWeight: '600',
+                padding: '2px 6px'
+              }}
+            >
+              {validating ? 'Checking...' : '↻ Refresh'}
+            </button>
+          </div>
+
+          {/* Loading state */}
+          {validating && !validation && (
+            <div style={{ fontSize: '12px', color: '#94A3B8', padding: '8px 0' }}>
+              Running checks...
+            </div>
+          )}
+
+          {/* Summary badge */}
+          {validation && (
+            <>
+              <div style={{
+                fontSize: '12px', fontWeight: '600',
+                color: validation.ready ? '#166534' : '#991B1B',
+                background: validation.ready ? '#F0FDF4' : '#FEF2F2',
+                border: `1px solid ${validation.ready ? '#BBF7D0' : '#FECACA'}`,
+                borderRadius: '6px', padding: '7px 10px', marginBottom: '12px'
+              }}>
+                {validation.ready ? '✓' : '✗'} {validation.summary}
+              </div>
+
+              {/* Issues */}
+              {validation.issues.map((msg, i) => (
+                <div key={i} style={{
+                  display: 'flex', gap: '8px', alignItems: 'flex-start',
+                  padding: '7px 10px', borderRadius: '7px',
+                  marginBottom: '4px', background: '#FEF2F2'
+                }}>
+                  <span style={{ color: '#DC2626', fontSize: '13px', flexShrink: 0 }}>✗</span>
+                  <span style={{ fontSize: '12px', color: '#991B1B' }}>{msg}</span>
+                </div>
+              ))}
+
+              {/* Warnings */}
+              {validation.warnings.map((msg, i) => (
+                <div key={i} style={{
+                  display: 'flex', gap: '8px', alignItems: 'flex-start',
+                  padding: '7px 10px', borderRadius: '7px',
+                  marginBottom: '4px', background: '#FFFBEB'
+                }}>
+                  <span style={{ color: '#D97706', fontSize: '13px', flexShrink: 0 }}>⚠</span>
+                  <span style={{ fontSize: '12px', color: '#92400E' }}>{msg}</span>
+                </div>
+              ))}
+
+              {/* Passed */}
+              {validation.passed.map((msg, i) => (
+                <div key={i} style={{
+                  display: 'flex', gap: '8px', alignItems: 'flex-start',
+                  padding: '7px 10px', borderRadius: '7px',
+                  marginBottom: '4px', background: '#F0FDF4'
+                }}>
+                  <span style={{ color: '#16A34A', fontSize: '13px', flexShrink: 0 }}>✓</span>
+                  <span style={{ fontSize: '12px', color: '#166534' }}>{msg}</span>
+                </div>
+              ))}
+            </>
+          )}
         </div>
+
       </div>
     </div>
   )
