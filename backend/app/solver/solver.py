@@ -9,6 +9,8 @@ from app.solver.constraints import (
     add_teacher_availability,
     add_lab_room_matching,
     add_soft_max_periods_per_day,
+    add_soft_no_consecutive_periods,
+    add_soft_even_distribution,
 )
 from app.solver.solution_parser import parse_and_save_solution, solution_to_dict
 
@@ -43,12 +45,27 @@ def build_and_solve(db: Session) -> dict:
     add_lab_room_matching(model, assign,
         data['lab_subjects'], data['lab_rooms'])
 
-    # --- Soft constraints (penalties) ---
-    penalties = add_soft_max_periods_per_day(
+   
+   # --- Soft constraints (penalties) ---
+    penalties = []
+
+    penalties += add_soft_max_periods_per_day(
         model, assign,
         data['teacher_max_periods'],
         data['slots_by_day']
     )
+    penalties += add_soft_no_consecutive_periods(
+        model, assign,
+        data['teacher_ids'],
+        data['slots_by_day']
+    )
+    penalties += add_soft_even_distribution(
+        model, assign,
+        data['subject_periods'],
+        data['subject_map'],
+        data['slots_by_day']
+    )
+
     if penalties:
         model.Minimize(sum(penalties))
 

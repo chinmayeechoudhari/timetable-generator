@@ -37,8 +37,12 @@ def load_solver_data(db: Session) -> dict:
 def _group_slots_by_day(slots) -> dict:
     result = {}
     for s in slots:
-        result.setdefault(s.day, []).append(s.slot_id)
-    return result
+        result.setdefault(s.day, []).append(s)   # store full slot object
+    # Sort each day's slots by period_number, then extract just the IDs
+    return {
+        day: [s.slot_id for s in sorted(day_slots, key=lambda s: s.period_number)]
+        for day, day_slots in result.items()
+    }
 
 def _build_teacher_subject_map(ts_links) -> dict:
     result = {}

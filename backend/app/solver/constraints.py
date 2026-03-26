@@ -77,3 +77,76 @@ def add_soft_max_periods_per_day(model, assign, teacher_max, slots_by_day):
                 model.Add(overflow >= sum(day_assigns) - max_p)
                 penalties.append(overflow)
     return penalties
+
+def add_soft_no_consecutive_periods(model, assign, teacher_ids, slots_by_day):
+    """S2: soft penalty when a teacher is assigned back-to-back periods on the same day"""
+    penalties = []
+    for t_id in teacher_ids:
+        for day, day_slots in slots_by_day.items():
+            # day_slots is a list of slot_ids — sort them by period number order
+            # We assume slots_by_day gives slots in period order (1,2,3...)
+            sorted_slots = list(day_slots)  # already ordered from data_loader
+            for i in range(len(sorted_slots) - 1):
+                slot_a = sorted_slots[i]
+                slot_b = sorted_slots[i + 1]  # next consecutive period
+
+                assigns_a = [v for (c, s, tt, sl, r), v in assign.items()
+                             if tt == t_id and sl == slot_a]
+                assigns_b = [v for (c, s, tt, sl, r), v in assign.items()
+                             if tt == t_id and sl == slot_b]
+
+                if not assigns_a or not assigns_b:
+                    continue
+
+                # consecutive_flag = 1 if teacher is assigned in BOTH periods
+                consecutive_flag = model.NewBoolVar(
+                    f'consec_t{t_id}_d{day}_p{i}'
+                )
+                # If sum of assigns_a >= 1 AND sum of assigns_b >= 1,
+                # we want consecutive_flag = 1
+                # We use a simple linearisation:
+                # consecutive_flag <= sum(assigns_a)
+                # consecutive_flag <= sum(assigns_b)
+                # consecutive_flag >= sum(assigns_a) + sum(assigns_b) - 1
+                model.Add(sum(assigns_a) >= 1).OnlyEnforceIf(consecutive_flag)
+                model.Add(sum(assigns_b) >= 1).OnlyEnforceIf(consecutive_flag)
+                model.Add(consecutive_flag == 0).OnlyEnforceIf(consecutive_flag.Not())
+
+                penalties.append(consecutive_flag)
+    return penalties
+
+
+def add_soft_even_distribution(model, assign, subject_periods, subject_class_map, slots_by_day):
+    """S3: soft penalty when a subject's periods are bunched on fewer days than possible"""
+    penalties = []
+    all_days = list(slots_by_day.keys())
+
+    for s_id, needed in subject_periods.items():
+        c_id = subject_class_map[s_id]
+        # ideal = spread across as many days as possible (capped at needed)
+        ideal_days = min(needed, len(all_days))
+
+        # For each day, create a BoolVar: was this subject assigned on this day?
+        day_used_vars = []
+        for day, day_slots in slots_by_day.items():
+            day_assigns = [v for (c, s, t, sl, r), v in assign.items()
+                           if c == c_id and s == s_id and sl in day_slots]
+            if not day_assigns:
+                continue
+
+            day_used = model.NewBoolVar(f'dayused_s{s_id}_d{day}')
+            # day_used = 1 if any assignment on this day
+            model.Add(sum(day_assigns) >= 1).OnlyEnforceIf(day_used)
+            model.Add(sum(day_assigns) == 0).OnlyEnforceIf(day_used.Not())
+            day_used_vars.append(day_used)
+
+        if not day_used_vars:
+            continue
+
+        # bunching_penalty = ideal_days - actual days used (>=0)
+        # We want to minimize this — 0 means perfectly spread
+        bunching = model.NewIntVar(0, ideal_days, f'bunch_s{s_id}')
+        model.Add(bunching >= ideal_days - sum(day_used_vars))
+        penalties.append(bunching)
+
+    return penalties
