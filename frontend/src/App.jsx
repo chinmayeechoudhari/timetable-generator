@@ -26,7 +26,7 @@ export default function App() {
       <div style={{
         display:    'flex',
         height:     '100vh',
-        width:      '100vw',
+        width:      '100%',
         overflow:   'hidden',
         background: '#F0F4F8',
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
