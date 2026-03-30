@@ -5,14 +5,15 @@ import * as S from '../styles/formStyles'
 const BASE = 'http://localhost:8000'
 
 export default function SubjectForm() {
-  const [classes, setClasses]               = useState([])
-  const [subjects, setSubjects]             = useState([])
+  const [classes, setClasses]                 = useState([])
+  const [subjects, setSubjects]               = useState([])
   const [selectedClassId, setSelectedClassId] = useState('')
-  const [subjectName, setSubjectName]       = useState('')
-  const [periodsPerWeek, setPeriodsPerWeek] = useState(1)
-  const [subjectType, setSubjectType]       = useState('theory')
-  const [message, setMessage]               = useState('')
-  const [error, setError]                   = useState('')
+  const [subjectName, setSubjectName]         = useState('')
+  const [selectedTypes, setSelectedTypes]     = useState({ theory: true, lab: false })
+  const [theoryPeriods, setTheoryPeriods]     = useState(1)
+  const [labPeriods, setLabPeriods]           = useState(1)
+  const [message, setMessage]                 = useState('')
+  const [error, setError]                     = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -29,21 +30,44 @@ export default function SubjectForm() {
     }
   }
 
+  function toggleType(type) {
+    setSelectedTypes(prev => {
+      const next = { ...prev, [type]: !prev[type] }
+      // at least one must stay selected
+      if (!next.theory && !next.lab) return prev
+      return next
+    })
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!selectedClassId) return
+    if (!selectedClassId || !subjectName.trim()) return
     setMessage(''); setError('')
+
+    // Build list of entries to post: 1 or 2 depending on selection
+    const entries = []
+    if (selectedTypes.theory) entries.push({ subject_type: 'theory', periods_per_week: parseInt(theoryPeriods) })
+    if (selectedTypes.lab)    entries.push({ subject_type: 'lab',    periods_per_week: parseInt(labPeriods) })
+
     try {
-      await axios.post(`${BASE}/subjects`, {
-        subject_name:     subjectName,
-        periods_per_week: parseInt(periodsPerWeek),
-        subject_type:     subjectType,
-        class_id:         parseInt(selectedClassId)
-      })
-      setMessage(`Subject "${subjectName}" added to ${getClassName(parseInt(selectedClassId))}`)
+      for (const entry of entries) {
+        await axios.post(`${BASE}/subjects`, {
+          subject_name:     subjectName.trim(),
+          periods_per_week: entry.periods_per_week,
+          subject_type:     entry.subject_type,
+          class_id:         parseInt(selectedClassId)
+        })
+      }
+      const both = selectedTypes.theory && selectedTypes.lab
+      setMessage(
+        both
+          ? `"${subjectName}" added as Theory + Lab to ${getClassName(parseInt(selectedClassId))}`
+          : `"${subjectName}" added to ${getClassName(parseInt(selectedClassId))}`
+      )
       setSubjectName('')
-      setPeriodsPerWeek(1)
-      setSubjectType('theory')
+      setTheoryPeriods(1)
+      setLabPeriods(1)
+      setSelectedTypes({ theory: true, lab: false })
       fetchAll()
     } catch (err) {
       setError(err.response?.data?.detail || 'Error adding subject')
@@ -53,8 +77,9 @@ export default function SubjectForm() {
   function handleClassSwitch(id) {
     setSelectedClassId(id)
     setSubjectName('')
-    setPeriodsPerWeek(1)
-    setSubjectType('theory')
+    setTheoryPeriods(1)
+    setLabPeriods(1)
+    setSelectedTypes({ theory: true, lab: false })
     setMessage('')
     setError('')
   }
@@ -66,7 +91,10 @@ export default function SubjectForm() {
     ? subjects.filter(s => s.class_id === parseInt(selectedClassId))
     : []
 
-  const hasClass = !!selectedClassId
+  const hasClass  = !!selectedClassId
+  const bothTypes = selectedTypes.theory && selectedTypes.lab
+  const canSubmit = hasClass && subjectName.trim() &&
+                    (selectedTypes.theory || selectedTypes.lab)
 
   return (
     <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
@@ -79,7 +107,7 @@ export default function SubjectForm() {
         </div>
       </div>
 
-      {/* ── Step 1: Class selector ── */}
+      {/* ── Class selector ── */}
       <div style={{
         background: '#FFFFFF', borderRadius: '10px',
         padding: '16px 20px', marginBottom: '20px',
@@ -94,11 +122,10 @@ export default function SubjectForm() {
           value={selectedClassId}
           onChange={e => handleClassSwitch(e.target.value)}
           style={{
-            ...S.select,
-            maxWidth: '220px',
-            fontWeight: selectedClassId ? '700' : '400',
+            ...S.select, maxWidth: '220px',
+            fontWeight:  selectedClassId ? '700'     : '400',
             borderColor: selectedClassId ? '#2563EB' : '#CBD5E1',
-            color: selectedClassId ? '#1D4ED8' : '#94A3B8',
+            color:       selectedClassId ? '#1D4ED8' : '#94A3B8',
           }}
         >
           <option value="">— Select a class —</option>
@@ -107,19 +134,17 @@ export default function SubjectForm() {
           ))}
         </select>
 
-        {/* Subject count badge */}
         {hasClass && (
           <div style={{
             fontSize: '12px', fontWeight: '600',
             background: filteredSubjects.length > 0 ? '#EFF6FF' : '#F8FAFC',
-            color: filteredSubjects.length > 0 ? '#1D4ED8' : '#94A3B8',
-            border: `1px solid ${filteredSubjects.length > 0 ? '#BFDBFE' : '#E2E8F0'}`,
+            color:      filteredSubjects.length > 0 ? '#1D4ED8' : '#94A3B8',
+            border:     `1px solid ${filteredSubjects.length > 0 ? '#BFDBFE' : '#E2E8F0'}`,
             borderRadius: '20px', padding: '3px 12px',
           }}>
             {filteredSubjects.length} subject{filteredSubjects.length !== 1 ? 's' : ''}
           </div>
         )}
-
         {!hasClass && (
           <div style={{ fontSize: '12px', color: '#F59E0B', fontWeight: '500' }}>
             ➡️ Please select a class to manage subjects
@@ -129,26 +154,14 @@ export default function SubjectForm() {
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
 
-        {/* ── Step 2: Add Subject form ── */}
+        {/* ── Add Subject form ── */}
         <div style={{
           ...S.card,
-          opacity: hasClass ? 1 : 0.5,
-          transition: 'opacity 0.2s ease',
+          opacity:       hasClass ? 1 : 0.5,
+          transition:    'opacity 0.2s ease',
           pointerEvents: hasClass ? 'auto' : 'none',
-          position: 'relative'
+          position:      'relative'
         }}>
-          {/* Disabled overlay label */}
-          {!hasClass && (
-            <div style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              borderRadius: '10px', zIndex: 1,
-              fontSize: '13px', fontWeight: '600', color: '#64748B'
-            }}>
-              
-            </div>
-          )}
-
           <div style={{
             display: 'flex', alignItems: 'center',
             justifyContent: 'space-between', marginBottom: '4px'
@@ -166,44 +179,120 @@ export default function SubjectForm() {
             )}
           </div>
 
+          {/* Subject name */}
           <div style={S.fieldWrap}>
             <label style={S.label}>Subject name</label>
             <input
               value={subjectName}
               onChange={e => setSubjectName(e.target.value)}
-              placeholder="e.g., Mathematics"
+              placeholder="e.g., Programming"
               style={S.input}
               required
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div style={S.fieldWrap}>
-              <label style={S.label}>Periods per week</label>
-              <input
-                type="number" min="1" max="10"
-                value={periodsPerWeek}
-                onChange={e => setPeriodsPerWeek(e.target.value)}
-                style={S.input}
-                required
-              />
+          {/* Type checkboxes */}
+          <div style={S.fieldWrap}>
+            <label style={S.label}>Subject type</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {[
+                { key: 'theory', icon: '📖', label: 'Theory' },
+                { key: 'lab',    icon: '🔬', label: 'Lab'    },
+              ].map(({ key, icon, label }) => {
+                const active = selectedTypes[key]
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleType(key)}
+                    style={{
+                      display:        'flex',
+                      alignItems:     'center',
+                      gap:            '6px',
+                      padding:        '7px 14px',
+                      borderRadius:   '7px',
+                      border:         `1.5px solid ${active ? '#2563EB' : '#E2E8F0'}`,
+                      background:     active ? '#EFF6FF' : '#F8FAFC',
+                      color:          active ? '#1D4ED8' : '#94A3B8',
+                      fontWeight:     active ? '600'     : '500',
+                      fontSize:       '12px',
+                      cursor:         'pointer',
+                      transition:     'all 0.15s ease',
+                    }}
+                  >
+                    {/* Checkbox indicator */}
+                    <div style={{
+                      width:        '14px', height: '14px',
+                      borderRadius: '3px',
+                      border:       `1.5px solid ${active ? '#2563EB' : '#CBD5E1'}`,
+                      background:   active ? '#2563EB' : '#FFFFFF',
+                      display:      'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize:     '9px', color: '#FFFFFF', flexShrink: 0,
+                    }}>
+                      {active ? '✓' : ''}
+                    </div>
+                    {icon} {label}
+                  </button>
+                )
+              })}
             </div>
 
-            <div style={S.fieldWrap}>
-              <label style={S.label}>Subject type</label>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {['theory', 'lab'].map(type => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => setSubjectType(type)}
-                    style={subjectType === type ? S.toggleActive : S.toggleInactive}
-                  >
-                    {type === 'theory' ? '📖 Theory' : '🔬 Lab'}
-                  </button>
-                ))}
+            {/* Both selected badge */}
+            {bothTypes && (
+              <div style={{
+                marginTop:    '8px',
+                fontSize:     '11px', fontWeight: '600',
+                background:   '#F0FDF4', color: '#166534',
+                border:       '1px solid #BBF7D0',
+                borderRadius: '6px', padding: '4px 10px',
+                display:      'inline-block'
+              }}>
+                ✓ Will create 2 entries: Theory + Lab
               </div>
-            </div>
+            )}
+          </div>
+
+          {/* Period inputs — conditional on type selection */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: bothTypes ? '1fr 1fr' : '1fr',
+            gap: '12px'
+          }}>
+            {selectedTypes.theory && (
+              <div style={S.fieldWrap}>
+                <label style={S.label}>
+                  {bothTypes ? 'Theory periods/wk' : 'Periods per week'}
+                </label>
+                <input
+                  type="number" min="1" max="10"
+                  value={theoryPeriods}
+                  onChange={e => setTheoryPeriods(e.target.value)}
+                  style={{
+                    ...S.input,
+                    borderColor: '#2563EB',
+                    background:  '#EFF6FF',
+                  }}
+                  required
+                />
+              </div>
+            )}
+            {selectedTypes.lab && (
+              <div style={S.fieldWrap}>
+                <label style={S.label}>
+                  {bothTypes ? 'Lab periods/wk' : 'Periods per week'}
+                </label>
+                <input
+                  type="number" min="1" max="10"
+                  value={labPeriods}
+                  onChange={e => setLabPeriods(e.target.value)}
+                  style={{
+                    ...S.input,
+                    borderColor: '#D97706',
+                    background:  '#FFFBEB',
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {message && <div style={S.successBox}>{message}</div>}
@@ -211,18 +300,18 @@ export default function SubjectForm() {
 
           <button
             onClick={handleSubmit}
-            disabled={!hasClass || !subjectName.trim()}
+            disabled={!canSubmit}
             style={{
               ...S.btn,
-              opacity: (!hasClass || !subjectName.trim()) ? 0.5 : 1,
-              cursor:  (!hasClass || !subjectName.trim()) ? 'not-allowed' : 'pointer',
+              opacity: canSubmit ? 1 : 0.5,
+              cursor:  canSubmit ? 'pointer' : 'not-allowed',
             }}
           >
-            + Add Subject
+            + Add Subject{bothTypes ? ' (Theory + Lab)' : ''}
           </button>
         </div>
 
-        {/* ── Step 3: Filtered subject table ── */}
+        {/* ── Filtered subject table ── */}
         <div style={{ flex: 1, minWidth: '320px' }}>
           {!hasClass ? (
             <div style={{
@@ -274,8 +363,8 @@ export default function SubjectForm() {
                       </td>
                       <td style={S.td}>
                         <span style={{
-                          padding: '3px 10px', borderRadius: '20px',
-                          fontSize: '11px', fontWeight: '600',
+                          padding:    '3px 10px', borderRadius: '20px',
+                          fontSize:   '11px', fontWeight: '600',
                           background: s.subject_type === 'lab' ? '#FEF3C7' : '#EFF6FF',
                           color:      s.subject_type === 'lab' ? '#92400E' : '#1D4ED8'
                         }}>
