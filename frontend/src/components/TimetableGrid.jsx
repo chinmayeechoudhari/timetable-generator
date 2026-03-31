@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
+import SubjectTypeBadge from './SubjectTypeBadge'
 
 const BASE = 'http://localhost:8000'
-const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-const PERIODS = [1,2,3,4,5,6,7,8]
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8]
+
 
 const COLORS = [
   { bg: '#EFF6FF', border: '#2563EB', text: '#1D4ED8' },
@@ -17,19 +19,20 @@ const COLORS = [
 ]
 
 export default function TimetableGrid() {
-  const [timetable, setTimetable]         = useState([])
-  const [teachers, setTeachers]           = useState({})
-  const [subjects, setSubjects]           = useState({})
-  const [rooms, setRooms]                 = useState({})
-  const [classes, setClasses]             = useState({})
+  const [timetable, setTimetable] = useState([])
+  const [teachers, setTeachers] = useState({})
+  const [subjects, setSubjects] = useState({})
+  const [rooms, setRooms] = useState({})
+  const [classes, setClasses] = useState({})
   const [subjectColors, setSubjectColors] = useState({})
-  const [allClasses, setAllClasses]       = useState([])
-  const [allTeachers, setAllTeachers]     = useState([])
-  const [allRooms, setAllRooms]           = useState([])
-  const [slots, setSlots]                 = useState([])
-  const [view, setView]                   = useState('class')
-  const [selected, setSelected]           = useState(null)
-  const [loading, setLoading]             = useState(true)
+  const [allClasses, setAllClasses] = useState([])
+  const [allTeachers, setAllTeachers] = useState([])
+  const [allRooms, setAllRooms] = useState([])
+  const [slots, setSlots] = useState([])
+  const [view, setView] = useState('class')
+  const [selected, setSelected] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [subjectsList, setSubjectsList] = useState([])
 
   useEffect(() => { fetchAll() }, [])
 
@@ -45,9 +48,10 @@ export default function TimetableGrid() {
       ])
       const teacherMap = {}; tRes.data.forEach(t => { teacherMap[t.teacher_id] = t.teacher_name })
       const subjectMap = {}; sRes.data.forEach(s => { subjectMap[s.subject_id] = s.subject_name })
-      const roomMap    = {}; rRes.data.forEach(r => { roomMap[r.room_id] = r.room_number })
-      const classMap   = {}; cRes.data.forEach(c => { classMap[c.class_id] = c.class_name })
-      const colors     = {}; sRes.data.forEach((s, i) => { colors[s.subject_id] = COLORS[i % COLORS.length] })
+      setSubjectsList(sRes.data)
+      const roomMap = {}; rRes.data.forEach(r => { roomMap[r.room_id] = r.room_number })
+      const classMap = {}; cRes.data.forEach(c => { classMap[c.class_id] = c.class_name })
+      const colors = {}; sRes.data.forEach((s, i) => { colors[s.subject_id] = COLORS[i % COLORS.length] })
 
       setTimetable(ttRes.data); setTeachers(teacherMap); setSubjects(subjectMap)
       setRooms(roomMap); setClasses(classMap); setSubjectColors(colors)
@@ -71,27 +75,27 @@ export default function TimetableGrid() {
 
   const switchView = (v) => {
     setView(v)
-    if (v === 'class'   && allClasses.length > 0)  setSelected(allClasses[0].class_id)
+    if (v === 'class' && allClasses.length > 0) setSelected(allClasses[0].class_id)
     if (v === 'teacher' && allTeachers.length > 0) setSelected(allTeachers[0].teacher_id)
-    if (v === 'room'    && allRooms.length > 0)    setSelected(allRooms[0].room_id)
+    if (v === 'room' && allRooms.length > 0) setSelected(allRooms[0].room_id)
   }
 
   const filterOptions = () => {
-    if (view === 'class')   return allClasses.map(c  => ({ id: c.class_id,   label: c.class_name }))
+    if (view === 'class') return allClasses.map(c => ({ id: c.class_id, label: c.class_name }))
     if (view === 'teacher') return allTeachers.map(t => ({ id: t.teacher_id, label: t.teacher_name }))
-    if (view === 'room')    return allRooms.map(r    => ({ id: r.room_id,    label: r.room_number }))
+    if (view === 'room') return allRooms.map(r => ({ id: r.room_id, label: r.room_number }))
     return []
   }
 
   const getSelectedLabel = () => {
-    if (view === 'class')   return classes[selected]  || ''
+    if (view === 'class') return classes[selected] || ''
     if (view === 'teacher') return teachers[selected] || ''
-    if (view === 'room')    return rooms[selected]    || ''
+    if (view === 'room') return rooms[selected] || ''
     return ''
   }
 
-  const filterKey     = view === 'class' ? 'class_id' : view === 'teacher' ? 'teacher_id' : 'room_id'
-  const activeDays    = DAYS.filter(day => slots.some(s => s.day === day))
+  const filterKey = view === 'class' ? 'class_id' : view === 'teacher' ? 'teacher_id' : 'room_id'
+  const activeDays = DAYS.filter(day => slots.some(s => s.day === day))
   const activePeriods = PERIODS.filter(p => slots.some(s => s.period_number === p))
 
   function handleExport() {
@@ -131,8 +135,8 @@ export default function TimetableGrid() {
   }
 
   const renderGrid = (fKey, fVal, showTeacher, showClass, showRoom) => (
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-      
+    <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+
       {/* HEADER → PERIODS AS COLUMNS */}
       <thead>
         <tr style={{ background: '#F8FAFC' }}>
@@ -142,22 +146,22 @@ export default function TimetableGrid() {
           ))}
         </tr>
       </thead>
-  
+
       {/* BODY → DAYS AS ROWS */}
       <tbody>
         {activeDays.map((day, di) => (
           <tr key={day} style={{ background: di % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
-  
+
             {/* DAY LABEL */}
             <td style={periodStyle}>{day}</td>
-  
+
             {/* PERIOD CELLS */}
             {activePeriods.map(period => {
               const entry = getCell(fKey, fVal, day, period)
               const color = entry
                 ? (subjectColors[entry.subject_id] || COLORS[0])
                 : null
-  
+
               return (
                 <td key={period} style={tdStyle}>
                   {entry ? (
@@ -165,30 +169,25 @@ export default function TimetableGrid() {
                       background: color.bg,
                       borderLeft: `3px solid ${color.border}`,
                       borderRadius: '5px',
-                      padding: '6px 8px',
-                      minHeight: '52px'
+                      padding: '4px 5px',
+                      minHeight: '44px'
                     }}>
-                      <div style={{
-                        fontSize: '11px',
-                        fontWeight: '700',
-                        color: color.text,
-                        marginBottom: '3px'
-                      }}>
-                        {subjects[entry.subject_id] || `S${entry.subject_id}`}
-                      </div>
-  
+                     <SubjectTypeBadge
+  name={subjects[entry.subject_id] || `S${entry.subject_id}`}
+  type={subjectsList.find(s => s.subject_id === entry.subject_id)?.subject_type}
+/>
                       {showTeacher && (
                         <div style={{ fontSize: '10px', color: '#475569' }}>
                           👤 {teachers[entry.teacher_id] || `T${entry.teacher_id}`}
                         </div>
                       )}
-  
+
                       {showClass && (
                         <div style={{ fontSize: '10px', color: '#475569' }}>
                           🏫 {classes[entry.class_id] || `C${entry.class_id}`}
                         </div>
                       )}
-  
+
                       {showRoom && (
                         <div style={{ fontSize: '10px', color: '#64748B' }}>
                           🚪 {rooms[entry.room_id] || `R${entry.room_id}`}
@@ -276,9 +275,9 @@ export default function TimetableGrid() {
         padding: '3px', marginBottom: '14px'
       }}>
         {[
-          { key: 'class',   label: 'Class-wise' },
+          { key: 'class', label: 'Class-wise' },
           { key: 'teacher', label: 'Teacher-wise' },
-          { key: 'room',    label: 'Room-wise' }
+          { key: 'room', label: 'Room-wise' }
         ].map(v => (
           <button key={v.key} onClick={() => switchView(v.key)} style={{
             padding: '7px 16px', borderRadius: '6px', border: 'none',
@@ -350,32 +349,44 @@ export default function TimetableGrid() {
 
       {/* Legend */}
       <div className="no-print" style={{
-        marginTop: '16px', display: 'flex',
-        gap: '8px', flexWrap: 'wrap', alignItems: 'center'
+        marginTop: '16px',
+        display: 'flex',
+        gap: '8px',
+        flexWrap: 'wrap',
+        alignItems: 'center'
       }}>
         <span style={{
-          fontSize: '10px', color: '#94A3B8',
-          fontWeight: '700', textTransform: 'uppercase',
+          fontSize: '10px',
+          color: '#94A3B8',
+          fontWeight: '700',
+          textTransform: 'uppercase',
           letterSpacing: '0.06em'
         }}>
           Subjects
         </span>
-        {Object.entries(subjects).map(([id, name]) => {
-          const color = subjectColors[parseInt(id)] || COLORS[0]
+
+        {subjectsList.map(s => {
+          const color = subjectColors[s.subject_id] || COLORS[0]
           return (
-            <div key={id} style={{
-              display: 'flex', alignItems: 'center', gap: '5px',
+            <div key={s.subject_id} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
               background: color.bg,
               border: `1px solid ${color.border}`,
-              borderRadius: '20px', padding: '3px 10px'
+              borderRadius: '20px',
+              padding: '3px 10px'
             }}>
               <div style={{
-                width: '6px', height: '6px',
-                borderRadius: '50%', background: color.border
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: color.border
               }} />
-              <span style={{
-                fontSize: '11px', fontWeight: '600', color: color.text
-              }}>{name}</span>
+              <SubjectTypeBadge
+                name={s.subject_name}
+                type={s.subject_type}
+              />
             </div>
           )
         })}
@@ -393,8 +404,10 @@ const thStyle = {
 }
 
 const tdStyle = {
-  padding: '4px', border: '1px solid #F1F5F9',
-  verticalAlign: 'top', minWidth: '110px'
+  padding: '3px',
+  border: '1px solid #F1F5F9',
+  verticalAlign: 'top',
+  width: 'auto'
 }
 
 const periodStyle = {

@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import * as S from '../styles/formStyles'
+import SubjectTypeBadge from './SubjectTypeBadge'
 
 const BASE = 'http://localhost:8000'
 
 export default function SubjectForm() {
-  const [classes, setClasses]                 = useState([])
-  const [subjects, setSubjects]               = useState([])
+  const [classes, setClasses] = useState([])
+  const [subjects, setSubjects] = useState([])
   const [selectedClassId, setSelectedClassId] = useState('')
-  const [subjectName, setSubjectName]         = useState('')
-  const [selectedTypes, setSelectedTypes]     = useState({ theory: true, lab: false })
-  const [theoryPeriods, setTheoryPeriods]     = useState(1)
-  const [labPeriods, setLabPeriods]           = useState(1)
-  const [message, setMessage]                 = useState('')
-  const [error, setError]                     = useState('')
+  const [subjectName, setSubjectName] = useState('')
+  const [selectedTypes, setSelectedTypes] = useState({ theory: true, lab: false })
+  const [theoryPeriods, setTheoryPeriods] = useState(1)
+  const [labPeriods, setLabPeriods] = useState(1)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -47,15 +48,15 @@ export default function SubjectForm() {
     // Build list of entries to post: 1 or 2 depending on selection
     const entries = []
     if (selectedTypes.theory) entries.push({ subject_type: 'theory', periods_per_week: parseInt(theoryPeriods) })
-    if (selectedTypes.lab)    entries.push({ subject_type: 'lab',    periods_per_week: parseInt(labPeriods) })
+    if (selectedTypes.lab) entries.push({ subject_type: 'lab', periods_per_week: parseInt(labPeriods) })
 
     try {
       for (const entry of entries) {
         await axios.post(`${BASE}/subjects`, {
-          subject_name:     subjectName.trim(),
+          subject_name: subjectName.trim(),
           periods_per_week: entry.periods_per_week,
-          subject_type:     entry.subject_type,
-          class_id:         parseInt(selectedClassId)
+          subject_type: entry.subject_type,
+          class_id: parseInt(selectedClassId)
         })
       }
       const both = selectedTypes.theory && selectedTypes.lab
@@ -91,10 +92,10 @@ export default function SubjectForm() {
     ? subjects.filter(s => s.class_id === parseInt(selectedClassId))
     : []
 
-  const hasClass  = !!selectedClassId
+  const hasClass = !!selectedClassId
   const bothTypes = selectedTypes.theory && selectedTypes.lab
   const canSubmit = hasClass && subjectName.trim() &&
-                    (selectedTypes.theory || selectedTypes.lab)
+    (selectedTypes.theory || selectedTypes.lab)
 
   return (
     <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
@@ -123,9 +124,9 @@ export default function SubjectForm() {
           onChange={e => handleClassSwitch(e.target.value)}
           style={{
             ...S.select, maxWidth: '220px',
-            fontWeight:  selectedClassId ? '700'     : '400',
+            fontWeight: selectedClassId ? '700' : '400',
             borderColor: selectedClassId ? '#2563EB' : '#CBD5E1',
-            color:       selectedClassId ? '#1D4ED8' : '#94A3B8',
+            color: selectedClassId ? '#1D4ED8' : '#94A3B8',
           }}
         >
           <option value="">— Select a class —</option>
@@ -138,8 +139,8 @@ export default function SubjectForm() {
           <div style={{
             fontSize: '12px', fontWeight: '600',
             background: filteredSubjects.length > 0 ? '#EFF6FF' : '#F8FAFC',
-            color:      filteredSubjects.length > 0 ? '#1D4ED8' : '#94A3B8',
-            border:     `1px solid ${filteredSubjects.length > 0 ? '#BFDBFE' : '#E2E8F0'}`,
+            color: filteredSubjects.length > 0 ? '#1D4ED8' : '#94A3B8',
+            border: `1px solid ${filteredSubjects.length > 0 ? '#BFDBFE' : '#E2E8F0'}`,
             borderRadius: '20px', padding: '3px 12px',
           }}>
             {filteredSubjects.length} subject{filteredSubjects.length !== 1 ? 's' : ''}
@@ -157,10 +158,10 @@ export default function SubjectForm() {
         {/* ── Add Subject form ── */}
         <div style={{
           ...S.card,
-          opacity:       hasClass ? 1 : 0.5,
-          transition:    'opacity 0.2s ease',
+          opacity: hasClass ? 1 : 0.5,
+          transition: 'opacity 0.2s ease',
           pointerEvents: hasClass ? 'auto' : 'none',
-          position:      'relative'
+          position: 'relative'
         }}>
           <div style={{
             display: 'flex', alignItems: 'center',
@@ -197,7 +198,7 @@ export default function SubjectForm() {
             <div style={{ display: 'flex', gap: '8px' }}>
               {[
                 { key: 'theory', icon: '📖', label: 'Theory' },
-                { key: 'lab',    icon: '🔬', label: 'Lab'    },
+                { key: 'lab', icon: '🔬', label: 'Lab' },
               ].map(({ key, icon, label }) => {
                 const active = selectedTypes[key]
                 return (
@@ -206,28 +207,28 @@ export default function SubjectForm() {
                     type="button"
                     onClick={() => toggleType(key)}
                     style={{
-                      display:        'flex',
-                      alignItems:     'center',
-                      gap:            '6px',
-                      padding:        '7px 14px',
-                      borderRadius:   '7px',
-                      border:         `1.5px solid ${active ? '#2563EB' : '#E2E8F0'}`,
-                      background:     active ? '#EFF6FF' : '#F8FAFC',
-                      color:          active ? '#1D4ED8' : '#94A3B8',
-                      fontWeight:     active ? '600'     : '500',
-                      fontSize:       '12px',
-                      cursor:         'pointer',
-                      transition:     'all 0.15s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '7px 14px',
+                      borderRadius: '7px',
+                      border: `1.5px solid ${active ? '#2563EB' : '#E2E8F0'}`,
+                      background: active ? '#EFF6FF' : '#F8FAFC',
+                      color: active ? '#1D4ED8' : '#94A3B8',
+                      fontWeight: active ? '600' : '500',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     {/* Checkbox indicator */}
                     <div style={{
-                      width:        '14px', height: '14px',
+                      width: '14px', height: '14px',
                       borderRadius: '3px',
-                      border:       `1.5px solid ${active ? '#2563EB' : '#CBD5E1'}`,
-                      background:   active ? '#2563EB' : '#FFFFFF',
-                      display:      'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize:     '9px', color: '#FFFFFF', flexShrink: 0,
+                      border: `1.5px solid ${active ? '#2563EB' : '#CBD5E1'}`,
+                      background: active ? '#2563EB' : '#FFFFFF',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '9px', color: '#FFFFFF', flexShrink: 0,
                     }}>
                       {active ? '✓' : ''}
                     </div>
@@ -240,12 +241,12 @@ export default function SubjectForm() {
             {/* Both selected badge */}
             {bothTypes && (
               <div style={{
-                marginTop:    '8px',
-                fontSize:     '11px', fontWeight: '600',
-                background:   '#F0FDF4', color: '#166534',
-                border:       '1px solid #BBF7D0',
+                marginTop: '8px',
+                fontSize: '11px', fontWeight: '600',
+                background: '#F0FDF4', color: '#166534',
+                border: '1px solid #BBF7D0',
                 borderRadius: '6px', padding: '4px 10px',
-                display:      'inline-block'
+                display: 'inline-block'
               }}>
                 ✓ Will create 2 entries: Theory + Lab
               </div>
@@ -270,7 +271,7 @@ export default function SubjectForm() {
                   style={{
                     ...S.input,
                     borderColor: '#2563EB',
-                    background:  '#EFF6FF',
+                    background: '#EFF6FF',
                   }}
                   required
                 />
@@ -288,7 +289,7 @@ export default function SubjectForm() {
                   style={{
                     ...S.input,
                     borderColor: '#D97706',
-                    background:  '#FFFBEB',
+                    background: '#FFFBEB',
                   }}
                 />
               </div>
@@ -296,7 +297,7 @@ export default function SubjectForm() {
           </div>
 
           {message && <div style={S.successBox}>{message}</div>}
-          {error   && <div style={S.errorBox}>{error}</div>}
+          {error && <div style={S.errorBox}>{error}</div>}
 
           <button
             onClick={handleSubmit}
@@ -304,7 +305,7 @@ export default function SubjectForm() {
             style={{
               ...S.btn,
               opacity: canSubmit ? 1 : 0.5,
-              cursor:  canSubmit ? 'pointer' : 'not-allowed',
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
             }}
           >
             + Add Subject{bothTypes ? ' (Theory + Lab)' : ''}
@@ -362,14 +363,7 @@ export default function SubjectForm() {
                         {s.subject_name}
                       </td>
                       <td style={S.td}>
-                        <span style={{
-                          padding:    '3px 10px', borderRadius: '20px',
-                          fontSize:   '11px', fontWeight: '600',
-                          background: s.subject_type === 'lab' ? '#FEF3C7' : '#EFF6FF',
-                          color:      s.subject_type === 'lab' ? '#92400E' : '#1D4ED8'
-                        }}>
-                          {s.subject_type === 'lab' ? '🔬 Lab' : '📖 Theory'}
-                        </span>
+                        <SubjectTypeBadge type={s.subject_type} showName={false} />
                       </td>
                       <td style={{ ...S.td, textAlign: 'center', fontWeight: '700', color: '#2563EB' }}>
                         {s.periods_per_week}

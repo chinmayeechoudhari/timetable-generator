@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import * as S from '../styles/formStyles'
+import SubjectTypeBadge from './SubjectTypeBadge'
+
 
 const BASE = 'http://localhost:8000'
 
 export default function TeacherSubjectForm() {
-  const [classes, setClasses]     = useState([])
-  const [teachers, setTeachers]   = useState([])
-  const [subjects, setSubjects]   = useState([])
-  const [links, setLinks]         = useState([])
+  const [classes, setClasses] = useState([])
+  const [teachers, setTeachers] = useState([])
+  const [subjects, setSubjects] = useState([])
+  const [links, setLinks] = useState([])
   const [selectedClass, setSelectedClass] = useState('')
   const [teacherId, setTeacherId] = useState('')
   const [subjectId, setSubjectId] = useState('')
-  const [message, setMessage]     = useState('')
-  const [error, setError]         = useState('')
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -64,7 +66,7 @@ export default function TeacherSubjectForm() {
     ? subjects.filter(s => s.class_id === parseInt(selectedClass))
     : []
 
-  const getClassName   = (id) => classes.find(c => c.class_id === id)?.class_name   || `Class ${id}`
+  const getClassName = (id) => classes.find(c => c.class_id === id)?.class_name || `Class ${id}`
   const getTeacherName = (id) => teachers.find(t => t.teacher_id === id)?.teacher_name || `Teacher ${id}`
   const getSubjectName = (id) => {
     const s = subjects.find(s => s.subject_id === id)
@@ -73,9 +75,9 @@ export default function TeacherSubjectForm() {
     return cls ? `${s.subject_name} (${cls.class_name})` : s.subject_name
   }
 
-  const hasClass   = !!selectedClass
+  const hasClass = !!selectedClass
   const hasTeacher = !!teacherId
-  const canSubmit  = hasClass && hasTeacher && !!subjectId
+  const canSubmit = hasClass && hasTeacher && !!subjectId
 
   return (
     <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
@@ -110,7 +112,7 @@ export default function TeacherSubjectForm() {
             marginBottom: '4px'
           }}>
             {[
-              { n: '1', label: 'Class',   done: hasClass },
+              { n: '1', label: 'Class', done: hasClass },
               { n: '2', label: 'Teacher', done: hasTeacher },
               { n: '3', label: 'Subject', done: !!subjectId },
             ].map((step, i) => (
@@ -120,7 +122,7 @@ export default function TeacherSubjectForm() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '11px', fontWeight: '700', flexShrink: 0,
                   background: step.done ? '#2563EB' : '#E2E8F0',
-                  color:      step.done ? '#FFFFFF'  : '#94A3B8',
+                  color: step.done ? '#FFFFFF' : '#94A3B8',
                   transition: 'background 0.2s'
                 }}>
                   {step.done ? '✓' : step.n}
@@ -150,9 +152,9 @@ export default function TeacherSubjectForm() {
               onChange={e => handleClassSwitch(e.target.value)}
               style={{
                 ...S.select,
-                borderColor:  hasClass ? '#2563EB' : '#CBD5E1',
-                color:        hasClass ? '#1D4ED8' : '#94A3B8',
-                fontWeight:   hasClass ? '600'     : '400',
+                borderColor: hasClass ? '#2563EB' : '#CBD5E1',
+                color: hasClass ? '#1D4ED8' : '#94A3B8',
+                fontWeight: hasClass ? '600' : '400',
               }}
             >
               <option value="">— Select a class —</option>
@@ -165,9 +167,9 @@ export default function TeacherSubjectForm() {
           {/* Step 2: Teacher */}
           <div style={{
             ...S.fieldWrap,
-            opacity:        hasClass ? 1 : 0.45,
-            transition:     'opacity 0.2s',
-            pointerEvents:  hasClass ? 'auto' : 'none',
+            opacity: hasClass ? 1 : 0.45,
+            transition: 'opacity 0.2s',
+            pointerEvents: hasClass ? 'auto' : 'none',
           }}>
             <label style={S.label}>Step 2 — Teacher</label>
             <select
@@ -176,7 +178,7 @@ export default function TeacherSubjectForm() {
               style={{
                 ...S.select,
                 borderColor: hasTeacher ? '#2563EB' : '#CBD5E1',
-                color:       hasTeacher ? '#1D4ED8' : '#94A3B8',
+                color: hasTeacher ? '#1D4ED8' : '#94A3B8',
               }}
             >
               <option value="">
@@ -193,8 +195,8 @@ export default function TeacherSubjectForm() {
           {/* Step 3: Subject */}
           <div style={{
             ...S.fieldWrap,
-            opacity:       hasTeacher ? 1 : 0.45,
-            transition:    'opacity 0.2s',
+            opacity: hasTeacher ? 1 : 0.45,
+            transition: 'opacity 0.2s',
             pointerEvents: hasTeacher ? 'auto' : 'none',
           }}>
             <label style={S.label}>
@@ -216,18 +218,18 @@ export default function TeacherSubjectForm() {
               style={{
                 ...S.select,
                 borderColor: subjectId ? '#2563EB' : '#CBD5E1',
-                color:       subjectId ? '#1D4ED8' : '#94A3B8',
+                color: subjectId ? '#1D4ED8' : '#94A3B8',
               }}
             >
               <option value="">
-                {!hasClass   ? 'Select class first'   :
-                 !hasTeacher ? 'Select teacher first'  :
-                 filteredSubjects.length === 0 ? 'No subjects for this class' :
-                 'Select subject'}
+                {!hasClass ? 'Select class first' :
+                  !hasTeacher ? 'Select teacher first' :
+                    filteredSubjects.length === 0 ? 'No subjects for this class' :
+                      'Select subject'}
               </option>
               {filteredSubjects.map(s => (
                 <option key={s.subject_id} value={s.subject_id}>
-                  {s.subject_name}
+                  {s.subject_name} ({s.subject_type === 'lab' ? 'Lab' : 'Theory'})
                 </option>
               ))}
             </select>
@@ -242,7 +244,7 @@ export default function TeacherSubjectForm() {
           </div>
 
           {message && <div style={S.successBox}>{message}</div>}
-          {error   && <div style={S.errorBox}>{error}</div>}
+          {error && <div style={S.errorBox}>{error}</div>}
 
           <button
             onClick={handleSubmit}
@@ -250,7 +252,7 @@ export default function TeacherSubjectForm() {
             style={{
               ...S.btn,
               opacity: canSubmit ? 1 : 0.5,
-              cursor:  canSubmit ? 'pointer' : 'not-allowed',
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
               padding: '11px 16px',
               fontSize: '13px',
             }}
@@ -263,67 +265,88 @@ export default function TeacherSubjectForm() {
         {(() => {
           const filteredLinks = selectedClass
             ? links.filter(l => {
-                const s = subjects.find(s => s.subject_id === l.subject_id)
-                return s?.class_id === parseInt(selectedClass)
-              })
+              const s = subjects.find(s => s.subject_id === l.subject_id)
+              return s?.class_id === parseInt(selectedClass)
+            })
             : links
 
           return filteredLinks.length > 0 && (
-          <div style={{ flex: 1, minWidth: '300px' }}>
+            <div style={{ flex: 1, minWidth: '300px' }}>
 
-            {/* Sync label */}
-            <div style={{
-              fontSize: '11px', fontWeight: '600',
-              color: selectedClass ? '#1D4ED8' : '#64748B',
-              background: selectedClass ? '#EFF6FF' : '#F8FAFC',
-              border: `1px solid ${selectedClass ? '#BFDBFE' : '#E2E8F0'}`,
-              borderRadius: '6px', padding: '4px 10px',
-              marginBottom: '8px', display: 'inline-block'
-            }}>
-              {selectedClass
-                ? `Showing assignments for: ${getClassName(parseInt(selectedClass))}`
-                : 'Showing all assignments'}
-            </div>
+              {/* Sync label */}
+              <div style={{
+                fontSize: '11px', fontWeight: '600',
+                color: selectedClass ? '#1D4ED8' : '#64748B',
+                background: selectedClass ? '#EFF6FF' : '#F8FAFC',
+                border: `1px solid ${selectedClass ? '#BFDBFE' : '#E2E8F0'}`,
+                borderRadius: '6px', padding: '4px 10px',
+                marginBottom: '8px', display: 'inline-block'
+              }}>
+                {selectedClass
+                  ? `Showing assignments for: ${getClassName(parseInt(selectedClass))}`
+                  : 'Showing all assignments'}
+              </div>
 
-            <div style={S.tableCount}>
-              {filteredLinks.length} assignment{filteredLinks.length !== 1 ? 's' : ''}
-              {selectedClass ? ` in ${getClassName(parseInt(selectedClass))}` : ' total'}
+              <div style={S.tableCount}>
+                {filteredLinks.length} assignment{filteredLinks.length !== 1 ? 's' : ''}
+                {selectedClass ? ` in ${getClassName(parseInt(selectedClass))}` : ' total'}
+              </div>
+              <table style={S.table}>
+  <thead>
+    <tr>
+      <th style={S.th}>Teacher</th>
+      <th style={S.th}>Subject</th>
+      <th style={S.th}>Class</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {filteredLinks.map((l, i) => (
+      <tr key={i}>
+
+        {/* Teacher */}
+        <td style={{ ...S.td, fontWeight: '600', color: '#1B2A3B' }}>
+          👤 {getTeacherName(l.teacher_id)}
+        </td>
+
+        {/* Subject */}
+        <td style={S.td}>
+          <SubjectTypeBadge
+            name={(() => {
+              const s = subjects.find(s => s.subject_id === l.subject_id)
+              return s?.subject_name || `Subject ${l.subject_id}`
+            })()}
+            type={
+              subjects.find(s => s.subject_id === l.subject_id)?.subject_type
+            }
+          />
+        </td>
+
+        {/* Class */}
+        <td style={S.td}>
+          <span
+            style={{
+              padding: '2px 8px',
+              borderRadius: '20px',
+              fontSize: '11px',
+              fontWeight: '600',
+              background: '#EFF6FF',
+              color: '#1D4ED8',
+              border: '1px solid #BFDBFE',
+            }}
+          >
+            {(() => {
+              const s = subjects.find(s => s.subject_id === l.subject_id)
+              return s ? getClassName(s.class_id) : '—'
+            })()}
+          </span>
+        </td>
+
+      </tr>
+    ))}
+  </tbody>
+</table>
             </div>
-            <table style={S.table}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Teacher</th>
-                  <th style={S.th}>Subject</th>
-                  <th style={S.th}>Class</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLinks.map((l, i) => (
-                  <tr key={i}>
-                    <td style={{ ...S.td, fontWeight: '600', color: '#1B2A3B' }}>
-                      👤 {getTeacherName(l.teacher_id)}
-                    </td>
-                    <td style={S.td}>
-                      📚 {getSubjectName(l.subject_id).split(' (')[0]}
-                    </td>
-                    <td style={S.td}>
-                      <span style={{
-                        padding: '2px 8px', borderRadius: '20px',
-                        fontSize: '11px', fontWeight: '600',
-                        background: '#EFF6FF', color: '#1D4ED8',
-                        border: '1px solid #BFDBFE'
-                      }}>
-                        {(() => {
-                          const s = subjects.find(s => s.subject_id === l.subject_id)
-                          return s ? getClassName(s.class_id) : '—'
-                        })()}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
           )
         })()}
 
