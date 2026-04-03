@@ -97,6 +97,13 @@ export default function TimetableGrid() {
   const filterKey = view === 'class' ? 'class_id' : view === 'teacher' ? 'teacher_id' : 'room_id'
   const activeDays = DAYS.filter(day => slots.some(s => s.day === day))
   const activePeriods = PERIODS.filter(p => slots.some(s => s.period_number === p))
+  const visibleSubjectIds = new Set(
+    timetable
+      .filter(t => t[filterKey] === selected)
+      .map(t => t.subject_id)
+  )
+
+  const visibleSubjects = subjectsList.filter(s => visibleSubjectIds.has(s.subject_id))
 
   function handleExport() {
     const styleId = 'print-style'
@@ -172,10 +179,10 @@ export default function TimetableGrid() {
                       padding: '4px 5px',
                       minHeight: '44px'
                     }}>
-                     <SubjectTypeBadge
-  name={subjects[entry.subject_id] || `S${entry.subject_id}`}
-  type={subjectsList.find(s => s.subject_id === entry.subject_id)?.subject_type}
-/>
+                      <SubjectTypeBadge
+                        name={subjects[entry.subject_id] || `S${entry.subject_id}`}
+                        type={subjectsList.find(s => s.subject_id === entry.subject_id)?.subject_type}
+                      />
                       {showTeacher && (
                         <div style={{ fontSize: '10px', color: '#475569' }}>
                           👤 {teachers[entry.teacher_id] || `T${entry.teacher_id}`}
@@ -362,10 +369,14 @@ export default function TimetableGrid() {
           textTransform: 'uppercase',
           letterSpacing: '0.06em'
         }}>
-          Subjects
+          {view === 'class'
+            ? `Subjects in ${getSelectedLabel()}`
+            : view === 'teacher'
+              ? `Subjects for ${getSelectedLabel()}`
+              : `Subjects in ${getSelectedLabel()}`}
         </span>
 
-        {subjectsList.map(s => {
+        {visibleSubjects.map(s => {
           const color = subjectColors[s.subject_id] || COLORS[0]
           return (
             <div key={s.subject_id} style={{
