@@ -14,6 +14,8 @@ from app.api.teacher_subjects import (
 )
 from app.api.generate import router as generate_router
 
+
+
 app = FastAPI(title="Timetable Generator API", version="1.0.0")
 
 app.add_middleware(

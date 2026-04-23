@@ -46,6 +46,16 @@ async def get_timetable(db: Session = Depends(get_db)):
     try:
         from app.models.models import Timetable
         entries = db.query(Timetable).all()
-        return entries
+        return [
+            {
+                "timetable_id": e.timetable_id,
+                "class_id":     e.class_id,
+                "subject_id":   e.subject_id,
+                "teacher_id":   e.teacher_id,
+                "slot_id":      e.slot_id,
+                "room_id":      e.room_id,
+            }
+            for e in entries
+        ]
     except Exception as e:
         return {"error": str(e)}

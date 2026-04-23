@@ -1,3 +1,4 @@
+from collections import defaultdict
 from sqlalchemy.orm import Session
 from app.models.models import (
     Subject, Teacher, Room, TimeSlot,
@@ -13,30 +14,39 @@ def run_preflight_checks(db: Session) -> dict:
     warnings = []
     passed = []
 
-    subjects  = db.query(Subject).all()
-    teachers  = db.query(Teacher).all()
-    rooms     = db.query(Room).all()
-    slots     = db.query(TimeSlot).all()
-    ts_links  = db.query(TeacherSubject).all()
+    subjects = db.query(Subject).all()
+    teachers = db.query(Teacher).all()
+    rooms = db.query(Room).all()
+    slots = db.query(TimeSlot).all()
+    ts_links = db.query(TeacherSubject).all()
 
     total_slots = len(slots)
-    total_periods_needed = sum(s.periods_per_week for s in subjects)
     linked_subject_ids = {link.subject_id for link in ts_links}
     linked_teacher_ids = {link.teacher_id for link in ts_links}
-    lab_subject_ids    = {s.subject_id for s in subjects if s.subject_type == 'lab'}
-    lab_room_ids       = {r.room_id for r in rooms if r.room_type == 'lab'}
+    lab_subject_ids = {s.subject_id for s in subjects if s.subject_type == "lab"}
+    lab_room_ids = {r.room_id for r in rooms if r.room_type == "lab"}
 
-    # Check 1: total periods needed vs total slots available
-    if total_periods_needed > total_slots:
-        issues.append(
-            f"Total periods needed ({total_periods_needed}) exceeds "
-            f"total timeslots available ({total_slots}). "
-            f"Add more timeslots or reduce periods_per_week."
-        )
+    # Check 1: slot capacity check (PER CLASS, not global)
+    subjects_by_class = defaultdict(list)
+    for s in subjects:
+        subjects_by_class[s.class_id].append(s)
+
+    capacity_issues = []
+    for class_id, class_subjects in subjects_by_class.items():
+        class_periods_needed = sum(s.periods_per_week for s in class_subjects)
+
+        if class_periods_needed > total_slots:
+            capacity_issues.append(
+                f"Class {class_id} needs {class_periods_needed} periods/week "
+                f"but only {total_slots} timeslots are available. "
+                f"Add more timeslots or reduce periods_per_week."
+            )
+
+    if capacity_issues:
+        issues.extend(capacity_issues)
     else:
         passed.append(
-            f"Slot capacity OK: {total_periods_needed} periods needed, "
-            f"{total_slots} slots available."
+            f"Slot capacity OK: each class fits within {total_slots} available timeslots."
         )
 
     # Check 2: subjects with no teacher linked
@@ -44,7 +54,7 @@ def run_preflight_checks(db: Session) -> dict:
         s for s in subjects if s.subject_id not in linked_subject_ids
     ]
     if unlinked_subjects:
-        names = ', '.join(s.subject_name for s in unlinked_subjects)
+        names = ", ".join(s.subject_name for s in unlinked_subjects)
         issues.append(
             f"These subjects have no teacher assigned: {names}. "
             f"Go to Teacher-Subject page and link a teacher."
@@ -69,7 +79,7 @@ def run_preflight_checks(db: Session) -> dict:
         t for t in teachers if t.teacher_id not in linked_teacher_ids
     ]
     if unlinked_teachers:
-        names = ', '.join(t.teacher_name for t in unlinked_teachers)
+        names = ", ".join(t.teacher_name for t in unlinked_teachers)
         warnings.append(
             f"These teachers have no subjects assigned: {names}. "
             f"They will be ignored by the solver."
@@ -93,9 +103,9 @@ def run_preflight_checks(db: Session) -> dict:
 
     return {
         "ready": is_ready,
-        "issues": issues,        # blockers — generation will fail
-        "warnings": warnings,    # non-blockers — generation may still work
-        "passed": passed,        # things that look good
+        "issues": issues,
+        "warnings": warnings,
+        "passed": passed,
         "summary": (
             "Ready to generate." if is_ready
             else f"{len(issues)} issue(s) must be fixed before generating."
