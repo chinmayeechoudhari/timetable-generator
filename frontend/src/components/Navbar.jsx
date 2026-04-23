@@ -24,107 +24,220 @@ const NAV = [
 
 export default function Navbar() {
   const location = useLocation()
+
   return (
-    <div style={{
-      width: '210px',
-      minWidth: '210px',
-      height: '100vh',
-      background: '#1B2A3B',
-      display: 'flex',
-      flexDirection: 'column',
-      borderRight: 'none',
-      flexShrink: 0
-    }}>
-      {/* Logo */}
-      <div style={{
-        padding: '20px 16px 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.07)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '36px', height: '36px',
-            borderRadius: '8px',
-            background: '#2563EB',
-            display: 'flex', alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '18px', flexShrink: 0
-          }}>🗓️</div>
+    <div
+      style={{
+        width: '250px',
+        minWidth: '250px',
+        height: '100vh',
+        background: 'linear-gradient(180deg, #162334 0%, #1B2A3B 45%, #152233 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        borderRight: '1px solid rgba(255,255,255,0.06)',
+        flexShrink: 0,
+        boxShadow: '8px 0 24px rgba(15, 23, 42, 0.08)'
+      }}
+    >
+      <div
+        style={{
+          padding: '20px 18px 18px',
+          borderBottom: '1px solid rgba(255,255,255,0.08)'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '22px',
+              flexShrink: 0,
+              boxShadow: '0 10px 20px rgba(37, 99, 235, 0.28)'
+            }}
+          >
+            🗓️
+          </div>
+
           <div>
-            <div style={{
-              fontSize: '14px', fontWeight: '700',
-              color: '#FFFFFF', lineHeight: 1.2,
-              letterSpacing: '-0.2px'
-            }}>TimetablePro</div>
-            <div style={{
-              fontSize: '10px', color: 'rgba(255,255,255,0.4)',
-              marginTop: '1px'
-            }}>CP-SAT Scheduler</div>
+            <div
+              style={{
+                fontSize: '15px',
+                fontWeight: '800',
+                color: '#FFFFFF',
+                lineHeight: 1.2,
+                letterSpacing: '-0.2px'
+              }}
+            >
+              TimetablePro
+            </div>
+            <div
+              style={{
+                fontSize: '11px',
+                color: 'rgba(255,255,255,0.5)',
+                marginTop: '2px'
+              }}
+            >
+              CP-SAT Scheduler
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Nav */}
-      <div style={{ padding: '8px', flex: 1, overflowY: 'auto' }}>
+      <div
+        style={{
+          padding: '12px 10px',
+          flex: 1,
+          overflowY: 'auto'
+        }}
+      >
         {NAV.map(group => (
-          <div key={group.section} style={{ marginBottom: '4px' }}>
-            <div style={{
-              fontSize: '9px', fontWeight: '700',
-              color: 'rgba(255,255,255,0.25)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              padding: '10px 8px 4px'
-            }}>
+          <div key={group.section} style={{ marginBottom: '14px' }}>
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: '800',
+                color: 'rgba(255,255,255,0.28)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                padding: '10px 10px 6px'
+              }}
+            >
               {group.section}
             </div>
-            {group.items.map(item => {
-              const active = location.pathname === item.to
-              return (
-                <Link key={item.to} to={item.to} style={{
-                  display: 'flex', alignItems: 'center',
-                  gap: '8px', padding: '7px 10px',
-                  borderRadius: '6px', textDecoration: 'none',
-                  marginBottom: '1px', fontSize: '12px',
-                  fontWeight: active ? '600' : '400',
-                  background: active ? '#2563EB' : 'transparent',
-                  color: active ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
-                  transition: 'all 0.12s'
-                }}
-                  onMouseEnter={e => {
-                    if (!active) {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
-                      e.currentTarget.style.color = 'rgba(255,255,255,0.85)'
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!active) {
-                      e.currentTarget.style.background = 'transparent'
-                      e.currentTarget.style.color = 'rgba(255,255,255,0.5)'
-                    }
-                  }}>
-                  <span style={{ fontSize: '13px', width: '18px', textAlign: 'center' }}>
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </Link>
-              )
-            })}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {group.items.map(item => {
+                const active = location.pathname === item.to
+
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '11px 12px',
+                      borderRadius: '12px',
+                      textDecoration: 'none',
+                      fontSize: '13px',
+                      fontWeight: active ? '700' : '500',
+                      background: active
+                        ? 'linear-gradient(135deg, #2563EB, #1D4ED8)'
+                        : 'transparent',
+                      color: active ? '#FFFFFF' : 'rgba(255,255,255,0.68)',
+                      border: active
+                        ? '1px solid rgba(255,255,255,0.08)'
+                        : '1px solid transparent',
+                      boxShadow: active
+                        ? '0 8px 20px rgba(37, 99, 235, 0.22)'
+                        : 'none',
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={e => {
+                      if (!active) {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.95)'
+                        e.currentTarget.style.border = '1px solid rgba(255,255,255,0.05)'
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!active) {
+                        e.currentTarget.style.background = 'transparent'
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.68)'
+                        e.currentTarget.style.border = '1px solid transparent'
+                      }
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        background: active
+                          ? 'rgba(255,255,255,0.14)'
+                          : 'rgba(255,255,255,0.05)',
+                        flexShrink: 0
+                      }}
+                    >
+                      {item.icon}
+                    </span>
+
+                    <span style={{ flex: 1 }}>{item.label}</span>
+
+                    {active && (
+                      <span
+                        style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: '#FFFFFF',
+                          boxShadow: '0 0 0 4px rgba(255,255,255,0.12)'
+                        }}
+                      />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Footer */}
-      <div style={{
-        padding: '12px 16px',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex', alignItems: 'center', gap: '6px'
-      }}>
-        <div style={{
-          width: '6px', height: '6px', borderRadius: '50%',
-          background: '#22c55e'
-        }} />
-        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)' }}>
-          System ready
-        </span>
+      <div
+        style={{
+          padding: '14px 16px',
+          borderTop: '1px solid rgba(255,255,255,0.08)'
+        }}
+      >
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: '12px',
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: '#22C55E',
+                boxShadow: '0 0 0 4px rgba(34, 197, 94, 0.15)'
+              }}
+            />
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.68)', fontWeight: '600' }}>
+              System ready
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '10px',
+              color: 'rgba(255,255,255,0.32)',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em'
+            }}
+          >
+            Live
+          </span>
+        </div>
       </div>
     </div>
   )

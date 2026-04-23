@@ -292,60 +292,60 @@ export default function TeacherSubjectForm() {
                 {selectedClass ? ` in ${getClassName(parseInt(selectedClass))}` : ' total'}
               </div>
               <table style={S.table}>
-  <thead>
-    <tr>
-      <th style={S.th}>Teacher</th>
-      <th style={S.th}>Subject</th>
-      <th style={S.th}>Class</th>
-    </tr>
-  </thead>
+                <thead>
+                  <tr>
+                    <th style={S.th}>Teacher</th>
+                    <th style={S.th}>Subject</th>
+                    <th style={S.th}>Class</th>
+                  </tr>
+                </thead>
 
-  <tbody>
-    {filteredLinks.map((l, i) => (
-      <tr key={i}>
+                <tbody>
+                  {filteredLinks.map((l, i) => (
+                    <tr key={i}>
 
-        {/* Teacher */}
-        <td style={{ ...S.td, fontWeight: '600', color: '#1B2A3B' }}>
-          👤 {getTeacherName(l.teacher_id)}
-        </td>
+                      {/* Teacher */}
+                      <td style={{ ...S.td, fontWeight: '600', color: '#1B2A3B' }}>
+                        👤 {getTeacherName(l.teacher_id)}
+                      </td>
 
-        {/* Subject */}
-        <td style={S.td}>
-          <SubjectTypeBadge
-            name={(() => {
-              const s = subjects.find(s => s.subject_id === l.subject_id)
-              return s?.subject_name || `Subject ${l.subject_id}`
-            })()}
-            type={
-              subjects.find(s => s.subject_id === l.subject_id)?.subject_type
-            }
-          />
-        </td>
+                      {/* Subject */}
+                      <td style={S.td}>
+                        <SubjectTypeBadge
+                          name={(() => {
+                            const s = subjects.find(s => s.subject_id === l.subject_id)
+                            return s?.subject_name || `Subject ${l.subject_id}`
+                          })()}
+                          type={
+                            subjects.find(s => s.subject_id === l.subject_id)?.subject_type
+                          }
+                        />
+                      </td>
 
-        {/* Class */}
-        <td style={S.td}>
-          <span
-            style={{
-              padding: '2px 8px',
-              borderRadius: '20px',
-              fontSize: '11px',
-              fontWeight: '600',
-              background: '#EFF6FF',
-              color: '#1D4ED8',
-              border: '1px solid #BFDBFE',
-            }}
-          >
-            {(() => {
-              const s = subjects.find(s => s.subject_id === l.subject_id)
-              return s ? getClassName(s.class_id) : '—'
-            })()}
-          </span>
-        </td>
+                      {/* Class */}
+                      <td style={S.td}>
+                        <span
+                          style={{
+                            padding: '2px 8px',
+                            borderRadius: '20px',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            background: '#EFF6FF',
+                            color: '#1D4ED8',
+                            border: '1px solid #BFDBFE',
+                          }}
+                        >
+                          {(() => {
+                            const s = subjects.find(s => s.subject_id === l.subject_id)
+                            return s ? getClassName(s.class_id) : '—'
+                          })()}
+                        </span>
+                      </td>
 
-      </tr>
-    ))}
-  </tbody>
-</table>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )
         })()}

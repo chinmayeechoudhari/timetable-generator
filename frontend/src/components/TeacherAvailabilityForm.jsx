@@ -3,17 +3,17 @@ import axios from 'axios'
 import * as S from '../styles/formStyles'
 
 const BASE = 'http://localhost:8000'
-const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 export default function TeacherAvailabilityForm() {
-  const [teachers, setTeachers]         = useState([])
-  const [slots, setSlots]               = useState([])
-  const [records, setRecords]           = useState([])
-  const [timetable, setTimetable]       = useState([])
-  const [subjects, setSubjects]         = useState({})
-  const [teacherId, setTeacherId]       = useState('')
-  const [message, setMessage]           = useState('')
-  const [error, setError]               = useState('')
+  const [teachers, setTeachers] = useState([])
+  const [slots, setSlots] = useState([])
+  const [records, setRecords] = useState([])
+  const [timetable, setTimetable] = useState([])
+  const [subjects, setSubjects] = useState({})
+  const [teacherId, setTeacherId] = useState('')
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -33,7 +33,7 @@ export default function TeacherAvailabilityForm() {
       const subMap = {}
       subRes.data.forEach(s => { subMap[s.subject_id] = s.subject_name })
       setSubjects(subMap)
-      if (tRes.data.length > 0) setTeacherId(String(tRes.data[0].teacher_id))
+      if (tRes.data.length > 0 && !teacherId) setTeacherId(String(tRes.data[0].teacher_id))
     } catch {
       setError('Could not load data. Make sure the backend is running.')
     }
@@ -77,8 +77,8 @@ export default function TeacherAvailabilityForm() {
         )
       } else {
         await axios.post(`${BASE}/teacher-availabilities`, {
-          teacher_id:   parseInt(teacherId),
-          slot_id:      slotId,
+          teacher_id: parseInt(teacherId),
+          slot_id: slotId,
           is_available: false
         })
       }
@@ -142,9 +142,9 @@ export default function TeacherAvailabilityForm() {
           onChange={e => { setTeacherId(e.target.value); setMessage(''); setError('') }}
           style={{
             ...S.select, maxWidth: '240px',
-            fontWeight:  teacherId ? '700'     : '400',
+            fontWeight: teacherId ? '700' : '400',
             borderColor: teacherId ? '#2563EB' : '#CBD5E1',
-            color:       teacherId ? '#1D4ED8' : '#94A3B8',
+            color: teacherId ? '#1D4ED8' : '#94A3B8',
           }}
         >
           <option value="">— Select a teacher —</option>
@@ -157,8 +157,8 @@ export default function TeacherAvailabilityForm() {
           <div style={{
             fontSize: '12px', fontWeight: '600',
             background: assignedLectures.length > 0 ? '#EFF6FF' : '#F8FAFC',
-            color:      assignedLectures.length > 0 ? '#1D4ED8' : '#94A3B8',
-            border:     `1px solid ${assignedLectures.length > 0 ? '#BFDBFE' : '#E2E8F0'}`,
+            color: assignedLectures.length > 0 ? '#1D4ED8' : '#94A3B8',
+            border: `1px solid ${assignedLectures.length > 0 ? '#BFDBFE' : '#E2E8F0'}`,
             borderRadius: '20px', padding: '3px 12px',
           }}>
             {assignedLectures.length} lecture{assignedLectures.length !== 1 ? 's' : ''} assigned
@@ -177,7 +177,7 @@ export default function TeacherAvailabilityForm() {
       </div>
 
       {message && <div style={{ ...S.successBox, marginBottom: '12px' }}>{message}</div>}
-      {error   && <div style={{ ...S.errorBox,   marginBottom: '12px' }}>{error}</div>}
+      {error && <div style={{ ...S.errorBox, marginBottom: '12px' }}>{error}</div>}
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
 
@@ -185,9 +185,9 @@ export default function TeacherAvailabilityForm() {
         <div style={{
           ...S.card,
           minWidth: '300px', maxWidth: '420px',
-          opacity:       hasTeacher ? 1 : 0.5,
+          opacity: hasTeacher ? 1 : 0.5,
           pointerEvents: hasTeacher ? 'auto' : 'none',
-          transition:    'opacity 0.2s'
+          transition: 'opacity 0.2s'
         }}>
           <div style={S.heading}>Mark unavailable slots</div>
           <div style={{ fontSize: '11px', color: '#64748B', marginBottom: '12px', lineHeight: 1.5 }}>
@@ -207,34 +207,33 @@ export default function TeacherAvailabilityForm() {
               }}>{day}</div>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {sortedSlots.filter(s => s.day === day).map(s => {
-                  const isAssigned   = assignedSlotIds.has(s.slot_id)
+                  const isAssigned = assignedSlotIds.has(s.slot_id)
                   const isUnavailable = unavailableSlotIds.has(s.slot_id)
                   return (
                     <button
                       key={s.slot_id}
                       title={
                         isUnavailable ? 'Click to remove rule' :
-                        isAssigned    ? 'Assigned — click to mark unavailable' :
-                        'Click to mark unavailable'
+                          isAssigned ? 'Assigned — click to mark unavailable' :
+                            'Click to mark unavailable'
                       }
                       onClick={() =>
                         isUnavailable ? removeRule(s.slot_id) : markUnavailable(s.slot_id)
                       }
                       style={{
-                        padding:      '5px 10px',
+                        padding: '5px 10px',
                         borderRadius: '6px',
-                        border:       `1.5px solid ${
-                          isUnavailable ? '#DC2626' :
-                          isAssigned    ? '#2563EB' : '#E2E8F0'
-                        }`,
-                        background:   isUnavailable ? '#FEF2F2' :
-                                      isAssigned    ? '#EFF6FF' : '#F8FAFC',
-                        color:        isUnavailable ? '#DC2626' :
-                                      isAssigned    ? '#1D4ED8' : '#94A3B8',
-                        fontSize:     '11px', fontWeight: '600',
-                        cursor:       'pointer',
-                        transition:   'all 0.12s',
-                        position:     'relative',
+                        border: `1.5px solid ${isUnavailable ? '#DC2626' :
+                            isAssigned ? '#2563EB' : '#E2E8F0'
+                          }`,
+                        background: isUnavailable ? '#FEF2F2' :
+                          isAssigned ? '#EFF6FF' : '#F8FAFC',
+                        color: isUnavailable ? '#DC2626' :
+                          isAssigned ? '#1D4ED8' : '#94A3B8',
+                        fontSize: '11px', fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.12s',
+                        position: 'relative',
                       }}
                     >
                       P{s.period_number}
@@ -369,13 +368,13 @@ export default function TeacherAvailabilityForm() {
                           <button
                             onClick={() => removeRule(r.slot_id)}
                             style={{
-                              padding:      '3px 10px',
+                              padding: '3px 10px',
                               borderRadius: '6px',
-                              border:       '1px solid #FECACA',
-                              background:   '#FEF2F2',
-                              color:        '#DC2626',
-                              fontSize:     '11px', fontWeight: '600',
-                              cursor:       'pointer'
+                              border: '1px solid #FECACA',
+                              background: '#FEF2F2',
+                              color: '#DC2626',
+                              fontSize: '11px', fontWeight: '600',
+                              cursor: 'pointer'
                             }}
                           >
                             Remove
