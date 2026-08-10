@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import ThemeToggle from "./ThemeToggle";
 
 const BASE = "http://localhost:8000";
 
@@ -234,22 +235,9 @@ export default function StatusDashboard() {
         </div>
 
         {/* Top Right Action Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Theme Switch Button */}
-          <button style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '12px',
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-          }}>
-            {SVG.sun}
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {/* Uiverse Theme Switch */}
+          <ThemeToggle />
 
           {/* Refresh Button */}
           <button
