@@ -336,7 +336,7 @@ export default function TeacherForm() {
                       }}
                     >
                       <td style={{ ...S.td, width: '72px', color: '#64748B', fontWeight: '600' }}>
-                        #{t.teacher_id}
+                        #{index + 1}
                       </td>
 
                       <td style={S.td}>

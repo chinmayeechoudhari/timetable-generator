@@ -209,7 +209,7 @@ export default function ClassForm() {
                           : index % 2 === 0 ? '#FFFFFF' : '#FCFDFE'
                       }}
                     >
-                      <td style={{ ...S.td, width: '72px', color: '#64748B', fontWeight: '600' }}>#{c.class_id}</td>
+                      <td style={{ ...S.td, width: '72px', color: '#64748B', fontWeight: '600' }}>#{index + 1}</td>
 
                       <td style={S.td}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
