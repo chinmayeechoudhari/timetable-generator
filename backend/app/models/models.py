@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Text
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Boolean,
+    ForeignKey,
+    Text,
+    Index,
+    func,
+)
 from sqlalchemy.orm import relationship
 from app.core.config import Base
 
@@ -21,11 +30,42 @@ class Subject(Base):
 
 class Teacher(Base):
     __tablename__ = 'teacher'
-    teacher_id         = Column(Integer, primary_key=True, index=True)
-    teacher_name       = Column(String, nullable=False)
-    max_periods_per_day = Column(Integer, default=6)
-    teacher_subjects   = relationship('TeacherSubject', back_populates='teacher', cascade="all, delete-orphan")
-    availabilities     = relationship('TeacherAvailability', back_populates='teacher', cascade="all, delete-orphan")
+
+    teacher_id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    teacher_name = Column(
+        String,
+        nullable=False
+    )
+
+    max_periods_per_day = Column(
+        Integer,
+        default=6
+    )
+
+    teacher_subjects = relationship(
+        'TeacherSubject',
+        back_populates='teacher',
+        cascade="all, delete-orphan"
+    )
+
+    availabilities = relationship(
+        'TeacherAvailability',
+        back_populates='teacher',
+        cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        Index(
+            'uq_teacher_name_normalized',
+            func.lower(func.trim(teacher_name)),
+            unique=True,
+        ),
+    )
 
 class Room(Base):
     __tablename__ = 'room'
