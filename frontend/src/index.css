@@ -119,6 +119,28 @@ code {
   background: var(--code-bg);
 }
 
+:root {
+  --bg-page: #F0F4F8;
+  --bg-card: #FFFFFF;
+  --text-main: #1B2A3B;
+  --text-muted: #64748B;
+  --border-color: #E2E8F0;
+  --input-bg: #F8FAFC;
+  --input-border: #CBD5E1;
+  --table-th-bg: #F8FAFC;
+}
+
+[data-theme='dark'] {
+  --bg-page: #0F172A;
+  --bg-card: #1E293B;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --border-color: #334155;
+  --input-bg: #0F172A;
+  --input-border: #475569;
+  --table-th-bg: #0F172A;
+}
+
 /* ─── From Uiverse.io by JustCode14 ─── */
 /* Theme Switch */
 .switch {
@@ -220,69 +242,35 @@ code {
 [data-theme='dark'] html,
 [data-theme='dark'] body,
 [data-theme='dark'] #root {
-  background: #0f172a !important;
-  color: #f8fafc !important;
+  background: #0F172A !important;
+  color: #F8FAFC !important;
 }
 
-[data-theme='dark'] div[style*="background: '#F0F4F8'"],
-[data-theme='dark'] div[style*="background: '#f8fafc'"],
-[data-theme='dark'] div[style*="background: #F0F4F8"],
-[data-theme='dark'] div[style*="background: #f8fafc"] {
-  background: #0f172a !important;
-  color: #f8fafc !important;
-}
-
-[data-theme='dark'] div[style*="background: '#FFFFFF'"],
-[data-theme='dark'] div[style*="background: '#ffffff'"],
-[data-theme='dark'] div[style*="background: #FFFFFF"],
-[data-theme='dark'] div[style*="background: #ffffff"] {
-  background: #1e293b !important;
-  color: #f8fafc !important;
-  border-color: #334155 !important;
-}
-
-[data-theme='dark'] div[style*="color: '#1B2A3B'"],
-[data-theme='dark'] div[style*="color: '#1b2a3b'"],
-[data-theme='dark'] span[style*="color: '#1B2A3B'"],
-[data-theme='dark'] span[style*="color: '#1b2a3b'"] {
-  color: #f8fafc !important;
-}
-
-[data-theme='dark'] div[style*="color: '#64748B'"],
-[data-theme='dark'] span[style*="color: '#64748B'"],
-[data-theme='dark'] div[style*="color: '#475569'"],
-[data-theme='dark'] span[style*="color: '#475569'"] {
-  color: #94a3b8 !important;
+[data-theme='dark'] div,
+[data-theme='dark'] main,
+[data-theme='dark'] section {
+  border-color: var(--border-color);
 }
 
 [data-theme='dark'] input,
 [data-theme='dark'] select {
-  background: #0f172a !important;
-  color: #f8fafc !important;
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
   border-color: #334155 !important;
 }
 
 [data-theme='dark'] table {
-  background: #1e293b !important;
+  background-color: #1E293B !important;
   border-color: #334155 !important;
 }
 
 [data-theme='dark'] th {
-  background: #0f172a !important;
-  color: #94a3b8 !important;
+  background-color: #0F172A !important;
+  color: #94A3B8 !important;
   border-color: #334155 !important;
 }
 
 [data-theme='dark'] td {
-  color: #e2e8f0 !important;
+  color: #E2E8F0 !important;
   border-color: #334155 !important;
-}
-
-[data-theme='dark'] tr[style*="background: '#FFFFFF'"],
-[data-theme='dark'] tr[style*="background: '#FCFDFE'"] {
-  background: #1e293b !important;
-}
-
-[data-theme='dark'] tr[style*="background: '#EFF6FF'"] {
-  background: #1e3a8a !important;
 }

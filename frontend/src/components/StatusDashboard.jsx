@@ -219,14 +219,14 @@ export default function StatusDashboard() {
             margin: 0,
             fontSize: '26px',
             fontWeight: '800',
-            color: '#0f172a',
+            color: 'var(--text-main)',
             letterSpacing: '-0.4px',
           }}>
             Status Dashboard
           </h1>
           <p style={{
             margin: '6px 0 0',
-            color: '#94a3b8',
+            color: 'var(--text-muted)',
             fontSize: '13.5px',
             fontWeight: '500',
           }}>
@@ -508,23 +508,24 @@ export default function StatusDashboard() {
 function MetricCard({ title, value, subtitle, icon, badgeBg }) {
   return (
     <div className="dash-card" style={{
-      background: '#ffffff',
+      background: 'var(--bg-card)',
       borderRadius: '16px',
       padding: '20px',
-      border: '1px solid #f1f5f9',
+      border: '1px solid var(--border-color)',
       boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
+      transition: 'background 0.3s ease, border-color 0.3s ease',
     }}>
       <div>
-        <div style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', marginBottom: '6px' }}>
+        <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
           {title}
         </div>
-        <div style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', lineHeight: 1.1 }}>
+        <div style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-main)', lineHeight: 1.1 }}>
           {value}
         </div>
-        <div style={{ fontSize: '11px', fontWeight: '500', color: '#94a3b8', marginTop: '6px' }}>
+        <div style={{ fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', marginTop: '6px' }}>
           {subtitle}
         </div>
       </div>
@@ -552,15 +553,16 @@ function QuickActionCard({ icon, badgeBg, title, description, linkColor, onClick
       className="action-card"
       onClick={onClick}
       style={{
-        background: '#ffffff',
+        background: 'var(--bg-card)',
         borderRadius: '16px',
         padding: '22px 20px',
-        border: '1px solid #f1f5f9',
+        border: '1px solid var(--border-color)',
         boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
+        transition: 'background 0.3s ease, border-color 0.3s ease',
       }}
     >
       {/* Top right decorative dots grid */}
@@ -595,7 +597,7 @@ function QuickActionCard({ icon, badgeBg, title, description, linkColor, onClick
         margin: '0 0 4px',
         fontSize: '15px',
         fontWeight: '700',
-        color: '#0f172a',
+        color: 'var(--text-main)',
       }}>
         {title}
       </h3>
@@ -603,7 +605,7 @@ function QuickActionCard({ icon, badgeBg, title, description, linkColor, onClick
       <p style={{
         margin: '0 0 16px',
         fontSize: '12.5px',
-        color: '#94a3b8',
+        color: 'var(--text-muted)',
         lineHeight: 1.4,
         flex: 1,
       }}>

@@ -3,40 +3,42 @@
 export const page = {
   padding: '28px 32px',
   minHeight: '100vh',
-  background: '#F0F4F8',
-  color: '#1B2A3B',
+  background: 'var(--bg-page)',
+  color: 'var(--text-main)',
   fontFamily: "'Inter', 'Segoe UI', sans-serif",
+  transition: 'background 0.3s ease, color 0.3s ease',
 }
 
 export const pageTitle = {
   fontSize: '18px',
   fontWeight: '700',
-  color: '#1B2A3B',
+  color: 'var(--text-main)',
   marginBottom: '4px',
 }
 
 export const pageSub = {
   fontSize: '12px',
-  color: '#64748B',
+  color: 'var(--text-muted)',
   marginBottom: '20px',
 }
 
 export const card = {
-  background: '#FFFFFF',
+  background: 'var(--bg-card)',
   borderRadius: '14px',
   padding: '24px',
   maxWidth: '520px',
   display: 'flex',
   flexDirection: 'column',
   gap: '14px',
-  border: '1px solid #E2E8F0',
+  border: '1px solid var(--border-color)',
   boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+  transition: 'background 0.3s ease, border-color 0.3s ease',
 }
 
 export const heading = {
   fontSize: '15px',
   fontWeight: '700',
-  color: '#1B2A3B',
+  color: 'var(--text-main)',
   marginBottom: '2px',
 }
 
@@ -49,7 +51,7 @@ export const fieldWrap = {
 export const label = {
   fontSize: '11px',
   fontWeight: '600',
-  color: '#475569',
+  color: 'var(--text-muted)',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
 }
@@ -57,9 +59,9 @@ export const label = {
 export const input = {
   padding: '9px 12px',
   borderRadius: '7px',
-  border: '1px solid #CBD5E1',
-  background: '#F8FAFC',
-  color: '#1B2A3B',
+  border: '1px solid var(--input-border)',
+  background: 'var(--input-bg)',
+  color: 'var(--text-main)',
   fontSize: '13px',
   outline: 'none',
   width: '100%',
@@ -70,9 +72,9 @@ export const input = {
 export const select = {
   padding: '9px 12px',
   borderRadius: '7px',
-  border: '1px solid #CBD5E1',
-  background: '#F8FAFC',
-  color: '#1B2A3B',
+  border: '1px solid var(--input-border)',
+  background: 'var(--input-bg)',
+  color: 'var(--text-main)',
   fontSize: '13px',
   cursor: 'pointer',
   width: '100%',
@@ -120,7 +122,7 @@ export const tableWrap = {
 
 export const tableCount = {
   fontSize: '11px',
-  color: '#64748B',
+  color: 'var(--text-muted)',
   marginBottom: '6px',
   fontWeight: '600',
 }
@@ -129,28 +131,28 @@ export const table = {
   width: '100%',
   borderCollapse: 'collapse',
   fontSize: '12px',
-  background: '#FFFFFF',
+  background: 'var(--bg-card)',
   borderRadius: '8px',
   overflow: 'hidden',
-  border: '1px solid #E2E8F0',
+  border: '1px solid var(--border-color)',
 }
 
 export const th = {
   padding: '9px 14px',
-  background: '#F8FAFC',
-  color: '#475569',
+  background: 'var(--table-th-bg)',
+  color: 'var(--text-muted)',
   fontSize: '10px',
   fontWeight: '700',
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
   textAlign: 'left',
-  borderBottom: '1px solid #E2E8F0',
+  borderBottom: '1px solid var(--border-color)',
 }
 
 export const td = {
   padding: '9px 14px',
-  borderBottom: '1px solid #F1F5F9',
-  color: '#1B2A3B',
+  borderBottom: '1px solid var(--border-color)',
+  color: 'var(--text-main)',
   fontWeight: '500',
   fontSize: '12px',
 }

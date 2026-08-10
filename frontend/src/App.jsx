@@ -29,10 +29,10 @@ export default function App() {
         height:     '100vh',
         width:      '100%',
         overflow:   'hidden',
-        background: '#f8fafc',
+        background: 'var(--bg-page)',
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
         opacity:    enteredApp ? 1 : 0,
-        transition: 'opacity 0.4s ease',
+        transition: 'opacity 0.4s ease, background 0.3s ease',
       }}>
         <Navbar />
         <div style={{
@@ -40,7 +40,7 @@ export default function App() {
           height:     '100vh',
           overflowY:  'auto',
           overflowX:  'hidden',
-          background: '#f8fafc',
+          background: 'var(--bg-page)',
         }}>
           <Routes>
            <Route path="/"                      element={<StatusDashboard />} />

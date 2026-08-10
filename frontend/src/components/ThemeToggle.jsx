@@ -19,8 +19,8 @@ export default function ThemeToggle() {
     <label className="switch" title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}>
       <input
         type="checkbox"
-        checked={isDark}
-        onChange={(e) => setIsDark(e.target.checked)}
+        checked={!isDark}
+        onChange={(e) => setIsDark(!e.target.checked)}
       />
       <span className="slider">
         <span className="star star_1"></span>
