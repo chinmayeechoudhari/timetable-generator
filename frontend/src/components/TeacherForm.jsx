@@ -39,7 +39,9 @@ export default function TeacherForm() {
       const res = await axios.get(`${BASE}/teachers`)
       setTeachers(res.data)
     } catch {
-      setError('Could not load teachers. Please check that the backend is running.')
+      setError(
+        'Could not load teachers. Please check that the backend is running.'
+      )
     } finally {
       setLoading(false)
     }
@@ -99,12 +101,11 @@ export default function TeacherForm() {
       return
     }
 
-    // Immediate frontend duplicate check.
-    // Backend validation remains the final authority.
     const duplicate = teachers.some(
       teacher =>
         teacher.teacher_id !== editingId &&
-        teacher.teacher_name.trim().toLowerCase() === trimmedName.toLowerCase()
+        teacher.teacher_name.trim().toLowerCase() ===
+          trimmedName.toLowerCase()
     )
 
     if (duplicate) {
@@ -135,8 +136,6 @@ export default function TeacherForm() {
       resetForm()
 
       await fetchTeachers()
-
-      // Return to first page so a newly added teacher is easy to find.
       setCurrentPage(1)
     } catch (err) {
       const detail = err.response?.data?.detail
@@ -169,15 +168,10 @@ export default function TeacherForm() {
 
       setMessage(`"${deleteTarget.teacher_name}" deleted successfully.`)
 
-      if (editingId === deleteTarget.teacher_id) {
-        closeModal()
-      }
-
       await fetchTeachers()
 
-      // Make sure pagination doesn't point to an empty page.
       setCurrentPage(previousPage => {
-        const remainingItems = teachers.length - 1
+        const remainingItems = Math.max(0, teachers.length - 1)
         const remainingPages = Math.max(
           1,
           Math.ceil(remainingItems / PAGE_SIZE)
@@ -246,16 +240,50 @@ export default function TeacherForm() {
   return (
     <div style={S.page}>
       {/* ============================================================
-          PAGE HEADER
+          ACADEMIC BACKGROUND
       ============================================================ */}
+
+      <div style={academicBackground} aria-hidden="true">
+        <div style={backgroundGrid} />
+
+        <div style={backgroundRoom}>
+          <div style={roomWall} />
+          <div style={roomBoard} />
+
+          <div style={roomDoor} />
+
+          <div style={roomDeskRow}>
+            <span style={roomDesk} />
+            <span style={roomDesk} />
+            <span style={roomDesk} />
+            <span style={roomDesk} />
+          </div>
+
+          <div style={roomDeskRow}>
+            <span style={roomDesk} />
+            <span style={roomDesk} />
+            <span style={roomDesk} />
+            <span style={roomDesk} />
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================================
+          HEADER
+      ============================================================ */}
+
       <div style={pageHeader}>
-        <div>
+        <div style={headingBlock}>
+          <div style={eyebrow}>
+            ACADEMIC SCHEDULING
+          </div>
+
           <div style={pageTitle}>
             Teachers
           </div>
 
           <div style={pageSubtitle}>
-            Manage your faculty members and their daily teaching limits.
+            Manage faculty members and their daily teaching limits.
           </div>
         </div>
 
@@ -263,18 +291,21 @@ export default function TeacherForm() {
           <div style={statCard}>
             <span style={statLabel}>TOTAL</span>
             <span style={statValue}>{teachers.length}</span>
+            <span style={statHint}>Faculty members</span>
           </div>
 
           <div style={statCard}>
             <span style={statLabel}>AVG LOAD</span>
-            <span style={statValue}>{avgLoad}/day</span>
+            <span style={statValue}>{avgLoad}</span>
+            <span style={statHint}>Periods / day</span>
           </div>
         </div>
       </div>
 
       {/* ============================================================
-          GLOBAL MESSAGE
+          MESSAGES
       ============================================================ */}
+
       {message && (
         <div style={successBanner}>
           <span style={messageIcon}>✓</span>
@@ -290,8 +321,9 @@ export default function TeacherForm() {
       )}
 
       {/* ============================================================
-          ADD TEACHER CTA
+          ADD TEACHER
       ============================================================ */}
+
       <section style={addSection}>
         <div style={addSectionInner}>
           <div style={addIcon}>
@@ -300,12 +332,11 @@ export default function TeacherForm() {
 
           <div style={addText}>
             <div style={addTitle}>
-              Add a Teacher
+              Add Teacher
             </div>
 
             <div style={addSubtitle}>
-              Create a new faculty member and define their maximum
-              teaching periods per day.
+              Add a faculty member and define their daily teaching capacity.
             </div>
           </div>
 
@@ -314,15 +345,16 @@ export default function TeacherForm() {
             onClick={openAddModal}
             style={primaryButton}
           >
-            <span style={{ fontSize: '20px', lineHeight: 1 }}>+</span>
-            Add a Teacher
+            <span style={buttonPlus}>+</span>
+            Add Teacher
           </button>
         </div>
       </section>
 
       {/* ============================================================
-          TEACHER DIRECTORY
+          DIRECTORY
       ============================================================ */}
+
       <section style={directoryCard}>
         <div style={directoryHeader}>
           <div>
@@ -331,7 +363,7 @@ export default function TeacherForm() {
             </div>
 
             <div style={directorySubtitle}>
-              View, search and manage all teachers in the system.
+              Faculty available for timetable scheduling.
             </div>
           </div>
 
@@ -341,7 +373,8 @@ export default function TeacherForm() {
           </div>
         </div>
 
-        {/* Search */}
+        {/* SEARCH */}
+
         <div style={searchContainer}>
           <div style={searchWrapper}>
             <span style={searchIcon}>⌕</span>
@@ -370,18 +403,18 @@ export default function TeacherForm() {
           </div>
         </div>
 
-        {/* Table */}
+        {/* TABLE */}
+
         {loading ? (
           <div style={stateCard}>
             <div style={loadingSpinner} />
-            <div style={stateTitle}>Loading teachers...</div>
-            <div style={stateText}>
-              Fetching the latest teacher directory.
+            <div style={stateTitle}>
+              Loading teachers...
             </div>
           </div>
         ) : filteredTeachers.length === 0 ? (
           <div style={stateCard}>
-            <div style={emptyIcon}>👨‍🏫</div>
+            <div style={emptyIcon}>◌</div>
 
             <div style={stateTitle}>
               {search
@@ -391,8 +424,8 @@ export default function TeacherForm() {
 
             <div style={stateText}>
               {search
-                ? `No teacher matches "${search}". Try another search.`
-                : 'Add your first teacher using the button above.'}
+                ? `No teacher matches "${search}".`
+                : 'Add your first teacher to the directory.'}
             </div>
 
             {!search && (
@@ -401,7 +434,7 @@ export default function TeacherForm() {
                 onClick={openAddModal}
                 style={emptyActionButton}
               >
-                + Add a Teacher
+                + Add Teacher
               </button>
             )}
           </div>
@@ -411,32 +444,38 @@ export default function TeacherForm() {
               <table style={S.table}>
                 <thead>
                   <tr>
-                    <th style={{ ...S.th, width: '80px' }}>
-                      ID
+                    <th
+                      style={{
+                        ...S.th,
+                        width: '80px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      #
                     </th>
 
                     <th style={S.th}>
-                      Teacher Name
+                      TEACHER
                     </th>
 
                     <th
                       style={{
                         ...S.th,
-                        textAlign: 'center',
                         width: '220px',
+                        textAlign: 'center',
                       }}
                     >
-                      Max Periods / Day
+                      DAILY CAPACITY
                     </th>
 
                     <th
                       style={{
                         ...S.th,
+                        width: '190px',
                         textAlign: 'center',
-                        width: '220px',
                       }}
                     >
-                      Actions
+                      ACTIONS
                     </th>
                   </tr>
                 </thead>
@@ -449,12 +488,21 @@ export default function TeacherForm() {
                         background:
                           index % 2 === 0
                             ? '#FFFFFF'
-                            : '#FAFCFF',
+                            : '#FBFCFE',
                       }}
                     >
-                      <td style={S.td}>
+                      <td
+                        style={{
+                          ...S.td,
+                          textAlign: 'center',
+                        }}
+                      >
                         <span style={idText}>
-                          #{teacher.teacher_id}
+                          {String(
+                            (safeCurrentPage - 1) * PAGE_SIZE +
+                              index +
+                              1
+                          ).padStart(2, '0')}
                         </span>
                       </td>
 
@@ -470,7 +518,7 @@ export default function TeacherForm() {
                             </div>
 
                             <div style={teacherRole}>
-                              Faculty Member
+                              Faculty member
                             </div>
                           </div>
                         </div>
@@ -482,9 +530,15 @@ export default function TeacherForm() {
                           textAlign: 'center',
                         }}
                       >
-                        <span style={loadBadge}>
-                          {teacher.max_periods_per_day}
-                        </span>
+                        <div style={capacityWrapper}>
+                          <span style={loadBadge}>
+                            {teacher.max_periods_per_day}
+                          </span>
+
+                          <span style={capacityText}>
+                            periods / day
+                          </span>
+                        </div>
                       </td>
 
                       <td
@@ -496,7 +550,9 @@ export default function TeacherForm() {
                         <div style={actionGroup}>
                           <button
                             type="button"
-                            onClick={() => openEditModal(teacher)}
+                            onClick={() =>
+                              openEditModal(teacher)
+                            }
                             style={editButton}
                           >
                             Edit
@@ -504,7 +560,9 @@ export default function TeacherForm() {
 
                           <button
                             type="button"
-                            onClick={() => promptDelete(teacher)}
+                            onClick={() =>
+                              promptDelete(teacher)
+                            }
                             style={deleteButton}
                           >
                             Delete
@@ -517,7 +575,8 @@ export default function TeacherForm() {
               </table>
             </div>
 
-            {/* Pagination */}
+            {/* PAGINATION */}
+
             <div style={paginationContainer}>
               <div style={paginationInfo}>
                 Showing {firstVisible}–{lastVisible} of{' '}
@@ -555,7 +614,9 @@ export default function TeacherForm() {
                       <button
                         key={page}
                         type="button"
-                        onClick={() => setCurrentPage(page)}
+                        onClick={() =>
+                          setCurrentPage(page)
+                        }
                         style={{
                           ...paginationButton,
                           ...(safeCurrentPage === page
@@ -569,11 +630,15 @@ export default function TeacherForm() {
 
                   {totalPages > 5 && (
                     <>
-                      <span style={paginationDots}>...</span>
+                      <span style={paginationDots}>
+                        ...
+                      </span>
 
                       <button
                         type="button"
-                        onClick={() => setCurrentPage(totalPages)}
+                        onClick={() =>
+                          setCurrentPage(totalPages)
+                        }
                         style={{
                           ...paginationButton,
                           ...(safeCurrentPage === totalPages
@@ -588,14 +653,18 @@ export default function TeacherForm() {
 
                   <button
                     type="button"
-                    disabled={safeCurrentPage === totalPages}
+                    disabled={
+                      safeCurrentPage === totalPages
+                    }
                     onClick={() =>
                       setCurrentPage(previous => previous + 1)
                     }
                     style={{
                       ...paginationButton,
                       opacity:
-                        safeCurrentPage === totalPages ? 0.45 : 1,
+                        safeCurrentPage === totalPages
+                          ? 0.45
+                          : 1,
                       cursor:
                         safeCurrentPage === totalPages
                           ? 'not-allowed'
@@ -612,26 +681,29 @@ export default function TeacherForm() {
       </section>
 
       {/* ============================================================
-          DUPLICATE PREVENTION NOTICE
+          SMALL FOOTER NOTE
       ============================================================ */}
+
       <div style={infoBanner}>
         <span style={infoIcon}>i</span>
 
         <div>
-          <strong>Duplicate prevention:</strong>{' '}
-          Teacher names are unique. A teacher with the same name
-          cannot be added again.
+          Teacher names are unique and cannot be added twice.
         </div>
       </div>
 
       {/* ============================================================
           ADD / EDIT MODAL
       ============================================================ */}
+
       {isModalOpen && (
         <div
           style={modalOverlay}
           onMouseDown={e => {
-            if (e.target === e.currentTarget && !saving) {
+            if (
+              e.target === e.currentTarget &&
+              !saving
+            ) {
               closeModal()
             }
           }}
@@ -642,13 +714,13 @@ export default function TeacherForm() {
                 <div style={modalTitle}>
                   {editingId
                     ? 'Edit Teacher'
-                    : 'Add a Teacher'}
+                    : 'Add Teacher'}
                 </div>
 
                 <div style={modalSubtitle}>
                   {editingId
-                    ? 'Update the teacher details below.'
-                    : 'Create a faculty member and set their daily teaching limit.'}
+                    ? 'Update the faculty details.'
+                    : 'Create a faculty member and set their daily capacity.'}
                 </div>
               </div>
 
@@ -678,14 +750,14 @@ export default function TeacherForm() {
                       setName(e.target.value)
                       setError('')
                     }}
-                    placeholder="e.g., Prof. Sharma"
+                    placeholder="e.g. Prof. Sharma"
                     style={modalInput}
                     disabled={saving}
                     maxLength={100}
                   />
 
                   <div style={fieldHint}>
-                    Use the faculty member's display name.
+                    Faculty display name.
                   </div>
                 </div>
 
@@ -708,7 +780,7 @@ export default function TeacherForm() {
                   />
 
                   <div style={fieldHint}>
-                    Allowed range: 1–8 periods per day.
+                    1–8 periods per day.
                   </div>
                 </div>
 
@@ -735,7 +807,7 @@ export default function TeacherForm() {
                   disabled={saving}
                   style={{
                     ...primaryButton,
-                    minWidth: '150px',
+                    minWidth: '145px',
                     opacity: saving ? 0.7 : 1,
                   }}
                 >
@@ -752,8 +824,9 @@ export default function TeacherForm() {
       )}
 
       {/* ============================================================
-          DELETE CONFIRMATION
+          DELETE MODAL
       ============================================================ */}
+
       <ConfirmModal
         isOpen={!!deleteTarget}
         title="Delete Teacher"
@@ -781,27 +854,45 @@ function getInitials(name) {
 }
 
 /* ================================================================
-   PAGE STYLES
+   HEADER
 ================================================================ */
 
-const pageTitle = {
-  fontSize: '28px',
+const headingBlock = {
+  position: 'relative',
+  zIndex: 2,
+}
+
+const eyebrow = {
+  marginBottom: '7px',
+  fontSize: '11px',
   fontWeight: '800',
+  letterSpacing: '0.14em',
+  color: '#2563EB',
+}
+
+const pageTitle = {
+  fontSize: '32px',
+  lineHeight: '1.1',
+  fontWeight: '850',
+  letterSpacing: '-0.025em',
   color: 'var(--text-main)',
-  marginBottom: '6px',
+  marginBottom: '7px',
 }
 
 const pageSubtitle = {
-  fontSize: '13px',
+  fontSize: '14px',
+  lineHeight: '1.5',
   color: 'var(--text-muted)',
 }
 
 const pageHeader = {
+  position: 'relative',
   display: 'flex',
-  alignItems: 'flex-start',
+  alignItems: 'flex-end',
   justifyContent: 'space-between',
-  gap: '24px',
-  marginBottom: '24px',
+  gap: '30px',
+  marginBottom: '28px',
+  padding: '12px 2px',
   flexWrap: 'wrap',
 }
 
@@ -812,41 +903,54 @@ const statsContainer = {
 }
 
 const statCard = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '3px',
-  minWidth: '105px',
-  padding: '12px 16px',
-  background: 'var(--bg-card)',
-  border: '1px solid var(--border-color)',
+  minWidth: '128px',
+  padding: '14px 17px',
   borderRadius: '14px',
-  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+  background: 'rgba(255,255,255,0.86)',
+  border: '1px solid rgba(203,213,225,0.8)',
+  boxShadow: '0 8px 25px rgba(15,23,42,0.05)',
+  backdropFilter: 'blur(8px)',
 }
 
 const statLabel = {
+  display: 'block',
+  marginBottom: '3px',
   fontSize: '10px',
-  fontWeight: '700',
-  letterSpacing: '0.06em',
-  color: 'var(--text-muted)',
+  fontWeight: '800',
+  letterSpacing: '0.09em',
+  color: '#64748B',
 }
 
 const statValue = {
-  fontSize: '17px',
-  fontWeight: '800',
-  color: 'var(--text-main)',
+  display: 'block',
+  fontSize: '21px',
+  lineHeight: '1.2',
+  fontWeight: '850',
+  color: '#0F172A',
 }
+
+const statHint = {
+  display: 'block',
+  marginTop: '3px',
+  fontSize: '10px',
+  color: '#94A3B8',
+}
+
+/* ================================================================
+   MESSAGES
+================================================================ */
 
 const successBanner = {
   display: 'flex',
   alignItems: 'center',
   gap: '9px',
-  marginBottom: '16px',
-  padding: '11px 14px',
-  borderRadius: '10px',
+  marginBottom: '18px',
+  padding: '12px 15px',
+  borderRadius: '11px',
   background: '#F0FDF4',
   border: '1px solid #BBF7D0',
   color: '#166534',
-  fontSize: '12px',
+  fontSize: '13px',
   fontWeight: '600',
 }
 
@@ -854,13 +958,13 @@ const errorBanner = {
   display: 'flex',
   alignItems: 'center',
   gap: '9px',
-  marginBottom: '16px',
-  padding: '11px 14px',
-  borderRadius: '10px',
+  marginBottom: '18px',
+  padding: '12px 15px',
+  borderRadius: '11px',
   background: '#FEF2F2',
   border: '1px solid #FECACA',
   color: '#991B1B',
-  fontSize: '12px',
+  fontSize: '13px',
   fontWeight: '600',
 }
 
@@ -868,45 +972,52 @@ const messageIcon = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '20px',
-  height: '20px',
+  width: '21px',
+  height: '21px',
+  flexShrink: 0,
   borderRadius: '50%',
   background: 'rgba(255,255,255,0.7)',
   fontWeight: '800',
 }
 
+/* ================================================================
+   ADD SECTION
+================================================================ */
+
 const addSection = {
   marginBottom: '24px',
-  padding: '12px',
-  background: 'var(--bg-card)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '16px',
-  boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)',
+  padding: '10px',
+  borderRadius: '17px',
+  background: 'rgba(255,255,255,0.82)',
+  border: '1px solid rgba(203,213,225,0.85)',
+  boxShadow: '0 10px 30px rgba(15,23,42,0.045)',
+  backdropFilter: 'blur(8px)',
 }
 
 const addSectionInner = {
-  minHeight: '92px',
+  minHeight: '82px',
   display: 'flex',
   alignItems: 'center',
-  gap: '18px',
-  padding: '18px 22px',
-  border: '1px dashed #BFDBFE',
+  gap: '17px',
+  padding: '17px 20px',
   borderRadius: '12px',
-  background: 'linear-gradient(135deg, #FAFCFF, #F8FBFF)',
+  background:
+    'linear-gradient(135deg, rgba(239,246,255,0.78), rgba(248,250,252,0.72))',
+  border: '1px solid rgba(191,219,254,0.8)',
 }
 
 const addIcon = {
-  width: '48px',
-  height: '48px',
+  width: '46px',
+  height: '46px',
   flexShrink: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '14px',
+  borderRadius: '13px',
   background: '#EFF6FF',
-  color: '#2563EB',
   border: '1px solid #BFDBFE',
-  fontSize: '28px',
+  color: '#2563EB',
+  fontSize: '27px',
   fontWeight: '400',
 }
 
@@ -916,41 +1027,53 @@ const addText = {
 }
 
 const addTitle = {
+  marginBottom: '3px',
   fontSize: '16px',
   fontWeight: '800',
-  color: 'var(--text-main)',
-  marginBottom: '4px',
+  color: '#0F172A',
 }
 
 const addSubtitle = {
   fontSize: '12px',
   lineHeight: '1.5',
-  color: 'var(--text-muted)',
+  color: '#64748B',
+}
+
+const buttonPlus = {
+  fontSize: '20px',
+  lineHeight: 1,
+  fontWeight: '400',
 }
 
 const primaryButton = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '9px',
-  padding: '12px 20px',
-  minHeight: '44px',
+  gap: '8px',
+  minHeight: '43px',
+  padding: '11px 18px',
   border: 'none',
   borderRadius: '10px',
   background: '#2563EB',
   color: '#FFFFFF',
   fontSize: '13px',
-  fontWeight: '700',
+  fontWeight: '750',
   cursor: 'pointer',
-  boxShadow: '0 8px 18px rgba(37, 99, 235, 0.18)',
+  boxShadow: '0 7px 18px rgba(37,99,235,0.2)',
 }
 
+/* ================================================================
+   DIRECTORY
+================================================================ */
+
 const directoryCard = {
-  background: 'var(--bg-card)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '16px',
+  position: 'relative',
+  background: 'rgba(255,255,255,0.94)',
+  border: '1px solid rgba(203,213,225,0.85)',
+  borderRadius: '17px',
   overflow: 'hidden',
-  boxShadow: '0 6px 24px rgba(15, 23, 42, 0.04)',
+  boxShadow: '0 12px 34px rgba(15,23,42,0.055)',
+  backdropFilter: 'blur(8px)',
 }
 
 const directoryHeader = {
@@ -958,34 +1081,35 @@ const directoryHeader = {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '16px',
-  padding: '22px 24px 18px',
+  padding: '22px 24px 17px',
   flexWrap: 'wrap',
 }
 
 const directoryTitle = {
-  fontSize: '17px',
-  fontWeight: '800',
-  color: 'var(--text-main)',
+  fontSize: '19px',
+  fontWeight: '850',
+  letterSpacing: '-0.015em',
+  color: '#0F172A',
 }
 
 const directorySubtitle = {
   marginTop: '4px',
   fontSize: '12px',
-  color: 'var(--text-muted)',
+  color: '#64748B',
 }
 
 const teacherCountPill = {
   padding: '7px 12px',
   borderRadius: '999px',
-  background: '#EFF6FF',
-  border: '1px solid #BFDBFE',
-  color: '#1D4ED8',
+  background: '#F8FAFC',
+  border: '1px solid #CBD5E1',
+  color: '#475569',
   fontSize: '11px',
-  fontWeight: '700',
+  fontWeight: '750',
 }
 
 const searchContainer = {
-  padding: '0 24px 18px',
+  padding: '0 24px 19px',
 }
 
 const searchWrapper = {
@@ -997,9 +1121,9 @@ const searchWrapper = {
 
 const searchIcon = {
   position: 'absolute',
-  left: '14px',
+  left: '15px',
   zIndex: 1,
-  fontSize: '22px',
+  fontSize: '23px',
   lineHeight: 1,
   color: '#64748B',
   transform: 'rotate(-20deg)',
@@ -1007,14 +1131,14 @@ const searchIcon = {
 
 const searchInput = {
   width: '100%',
-  height: '44px',
+  height: '47px',
   boxSizing: 'border-box',
-  padding: '0 42px',
+  padding: '0 44px',
   border: '1px solid #CBD5E1',
-  borderRadius: '10px',
+  borderRadius: '11px',
   background: '#F8FAFC',
-  color: 'var(--text-main)',
-  fontSize: '13px',
+  color: '#0F172A',
+  fontSize: '14px',
   outline: 'none',
   fontFamily: 'inherit',
 }
@@ -1022,60 +1146,80 @@ const searchInput = {
 const clearSearchButton = {
   position: 'absolute',
   right: '10px',
-  width: '25px',
-  height: '25px',
+  width: '27px',
+  height: '27px',
   border: 'none',
   borderRadius: '50%',
   background: '#E2E8F0',
   color: '#475569',
   cursor: 'pointer',
-  fontSize: '17px',
+  fontSize: '18px',
   lineHeight: 1,
 }
+
+/* ================================================================
+   TABLE
+================================================================ */
 
 const tableWrapper = {
   width: '100%',
   overflowX: 'auto',
-  borderTop: '1px solid var(--border-color)',
-  borderBottom: '1px solid var(--border-color)',
+  borderTop: '1px solid #E2E8F0',
+  borderBottom: '1px solid #E2E8F0',
 }
 
 const idText = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minWidth: '30px',
+  height: '30px',
+  borderRadius: '8px',
+  background: '#F8FAFC',
   color: '#64748B',
   fontSize: '12px',
-  fontWeight: '700',
+  fontWeight: '750',
 }
 
 const teacherIdentity = {
   display: 'flex',
   alignItems: 'center',
-  gap: '11px',
+  gap: '13px',
 }
 
 const avatarCircle = {
-  width: '36px',
-  height: '36px',
+  width: '40px',
+  height: '40px',
   flexShrink: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '50%',
-  background: 'linear-gradient(135deg, #DBEAFE, #BFDBFE)',
+  borderRadius: '12px',
+  background:
+    'linear-gradient(135deg, #DBEAFE 0%, #E0E7FF 100%)',
+  border: '1px solid #BFDBFE',
   color: '#1D4ED8',
-  fontSize: '11px',
-  fontWeight: '800',
+  fontSize: '12px',
+  fontWeight: '850',
 }
 
 const teacherName = {
-  fontSize: '13px',
-  fontWeight: '700',
-  color: 'var(--text-main)',
+  fontSize: '14px',
+  fontWeight: '750',
+  color: '#0F172A',
 }
 
 const teacherRole = {
-  marginTop: '2px',
-  fontSize: '10px',
+  marginTop: '3px',
+  fontSize: '11px',
   color: '#94A3B8',
+}
+
+const capacityWrapper = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
 }
 
 const loadBadge = {
@@ -1083,13 +1227,19 @@ const loadBadge = {
   alignItems: 'center',
   justifyContent: 'center',
   minWidth: '36px',
-  padding: '5px 11px',
-  borderRadius: '999px',
-  background: '#F8FAFC',
-  border: '1px solid #CBD5E1',
-  color: '#1E293B',
-  fontSize: '12px',
-  fontWeight: '800',
+  height: '32px',
+  padding: '0 10px',
+  borderRadius: '9px',
+  background: '#EFF6FF',
+  border: '1px solid #BFDBFE',
+  color: '#1D4ED8',
+  fontSize: '13px',
+  fontWeight: '850',
+}
+
+const capacityText = {
+  fontSize: '11px',
+  color: '#64748B',
 }
 
 const actionGroup = {
@@ -1100,26 +1250,30 @@ const actionGroup = {
 }
 
 const editButton = {
-  padding: '7px 13px',
+  padding: '8px 14px',
   borderRadius: '8px',
-  border: '1px solid #BFDBFE',
-  background: '#EFF6FF',
-  color: '#1D4ED8',
+  border: '1px solid #CBD5E1',
+  background: '#FFFFFF',
+  color: '#334155',
   fontSize: '11px',
-  fontWeight: '700',
+  fontWeight: '750',
   cursor: 'pointer',
 }
 
 const deleteButton = {
-  padding: '7px 13px',
+  padding: '8px 14px',
   borderRadius: '8px',
   border: '1px solid #FECACA',
-  background: '#FEF2F2',
+  background: '#FFF7F7',
   color: '#DC2626',
   fontSize: '11px',
-  fontWeight: '700',
+  fontWeight: '750',
   cursor: 'pointer',
 }
+
+/* ================================================================
+   PAGINATION
+================================================================ */
 
 const paginationContainer = {
   display: 'flex',
@@ -1159,7 +1313,7 @@ const activePaginationButton = {
   background: '#2563EB',
   borderColor: '#2563EB',
   color: '#FFFFFF',
-  boxShadow: '0 4px 10px rgba(37, 99, 235, 0.18)',
+  boxShadow: '0 4px 10px rgba(37,99,235,0.18)',
 }
 
 const paginationDots = {
@@ -1167,22 +1321,34 @@ const paginationDots = {
   color: '#94A3B8',
 }
 
+/* ================================================================
+   STATES
+================================================================ */
+
 const stateCard = {
   margin: '0 24px 24px',
-  padding: '50px 24px',
+  padding: '55px 24px',
   textAlign: 'center',
   border: '1px dashed #CBD5E1',
-  borderRadius: '12px',
+  borderRadius: '13px',
   background: '#FAFCFF',
 }
 
 const emptyIcon = {
-  fontSize: '32px',
-  marginBottom: '10px',
+  width: '48px',
+  height: '48px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  margin: '0 auto 12px',
+  borderRadius: '14px',
+  background: '#EFF6FF',
+  color: '#2563EB',
+  fontSize: '26px',
 }
 
 const stateTitle = {
-  fontSize: '14px',
+  fontSize: '15px',
   fontWeight: '800',
   color: '#1E293B',
   marginBottom: '5px',
@@ -1202,29 +1368,33 @@ const emptyActionButton = {
   background: '#EFF6FF',
   color: '#1D4ED8',
   fontSize: '12px',
-  fontWeight: '700',
+  fontWeight: '750',
   cursor: 'pointer',
 }
 
 const loadingSpinner = {
-  width: '26px',
-  height: '26px',
+  width: '27px',
+  height: '27px',
   margin: '0 auto 14px',
   border: '3px solid #DBEAFE',
   borderTopColor: '#2563EB',
   borderRadius: '50%',
 }
 
+/* ================================================================
+   INFO
+================================================================ */
+
 const infoBanner = {
   display: 'flex',
-  alignItems: 'flex-start',
-  gap: '10px',
-  marginTop: '16px',
-  padding: '12px 14px',
+  alignItems: 'center',
+  gap: '9px',
+  marginTop: '15px',
+  padding: '11px 14px',
   borderRadius: '10px',
-  background: '#F8FAFC',
-  border: '1px solid #CBD5E1',
-  color: '#475569',
+  background: 'rgba(248,250,252,0.75)',
+  border: '1px solid #E2E8F0',
+  color: '#64748B',
   fontSize: '11px',
   lineHeight: '1.5',
 }
@@ -1237,11 +1407,15 @@ const infoIcon = {
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '50%',
-  background: '#DBEAFE',
-  color: '#1D4ED8',
-  fontSize: '11px',
+  background: '#E0E7FF',
+  color: '#4338CA',
+  fontSize: '10px',
   fontWeight: '800',
 }
+
+/* ================================================================
+   MODAL
+================================================================ */
 
 const modalOverlay = {
   position: 'fixed',
@@ -1251,8 +1425,8 @@ const modalOverlay = {
   alignItems: 'center',
   justifyContent: 'center',
   padding: '24px',
-  background: 'rgba(15, 23, 42, 0.45)',
-  backdropFilter: 'blur(4px)',
+  background: 'rgba(15,23,42,0.45)',
+  backdropFilter: 'blur(5px)',
 }
 
 const modalCard = {
@@ -1262,7 +1436,7 @@ const modalCard = {
   overflowY: 'auto',
   background: '#FFFFFF',
   borderRadius: '18px',
-  boxShadow: '0 24px 70px rgba(15, 23, 42, 0.22)',
+  boxShadow: '0 24px 70px rgba(15,23,42,0.22)',
 }
 
 const modalHeader = {
@@ -1270,13 +1444,13 @@ const modalHeader = {
   alignItems: 'flex-start',
   justifyContent: 'space-between',
   gap: '16px',
-  padding: '22px 24px',
+  padding: '23px 24px',
   borderBottom: '1px solid #E2E8F0',
 }
 
 const modalTitle = {
-  fontSize: '18px',
-  fontWeight: '800',
+  fontSize: '19px',
+  fontWeight: '850',
   color: '#0F172A',
 }
 
@@ -1288,11 +1462,11 @@ const modalSubtitle = {
 }
 
 const modalCloseButton = {
-  width: '32px',
-  height: '32px',
+  width: '33px',
+  height: '33px',
   flexShrink: 0,
   border: 'none',
-  borderRadius: '8px',
+  borderRadius: '9px',
   background: '#F1F5F9',
   color: '#475569',
   fontSize: '22px',
@@ -1309,10 +1483,11 @@ const modalBody = {
 
 const modalInput = {
   ...S.input,
-  height: '44px',
+  height: '46px',
   borderRadius: '10px',
   background: '#F8FAFC',
   border: '1px solid #CBD5E1',
+  fontSize: '14px',
 }
 
 const fieldHint = {
@@ -1352,4 +1527,97 @@ const cancelButton = {
   fontSize: '12px',
   fontWeight: '700',
   cursor: 'pointer',
+}
+
+/* ================================================================
+   ACADEMIC BACKGROUND
+================================================================ */
+
+const academicBackground = {
+  position: 'absolute',
+  inset: 0,
+  zIndex: -1,
+  pointerEvents: 'none',
+  overflow: 'hidden',
+}
+
+const backgroundGrid = {
+  position: 'absolute',
+  inset: 0,
+  opacity: 0.14,
+  backgroundImage: `
+    linear-gradient(
+      rgba(37, 99, 235, 0.08) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(37, 99, 235, 0.08) 1px,
+      transparent 1px
+    )
+  `,
+  backgroundSize: '42px 42px',
+  maskImage:
+    'linear-gradient(to bottom right, transparent 12%, black 62%, transparent 100%)',
+}
+
+const backgroundRoom = {
+  position: 'absolute',
+  right: '-55px',
+  bottom: '5px',
+  width: '460px',
+  height: '320px',
+  opacity: 0.075,
+  transform: 'rotate(-3deg)',
+}
+
+const roomWall = {
+  position: 'absolute',
+  inset: '18px 25px 55px 25px',
+  border: '2px solid #2563EB',
+  borderRadius: '10px',
+  background:
+    'linear-gradient(135deg, rgba(37,99,235,0.08), rgba(255,255,255,0.01))',
+}
+
+const roomBoard = {
+  position: 'absolute',
+  top: '42px',
+  left: '85px',
+  width: '205px',
+  height: '78px',
+  border: '2px solid #2563EB',
+  borderRadius: '5px',
+  background: 'rgba(37,99,235,0.04)',
+  boxShadow:
+    'inset 0 0 0 1px rgba(37,99,235,0.05)',
+}
+
+const roomDoor = {
+  position: 'absolute',
+  right: '53px',
+  top: '42px',
+  width: '48px',
+  height: '105px',
+  border: '2px solid #2563EB',
+  borderBottom: 'none',
+  borderRadius: '4px 4px 0 0',
+  background: 'rgba(37,99,235,0.025)',
+}
+
+const roomDeskRow = {
+  display: 'flex',
+  gap: '18px',
+  marginLeft: '65px',
+  marginBottom: '18px',
+  transform: 'translateY(165px)',
+}
+
+const roomDesk = {
+  display: 'block',
+  width: '62px',
+  height: '30px',
+  border: '2px solid #2563EB',
+  borderRadius: '5px',
+  background: 'rgba(37,99,235,0.025)',
 }
