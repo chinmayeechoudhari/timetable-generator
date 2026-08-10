@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import * as S from '../styles/formStyles'
+import ConfirmModal from './ConfirmModal'
 
 const BASE = 'http://localhost:8000'
 
@@ -9,6 +10,8 @@ export default function ClassForm() {
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [isDeleting, setIsDeleting]     = useState(false)
 
   // NEW
   const [editingId, setEditingId] = useState(null)
@@ -61,23 +64,38 @@ export default function ClassForm() {
     }
   }
 
-  // NEW
-  async function handleDelete(c) {
-    if (!window.confirm(`Delete class "${c.class_name}"? This will also remove its linked subjects.`)) return
+  function promptDelete(c) {
+    setDeleteTarget(c)
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setIsDeleting(true)
     setMessage('')
     setError('')
     try {
-      await axios.delete(`${BASE}/classes/${c.class_id}`)
-      setMessage(`Class "${c.class_name}" deleted`)
-      if (editingId === c.class_id) handleCancelEdit()
+      await axios.delete(`${BASE}/classes/${deleteTarget.class_id}`)
+      setMessage(`Class "${deleteTarget.class_name}" deleted successfully`)
+      if (editingId === deleteTarget.class_id) handleCancelEdit()
       fetchClasses()
     } catch (err) {
-      setError(err.response?.data?.detail || 'Cannot delete — linked records exist. Remove subjects first.')
+      setError(err.response?.data?.detail || 'Error deleting class.')
+    } finally {
+      setIsDeleting(false)
+      setDeleteTarget(null)
     }
   }
 
   return (
     <div style={{ ...S.page }}>
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Class"
+        message={`Are you sure you want to delete "${deleteTarget?.class_name}"? This will also remove its linked subjects.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+        isProcessing={isDeleting}
+      />
 
       <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
         <div>
@@ -207,7 +225,7 @@ export default function ClassForm() {
                       <td style={{ ...S.td, textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
                           <button onClick={() => handleEdit(c)} style={editBtn}>Edit</button>
-                          <button onClick={() => handleDelete(c)} style={deleteBtn}>Delete</button>
+                          <button onClick={() => promptDelete(c)} style={deleteBtn}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -224,6 +242,16 @@ export default function ClassForm() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Class"
+        itemName={deleteTarget?.class_name}
+        message="Are you sure you want to delete this class? This will also remove any linked subjects and timetable entries."
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

@@ -11,6 +11,7 @@ import TeacherSubjectForm from './components/TeacherSubjectForm.jsx'
 import TeacherAvailabilityForm from './components/TeacherAvailabilityForm.jsx'
 import GenerateTimetable from './components/GenerateTimetable.jsx'
 import TimetableGrid from './components/TimetableGrid.jsx'
+import StatusDashboard from './components/StatusDashboard.jsx'
 
 export default function App() {
   const [enteredApp, setEnteredApp] = useState(false)
@@ -28,7 +29,7 @@ export default function App() {
         height:     '100vh',
         width:      '100%',
         overflow:   'hidden',
-        background: '#F0F4F8',
+        background: '#f8fafc',
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
         opacity:    enteredApp ? 1 : 0,
         transition: 'opacity 0.4s ease',
@@ -39,10 +40,10 @@ export default function App() {
           height:     '100vh',
           overflowY:  'auto',
           overflowX:  'hidden',
-          background: '#F0F4F8',
+          background: '#f8fafc',
         }}>
           <Routes>
-            <Route path="/"                     element={<TeacherForm />} />
+           <Route path="/"                      element={<StatusDashboard />} />
             <Route path="/teachers"             element={<TeacherForm />} />
             <Route path="/rooms"                element={<RoomForm />} />
             <Route path="/classes"              element={<ClassForm />} />

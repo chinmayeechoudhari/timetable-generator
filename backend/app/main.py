@@ -16,11 +16,16 @@ from app.api.generate import router as generate_router
 
 
 
+from app.core.config import Base, engine
+from app.models import models  # Ensure models are loaded
+
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(title="Timetable Generator API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import * as S from '../styles/formStyles'
 import SubjectTypeBadge from './SubjectTypeBadge'
+import ConfirmModal from './ConfirmModal'
 
 const BASE = 'http://localhost:8000'
 
@@ -15,6 +16,8 @@ export default function SubjectForm() {
   const [labPeriods, setLabPeriods]         = useState(1)
   const [message, setMessage]               = useState('')
   const [error, setError]                   = useState('')
+  const [deleteTarget, setDeleteTarget]     = useState(null)
+  const [isDeleting, setIsDeleting]         = useState(false)
 
   // NEW — for edit mode
   // editingId is the subject_id being edited.
@@ -125,18 +128,25 @@ export default function SubjectForm() {
     }
   }
 
-  // NEW
-  async function handleDelete(s) {
-    if (!window.confirm(`Delete "${s.subject_name}" (${s.subject_type})?`)) return
+  function promptDelete(s) {
+    setDeleteTarget(s)
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setIsDeleting(true)
     setMessage('')
     setError('')
     try {
-      await axios.delete(`${BASE}/subjects/${s.subject_id}`)
-      setMessage(`"${s.subject_name}" (${s.subject_type}) deleted`)
-      if (editingId === s.subject_id) handleCancelEdit()
+      await axios.delete(`${BASE}/subjects/${deleteTarget.subject_id}`)
+      setMessage(`"${deleteTarget.subject_name}" (${deleteTarget.subject_type}) deleted successfully`)
+      if (editingId === deleteTarget.subject_id) handleCancelEdit()
       fetchAll()
     } catch (err) {
-      setError(err.response?.data?.detail || 'Cannot delete — linked records exist.')
+      setError(err.response?.data?.detail || 'Error deleting subject.')
+    } finally {
+      setIsDeleting(false)
+      setDeleteTarget(null)
     }
   }
 
@@ -417,7 +427,7 @@ export default function SubjectForm() {
                       <td style={{ ...S.td, textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
                           <button onClick={() => handleEdit(s)} style={editBtn}>Edit</button>
-                          <button onClick={() => handleDelete(s)} style={deleteBtn}>Delete</button>
+                          <button onClick={() => promptDelete(s)} style={deleteBtn}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -428,6 +438,16 @@ export default function SubjectForm() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Subject"
+        itemName={deleteTarget ? `${deleteTarget.subject_name} (${deleteTarget.subject_type})` : ''}
+        message="Are you sure you want to delete this subject? This will disassociate any teacher links and timetable entries."
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

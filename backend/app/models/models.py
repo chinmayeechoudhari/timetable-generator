@@ -6,8 +6,8 @@ class Class(Base):
     __tablename__ = 'class'
     class_id   = Column(Integer, primary_key=True, index=True)
     class_name = Column(String, nullable=False)
-    subjects   = relationship('Subject', back_populates='class_')
-    timetables = relationship('Timetable', back_populates='class_')
+    subjects   = relationship('Subject', back_populates='class_', cascade="all, delete-orphan")
+    timetables = relationship('Timetable', back_populates='class_', cascade="all, delete-orphan")
 
 class Subject(Base):
     __tablename__ = 'subject'
@@ -17,30 +17,30 @@ class Subject(Base):
     subject_type     = Column(String, default='theory')  # 'theory' or 'lab'
     class_id         = Column(Integer, ForeignKey('class.class_id'), nullable=False)
     class_           = relationship('Class', back_populates='subjects')
-    teacher_subjects = relationship('TeacherSubject', back_populates='subject')
+    teacher_subjects = relationship('TeacherSubject', back_populates='subject', cascade="all, delete-orphan")
 
 class Teacher(Base):
     __tablename__ = 'teacher'
     teacher_id         = Column(Integer, primary_key=True, index=True)
     teacher_name       = Column(String, nullable=False)
     max_periods_per_day = Column(Integer, default=6)
-    teacher_subjects   = relationship('TeacherSubject', back_populates='teacher')
-    availabilities     = relationship('TeacherAvailability', back_populates='teacher')
+    teacher_subjects   = relationship('TeacherSubject', back_populates='teacher', cascade="all, delete-orphan")
+    availabilities     = relationship('TeacherAvailability', back_populates='teacher', cascade="all, delete-orphan")
 
 class Room(Base):
     __tablename__ = 'room'
     room_id     = Column(Integer, primary_key=True, index=True)
     room_number = Column(String, nullable=False)
     room_type   = Column(String, default='classroom')  # 'classroom' or 'lab'
-    timetables  = relationship('Timetable', back_populates='room')
+    timetables  = relationship('Timetable', back_populates='room', cascade="all, delete-orphan")
 
 class TimeSlot(Base):
     __tablename__ = 'timeslot'
     slot_id       = Column(Integer, primary_key=True, index=True)
     day           = Column(String, nullable=False)
     period_number = Column(Integer, nullable=False)
-    timetables    = relationship('Timetable', back_populates='timeslot')
-    availabilities = relationship('TeacherAvailability', back_populates='timeslot')
+    timetables    = relationship('Timetable', back_populates='timeslot', cascade="all, delete-orphan")
+    availabilities = relationship('TeacherAvailability', back_populates='timeslot', cascade="all, delete-orphan")
 
 class TeacherSubject(Base):
     __tablename__ = 'teacher_subject'

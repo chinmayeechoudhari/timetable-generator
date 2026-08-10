@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import * as S from '../styles/formStyles'
+import ConfirmModal from './ConfirmModal'
 
 const BASE = 'http://localhost:8000'
 
@@ -10,6 +11,8 @@ export default function RoomForm() {
   const [roomType, setRoomType] = useState('classroom')
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // NEW
   const [editingId, setEditingId] = useState(null)
@@ -70,18 +73,25 @@ export default function RoomForm() {
     }
   }
 
-  // NEW
-  async function handleDelete(r) {
-    if (!window.confirm(`Delete room "${r.room_number}"? This may affect linked timetable entries.`)) return
+  function promptDelete(r) {
+    setDeleteTarget(r)
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setIsDeleting(true)
     setMessage('')
     setError('')
     try {
-      await axios.delete(`${BASE}/rooms/${r.room_id}`)
-      setMessage(`Room "${r.room_number}" deleted`)
-      if (editingId === r.room_id) handleCancelEdit()
+      await axios.delete(`${BASE}/rooms/${deleteTarget.room_id}`)
+      setMessage(`Room "${deleteTarget.room_number}" deleted successfully`)
+      if (editingId === deleteTarget.room_id) handleCancelEdit()
       fetchRooms()
     } catch (err) {
-      setError(err.response?.data?.detail || 'Cannot delete — linked timetable entries exist.')
+      setError(err.response?.data?.detail || 'Error deleting room.')
+    } finally {
+      setIsDeleting(false)
+      setDeleteTarget(null)
     }
   }
 
@@ -262,7 +272,7 @@ export default function RoomForm() {
                       <td style={{ ...S.td, textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
                           <button onClick={() => handleEdit(r)} style={editBtn}>Edit</button>
-                          <button onClick={() => handleDelete(r)} style={deleteBtn}>Delete</button>
+                          <button onClick={() => promptDelete(r)} style={deleteBtn}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -279,6 +289,16 @@ export default function RoomForm() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Room"
+        itemName={deleteTarget?.room_number}
+        message="Are you sure you want to delete this room? This will disassociate any assigned timetable entries."
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

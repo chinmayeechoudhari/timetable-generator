@@ -1,8 +1,9 @@
 # .gitignore
-venv/
+venv*/
 __pycache__/
 *.pyc
-.env
+.env*
+*.db
 node_modules/
 dist/
 .DS_Store

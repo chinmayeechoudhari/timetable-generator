@@ -77,6 +77,15 @@ def delete_class(class_id: int, db: Session = Depends(get_db)) -> ClassRead:
         )
 
     deleted = ClassRead(class_id=class_obj.class_id, class_name=class_obj.class_name)
+
+    from app.models.models import Subject, TeacherSubject, Timetable
+    subject_ids = [s.subject_id for s in db.query(Subject).filter(Subject.class_id == class_id).all()]
+    if subject_ids:
+        db.query(TeacherSubject).filter(TeacherSubject.subject_id.in_(subject_ids)).delete(synchronize_session=False)
+        db.query(Timetable).filter(Timetable.subject_id.in_(subject_ids)).delete(synchronize_session=False)
+        db.query(Subject).filter(Subject.class_id == class_id).delete(synchronize_session=False)
+    db.query(Timetable).filter(Timetable.class_id == class_id).delete(synchronize_session=False)
+
     db.delete(class_obj)
     db.commit()
     return deleted

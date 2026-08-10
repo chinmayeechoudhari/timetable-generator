@@ -101,6 +101,9 @@ def delete_room(room_id: int, db: Session = Depends(get_db)) -> RoomRead:
         room_type=room.room_type,
     )
 
+    from app.models.models import Timetable
+    db.query(Timetable).filter(Timetable.room_id == room_id).delete(synchronize_session=False)
+
     db.delete(room)
     db.commit()
     return deleted

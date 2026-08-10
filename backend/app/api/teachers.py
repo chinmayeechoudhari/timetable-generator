@@ -101,6 +101,11 @@ def delete_teacher(teacher_id: int, db: Session = Depends(get_db)) -> TeacherRea
         max_periods_per_day=teacher.max_periods_per_day,
     )
 
+    from app.models.models import TeacherSubject, TeacherAvailability, Timetable
+    db.query(TeacherSubject).filter(TeacherSubject.teacher_id == teacher_id).delete(synchronize_session=False)
+    db.query(TeacherAvailability).filter(TeacherAvailability.teacher_id == teacher_id).delete(synchronize_session=False)
+    db.query(Timetable).filter(Timetable.teacher_id == teacher_id).delete(synchronize_session=False)
+
     db.delete(teacher)
     db.commit()
     return deleted

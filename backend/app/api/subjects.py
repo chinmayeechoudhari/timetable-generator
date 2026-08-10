@@ -111,6 +111,10 @@ def delete_subject(subject_id: int, db: Session = Depends(get_db)) -> SubjectRea
         class_id=subject.class_id,
     )
 
+    from app.models.models import TeacherSubject, Timetable
+    db.query(TeacherSubject).filter(TeacherSubject.subject_id == subject_id).delete(synchronize_session=False)
+    db.query(Timetable).filter(Timetable.subject_id == subject_id).delete(synchronize_session=False)
+
     db.delete(subject)
     db.commit()
     return deleted

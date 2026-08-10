@@ -98,19 +98,11 @@ def add_soft_no_consecutive_periods(model, assign, teacher_ids, slots_by_day):
                 if not assigns_a or not assigns_b:
                     continue
 
-                # consecutive_flag = 1 if teacher is assigned in BOTH periods
+                # consecutive_flag = 1 if teacher is assigned in BOTH periods (assigns_a >= 1 AND assigns_b >= 1)
                 consecutive_flag = model.NewBoolVar(
                     f'consec_t{t_id}_d{day}_p{i}'
                 )
-                # If sum of assigns_a >= 1 AND sum of assigns_b >= 1,
-                # we want consecutive_flag = 1
-                # We use a simple linearisation:
-                # consecutive_flag <= sum(assigns_a)
-                # consecutive_flag <= sum(assigns_b)
-                # consecutive_flag >= sum(assigns_a) + sum(assigns_b) - 1
-                model.Add(sum(assigns_a) >= 1).OnlyEnforceIf(consecutive_flag)
-                model.Add(sum(assigns_b) >= 1).OnlyEnforceIf(consecutive_flag)
-                model.Add(consecutive_flag == 0).OnlyEnforceIf(consecutive_flag.Not())
+                model.Add(consecutive_flag >= sum(assigns_a) + sum(assigns_b) - 1)
 
                 penalties.append(consecutive_flag)
     return penalties

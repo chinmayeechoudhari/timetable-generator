@@ -42,8 +42,18 @@ export default function GenerateTimetable() {
     timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
     try {
       const res = await axios.post(`${BASE}/generate`)
+      if (res.data?.status === 'error') {
+        setError(res.data?.message || 'Failed to start generation')
+        setIsGenerating(false)
+        clearInterval(timerRef.current)
+        return
+      }
       setTaskId(res.data?.task_id || null)
       setStatus(res.data?.status || 'running')
+      // Immediately trigger first poll
+      if (res.data?.task_id) {
+        pollStatus(res.data.task_id)
+      }
     } catch (err) {
       setError(err?.response?.data?.detail || err?.message || 'Failed to start generation')
       setIsGenerating(false)
@@ -56,10 +66,12 @@ export default function GenerateTimetable() {
       const res = await axios.get(`${BASE}/generate/status/${id}`)
       const s = res.data?.status
       setStatus(s)
-      if (s === 'done') {
+      if (s === 'done' || s === 'error') {
         const r = res.data?.result ?? null
         setResult(r)
-        // If solver failed, surface the diagnosis
+        if (s === 'error' || r?.status === 'error') {
+          setError(res.data?.message || r?.message || 'Generation error')
+        }
         if (r?.status === 'no_solution' && r?.diagnosis) {
           setDiagnosis(r.diagnosis)
         }
@@ -86,7 +98,7 @@ export default function GenerateTimetable() {
 
   const showRunning  = isGenerating && status !== 'done'
   const solverFailed = status === 'done' && result?.status === 'no_solution'
-  const solverOk     = status === 'done' && !solverFailed
+  const solverOk     = status === 'done' && result?.status === 'success'
 
   // Generate button is disabled while generating OR if validation has issues
   const canGenerate  = !isGenerating && (validation?.ready !== false)
