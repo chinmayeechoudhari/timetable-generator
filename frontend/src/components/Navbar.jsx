@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import ThemeToggle from './ThemeToggle'
 
 /* ─── SVG Icons for Nav Items ─────────────────────────────────── */
 const Icons = {
@@ -123,40 +124,46 @@ export default function Navbar() {
         padding: '24px 20px 20px',
         display: 'flex',
         alignItems: 'center',
-        gap: '14px',
+        justifyContent: 'space-between',
+        gap: '12px',
         borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
       }}>
-        {/* Blue Logo Box */}
-        <div style={{
-          width: '42px',
-          height: '42px',
-          borderRadius: '12px',
-          background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 6px 18px rgba(37, 99, 235, 0.4)',
-          flexShrink: 0,
-        }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <rect x="3" y="4" width="18" height="17" rx="3"/>
-            <path d="M3 9h18"/>
-            <path d="M8 2v4M16 2v4"/>
-            <rect x="7" y="13" width="2" height="2" rx=".4" fill="white"/>
-            <rect x="11" y="13" width="2" height="2" rx=".4" fill="white"/>
-            <rect x="15" y="13" width="2" height="2" rx=".4" fill="white"/>
-          </svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Blue Logo Box */}
+          <div style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 6px 18px rgba(37, 99, 235, 0.4)',
+            flexShrink: 0,
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="17" rx="3"/>
+              <path d="M3 9h18"/>
+              <path d="M8 2v4M16 2v4"/>
+              <rect x="7" y="13" width="2" height="2" rx=".4" fill="white"/>
+              <rect x="11" y="13" width="2" height="2" rx=".4" fill="white"/>
+              <rect x="15" y="13" width="2" height="2" rx=".4" fill="white"/>
+            </svg>
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
+              <span style={{ fontSize: '18px', fontWeight: '800', color: '#ffffff', letterSpacing: '-0.3px' }}>Timetable</span>
+              <span style={{ fontSize: '18px', fontWeight: '900', color: '#3b82f6', letterSpacing: '-0.3px' }}>Pro</span>
+            </div>
+            <div style={{ fontSize: '11px', fontWeight: '500', color: '#64748b', marginTop: '2px' }}>
+              CP-SAT Scheduler
+            </div>
+          </div>
         </div>
 
-        <div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
-            <span style={{ fontSize: '18px', fontWeight: '800', color: '#ffffff', letterSpacing: '-0.3px' }}>Timetable</span>
-            <span style={{ fontSize: '18px', fontWeight: '900', color: '#3b82f6', letterSpacing: '-0.3px' }}>Pro</span>
-          </div>
-          <div style={{ fontSize: '11px', fontWeight: '500', color: '#64748b', marginTop: '2px' }}>
-            CP-SAT Scheduler
-          </div>
-        </div>
+        {/* ── Animated Theme Switch ── */}
+        <ThemeToggle />
       </div>
 
       {/* ── Nav Sections ── */}
