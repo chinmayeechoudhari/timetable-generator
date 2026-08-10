@@ -68,12 +68,38 @@ class Teacher(Base):
     )
 
 class Room(Base):
-    __tablename__ = 'room'
-    room_id     = Column(Integer, primary_key=True, index=True)
-    room_number = Column(String, nullable=False)
-    room_type   = Column(String, default='classroom')  # 'classroom' or 'lab'
-    timetables  = relationship('Timetable', back_populates='room', cascade="all, delete-orphan")
 
+    __tablename__ = 'room'
+
+    room_id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    room_number = Column(
+        String,
+        nullable=False
+    )
+
+    room_type = Column(
+        String,
+        default='classroom'
+    )
+
+    timetables = relationship(
+        'Timetable',
+        back_populates='room',
+        cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        Index(
+            'uq_room_room_number_lower',
+            func.lower(func.trim(room_number)),
+            unique=True,
+        ),
+    )
 class TimeSlot(Base):
     __tablename__ = 'timeslot'
     slot_id       = Column(Integer, primary_key=True, index=True)
