@@ -14,6 +14,23 @@ const DAY_ALIAS = {
   sat: 'Saturday', saturday: 'Saturday'
 }
 
+function editDistance(s1, s2) {
+  if (s1 === s2) return 0
+  const m = s1.length, n = s2.length
+  if (m === 0) return n
+  if (n === 0) return m
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0))
+  for (let i = 0; i <= m; i++) dp[i][0] = i
+  for (let j = 0; j <= n; j++) dp[0][j] = j
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = s1[i - 1] === s2[j - 1] ? 0 : 1
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost)
+    }
+  }
+  return dp[m][n]
+}
+
 export default function ChatBubble() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([
@@ -76,50 +93,75 @@ export default function ChatBubble() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // Parse natural language for Teacher + Day availability query (Available or Unavailable)
+  // Parse natural language for Teacher + Day availability query (Fuzzy & Typo Tolerant)
   function parseAvailabilityQuery(text) {
-    const lower = text.toLowerCase()
+    const lower = text.toLowerCase().trim()
+    const words = lower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
     
-    // Check day
+    // 1. Check day (exact or fuzzy edit distance <= 2)
+    const ALL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     let foundDay = null
-    const words = lower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
+
     for (const w of words) {
+      if (w.length < 3) continue
       if (DAY_ALIAS[w]) {
         foundDay = DAY_ALIAS[w]
         break
       }
+      for (const d of ALL_DAYS) {
+        const dLower = d.toLowerCase()
+        if (w.length >= 4 && editDistance(w, dLower) <= 2) {
+          foundDay = d
+          break
+        }
+      }
+      if (foundDay) break
     }
 
-    // Check teacher
+    // 2. Check teacher (exact or fuzzy token edit distance)
     let foundTeacher = null
     if (teachers && teachers.length > 0) {
       for (const t of teachers) {
         const tNameLower = t.teacher_name.toLowerCase()
-        const tokens = tNameLower.replace(/prof\.|dr\.|mr\.|mrs\.|ms\./gi, '').trim().split(/\s+/)
         if (lower.includes(tNameLower)) {
           foundTeacher = t
           break
         }
-        for (const tok of tokens) {
-          if (tok.length > 2 && lower.includes(tok)) {
-            foundTeacher = t
-            break
+        const nameTokens = tNameLower.replace(/prof\.|dr\.|mr\.|mrs\.|ms\./gi, '').trim().split(/\s+/).filter(Boolean)
+        for (const tok of nameTokens) {
+          if (tok.length >= 3) {
+            if (lower.includes(tok)) {
+              foundTeacher = t
+              break
+            }
+            for (const w of words) {
+              if (w.length >= 3 && editDistance(w, tok) <= 1) {
+                foundTeacher = t
+                break
+              }
+            }
           }
+          if (foundTeacher) break
         }
         if (foundTeacher) break
       }
     }
 
-    // Determine target state (Available vs Unavailable)
-    const isAvailIntent = /make available|set available|is available|mark available|remove unavailability|clear unavailability|remove rule|clear rule|can teach|present|on duty|available/i.test(lower) && !/not available|unavailable/i.test(lower)
-    const isUnavailIntent = /not available|unavailable|absent|off|leave|can't teach|cant teach|no class|free/i.test(lower)
+    // 3. Determine target state (Available vs Unavailable with typo tolerance)
+    let targetAvailable = null
+    const isUnavail = /not available|not availaible|not avialable|unavailable|unavailaible|absent|off|leave|can't teach|cant teach|no class/i.test(lower)
+    const isAvail = /make available|set available|is available|is availaible|mark available|available|availaible|avialable|avaiable|availible|free|can teach|present|on duty/i.test(lower)
 
-    if (foundTeacher && foundDay) {
-      if (isAvailIntent) {
-        return { teacher: foundTeacher, day: foundDay, targetAvailable: true }
-      } else if (isUnavailIntent) {
-        return { teacher: foundTeacher, day: foundDay, targetAvailable: false }
-      }
+    if (isUnavail) {
+      targetAvailable = false
+    } else if (isAvail) {
+      targetAvailable = true
+    } else if (foundTeacher && foundDay) {
+      targetAvailable = true
+    }
+
+    if (foundTeacher && foundDay && targetAvailable !== null) {
+      return { teacher: foundTeacher, day: foundDay, targetAvailable }
     }
     return null
   }
