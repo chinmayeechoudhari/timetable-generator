@@ -144,21 +144,21 @@ code {
   --live-text:            #16a34a;
 }
 
-/* ─── Dark Mode (matches reference image) ─── */
+/* ─── Dark Mode (matches reference images) ─── */
 [data-theme='dark'] {
   color-scheme: dark;
   /* Page & Cards */
   --bg-page:         #090d16;
-  --bg-card:         #0f1524;
+  --bg-card:         #0d1322;
   --text-main:       #ffffff;
   --text-muted:      #8a99ad;
-  --border-color:    #192236;
+  --border-color:    #1a2338;
   --input-bg:        #090d16;
   --input-border:    #1f2b45;
   --table-th-bg:     #090d16;
 
   /* Badge icon backgrounds */
-  --badge-teacher:   #152038;
+  --badge-teacher:   #141d33;
   --badge-classroom: #0d2820;
   --badge-lab:       #23173a;
   --badge-class:     #2b1b14;
@@ -200,14 +200,12 @@ code {
   flex-shrink: 0;
 }
 
-/* Hide default HTML checkbox */
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-/* The slider */
 .slider {
   position: absolute;
   cursor: pointer;
@@ -284,7 +282,10 @@ code {
   opacity: 1;
 }
 
-/* ─── Global Dark Theme Overrides for All Pages (Teachers, Rooms, Classes, Subjects, TimeSlots, etc.) ─── */
+/* ==========================================================================
+   GLOBAL DARK THEME OVERRIDES (MATCHING REFERENCE IMAGES)
+   ========================================================================== */
+
 [data-theme='dark'] html,
 [data-theme='dark'] body,
 [data-theme='dark'] #root,
@@ -293,114 +294,285 @@ code {
   color: var(--text-main) !important;
 }
 
-/* Page containers & wrappers across all forms */
-[data-theme='dark'] div[class*="-page"],
-[data-theme='dark'] div[class*="-wrapper"],
-[data-theme='dark'] div[class*="container"] {
-  color: var(--text-main);
+/* 1. HERO BANNERS Across Teachers, Rooms, Classes, Time Slots, Subjects */
+[data-theme='dark'] .teachers-hero,
+[data-theme='dark'] .rooms-hero,
+[data-theme='dark'] .classes-hero,
+[data-theme='dark'] .subjects-hero,
+[data-theme='dark'] .timeslots-hero,
+[data-theme='dark'] .availability-hero,
+[data-theme='dark'] .ts-hero {
+  background: #0d1322 !important;
+  border: 1px solid #1a2338 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Hero banners across form pages */
-[data-theme='dark'] div[class*="-hero"],
-[data-theme='dark'] .hero,
-[data-theme='dark'] .header-banner {
-  background: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-main) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+[data-theme='dark'] .teachers-hero h1,
+[data-theme='dark'] .rooms-hero h1,
+[data-theme='dark'] .classes-hero h1,
+[data-theme='dark'] .subjects-hero h1,
+[data-theme='dark'] .timeslots-hero h1,
+[data-theme='dark'] .ts-hero h1 {
+  color: #ffffff !important;
 }
 
-[data-theme='dark'] div[class*="-hero"] *,
-[data-theme='dark'] .hero * {
-  color: var(--text-main);
+[data-theme='dark'] .hero-subtitle {
+  color: #ffffff !important;
 }
 
-[data-theme='dark'] .hero-sub,
-[data-theme='dark'] .subtitle,
-[data-theme='dark'] .description,
+[data-theme='dark'] .hero-icon {
+  background: #141d33 !important;
+  border: 1px solid #1e2f57 !important;
+  color: #3b82f6 !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2) !important;
+}
+
 [data-theme='dark'] .eyebrow {
-  color: var(--text-muted) !important;
+  color: #3b82f6 !important;
 }
 
-/* Cards, Panels & Modals across form pages */
-[data-theme='dark'] div[class*="-card"],
-[data-theme='dark'] div[class*="panel"],
-[data-theme='dark'] div[class*="modal"],
-[data-theme='dark'] div[class*="box"],
-[data-theme='dark'] .card,
-[data-theme='dark'] .panel,
-[data-theme='dark'] .box,
+[data-theme='dark'] .hero-left p,
+[data-theme='dark'] .hero p {
+  color: #8a99ad !important;
+}
+
+/* 2. STAT CARDS Across All Pages */
+[data-theme='dark'] .stat-card,
+[data-theme='dark'] .ts-stat-card,
+[data-theme='dark'] .room-stat-card {
+  background: #0d1322 !important;
+  border: 1px solid #1a2338 !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme='dark'] .stat-label,
+[data-theme='dark'] .ts-stat-label {
+  color: #8a99ad !important;
+}
+
+[data-theme='dark'] .stat-number,
+[data-theme='dark'] .ts-stat-value {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .stat-blue .stat-icon {
+  background: #141d33 !important;
+  color: #3b82f6 !important;
+}
+
+[data-theme='dark'] .stat-purple .stat-icon {
+  background: #23173a !important;
+  color: #a855f7 !important;
+}
+
+[data-theme='dark'] .stat-green .stat-icon {
+  background: #0d2820 !important;
+  color: #22c55e !important;
+}
+
+[data-theme='dark'] .stat-decoration {
+  opacity: 0.15 !important;
+}
+
+/* 3. DIRECTORY & FORM CARDS Across All Pages */
+[data-theme='dark'] .directory-card,
+[data-theme='dark'] .form-card,
 [data-theme='dark'] .section-card,
-[data-theme='dark'] .table-card,
-[data-theme='dark'] .form-card {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-main) !important;
+[data-theme='dark'] .preview-card,
+[data-theme='dark'] .ts-card,
+[data-theme='dark'] .table-card {
+  background: #0d1322 !important;
+  border: 1px solid #1a2338 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Headings across all pages */
-[data-theme='dark'] h1,
-[data-theme='dark'] h2,
-[data-theme='dark'] h3,
-[data-theme='dark'] h4,
-[data-theme='dark'] h5,
-[data-theme='dark'] h6,
-[data-theme='dark'] .title,
-[data-theme='dark'] .heading {
-  color: var(--text-main) !important;
+[data-theme='dark'] .directory-header,
+[data-theme='dark'] .directory-title-row {
+  border-color: #1a2338 !important;
 }
 
-/* Inputs, Selects, Buttons, Textareas */
-[data-theme='dark'] input,
-[data-theme='dark'] select,
-[data-theme='dark'] textarea {
-  background-color: var(--input-bg) !important;
-  color: var(--text-main) !important;
-  border-color: var(--input-border) !important;
+[data-theme='dark'] .directory-title-row h2,
+[data-theme='dark'] .directory-title-row h3,
+[data-theme='dark'] .card-title {
+  color: #ffffff !important;
 }
 
-[data-theme='dark'] input::placeholder,
-[data-theme='dark'] textarea::placeholder {
-  color: var(--text-muted) !important;
+[data-theme='dark'] .directory-title-row p,
+[data-theme='dark'] .card-subtitle {
+  color: #8a99ad !important;
 }
 
-/* Tables, headers & rows across all pages */
+[data-theme='dark'] .directory-main-icon {
+  background: #141d33 !important;
+  color: #3b82f6 !important;
+}
+
+/* 4. SEARCH INPUTS Across All Pages */
+[data-theme='dark'] .search-bar,
+[data-theme='dark'] .search-input-wrapper,
+[data-theme='dark'] input[type="text"],
+[data-theme='dark'] input[type="search"],
+[data-theme='dark'] input[type="number"],
+[data-theme='dark'] select {
+  background: #090d16 !important;
+  border: 1px solid #1f2b45 !important;
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .search-bar input,
+[data-theme='dark'] .search-bar input::placeholder {
+  color: #8a99ad !important;
+}
+
+[data-theme='dark'] .search-bar svg {
+  color: #8a99ad !important;
+}
+
+/* 5. TABLES Across Teachers, Rooms, Classes, Subjects */
 [data-theme='dark'] table {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
+  background: #0d1322 !important;
+  border-color: #1a2338 !important;
 }
 
-[data-theme='dark'] thead,
-[data-theme='dark'] th {
-  background-color: var(--bg-page) !important;
-  color: var(--text-muted) !important;
-  border-color: var(--border-color) !important;
+[data-theme='dark'] thead th {
+  background: #090d16 !important;
+  color: #8a99ad !important;
+  border-bottom: 1px solid #1f2b45 !important;
 }
 
-[data-theme='dark'] tbody,
-[data-theme='dark'] tr {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
+[data-theme='dark'] tbody tr {
+  background: #0d1322 !important;
+  border-bottom: 1px solid #161e30 !important;
+}
+
+[data-theme='dark'] tbody tr:hover {
+  background: #111827 !important;
 }
 
 [data-theme='dark'] td {
-  color: var(--text-main) !important;
-  border-color: var(--border-color) !important;
+  color: #ffffff !important;
+  border-color: #161e30 !important;
 }
 
-[data-theme='dark'] tr:hover {
-  background-color: rgba(255, 255, 255, 0.03) !important;
+/* Row numbers */
+[data-theme='dark'] .row-num,
+[data-theme='dark'] .col-id {
+  color: #3b82f6 !important;
+  font-weight: 700 !important;
 }
 
-/* Badges, Chips, Pills */
-[data-theme='dark'] span[class*="-badge"],
-[data-theme='dark'] div[class*="-badge"],
-[data-theme='dark'] .chip,
-[data-theme='dark'] .tag {
-  border-color: var(--border-color) !important;
+/* Avatars (e.g. SS, DP, RR, SB, CA, CB) */
+[data-theme='dark'] .avatar,
+[data-theme='dark'] .teacher-avatar,
+[data-theme='dark'] .class-avatar,
+[data-theme='dark'] .room-avatar {
+  background: #1a2540 !important;
+  color: #3b82f6 !important;
+  border: 1px solid #233763 !important;
 }
 
-/* Modal overlays */
-[data-theme='dark'] div[style*="rgba(15, 23, 42"] {
-  background-color: rgba(0, 0, 0, 0.75) !important;
+/* Name & subtitle in table cells */
+[data-theme='dark'] .entity-name,
+[data-theme='dark'] .teacher-name,
+[data-theme='dark'] .class-name,
+[data-theme='dark'] .room-name {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .entity-sub,
+[data-theme='dark'] .teacher-sub,
+[data-theme='dark'] .class-sub,
+[data-theme='dark'] .room-sub {
+  color: #8a99ad !important;
+}
+
+/* 6. ACTION BUTTONS & BADGES Across Tables */
+[data-theme='dark'] .btn-edit,
+[data-theme='dark'] .action-edit {
+  background: #16223d !important;
+  color: #3b82f6 !important;
+  border: 1px solid #233763 !important;
+}
+
+[data-theme='dark'] .btn-edit:hover,
+[data-theme='dark'] .action-edit:hover {
+  background: #1c2b4d !important;
+}
+
+[data-theme='dark'] .btn-delete,
+[data-theme='dark'] .action-delete {
+  background: #2b141d !important;
+  color: #f43f5e !important;
+  border: 1px solid #4a1c29 !important;
+}
+
+[data-theme='dark'] .btn-delete:hover,
+[data-theme='dark'] .action-delete:hover {
+  background: #381825 !important;
+}
+
+[data-theme='dark'] .badge-capacity,
+[data-theme='dark'] .badge-role,
+[data-theme='dark'] .badge-group {
+  background: #121b2d !important;
+  color: #3b82f6 !important;
+  border: 1px solid #1e2f4a !important;
+}
+
+/* 7. TIME SLOTS PAGE SPECIFICS */
+[data-theme='dark'] .day-pill,
+[data-theme='dark'] .period-pill {
+  background: #141d33 !important;
+  color: #8a99ad !important;
+  border: 1px solid #1e2f4a !important;
+}
+
+[data-theme='dark'] .day-pill.active,
+[data-theme='dark'] .period-pill.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+[data-theme='dark'] .slot-preview-card,
+[data-theme='dark'] .grid-cell {
+  background: #111827 !important;
+  border: 1px solid #1e293b !important;
+  color: #ffffff !important;
+}
+
+/* 8. SUBJECTS PAGE SPECIFICS */
+[data-theme='dark'] .class-tab {
+  background: #121b2d !important;
+  color: #8a99ad !important;
+  border: 1px solid #1e2f4a !important;
+}
+
+[data-theme='dark'] .class-tab.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+[data-theme='dark'] .subject-type-btn {
+  background: #090d16 !important;
+  border: 1px solid #1f2b45 !important;
+  color: #8a99ad !important;
+}
+
+[data-theme='dark'] .subject-type-btn.active {
+  background: #141d33 !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Result count pills */
+[data-theme='dark'] .result-count,
+[data-theme='dark'] .count-badge {
+  background: #121b2d !important;
+  color: #3b82f6 !important;
+  border: 1px solid #1e2f4a !important;
 }
