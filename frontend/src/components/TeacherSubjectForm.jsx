@@ -797,9 +797,9 @@ export default function TeacherSubjectForm() {
           HERO
       =================================================== */}
 
-      <section style={heroCard}>
+      <section style={heroCard} className="ts-hero">
         <div style={heroContent}>
-          <div style={heroIcon}>
+          <div style={heroIcon} className="hero-icon">
             <span style={heroIconGlyph}>T</span>
           </div>
 
@@ -819,31 +819,64 @@ export default function TeacherSubjectForm() {
       =================================================== */}
 
       <section style={statsGrid}>
-        <div style={statCard}>
+        <div style={statCard} className="ts-stat-card stat-blue">
           <div style={statIconBlue}>▤</div>
           <div>
-            <div style={statLabel}>TOTAL TEACHERS</div>
-            <div style={statNumberBlue}>{teachers.length}</div>
+            <div style={statLabel} className="stat-label">TOTAL TEACHERS</div>
+            <div style={statNumberBlue} className="stat-number">{teachers.length}</div>
           </div>
-          <div style={statDecorationBlue} />
+          <div style={statDecorationBlue}>
+            <svg width="120" height="40" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <path d="M0 30 Q 15 15, 30 25 T 60 15 T 90 20 T 120 10" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" style={{ opacity: 0.6 }} />
+              <path d="M0 30 Q 15 15, 30 25 T 60 15 T 90 20 T 120 10 L 120 40 L 0 40 Z" fill="url(#blue-gradient)" style={{ opacity: 0.15 }} />
+              <defs>
+                <linearGradient id="blue-gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#2563eb" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
 
-        <div style={statCard}>
+        <div style={statCard} className="ts-stat-card stat-green">
           <div style={statIconGreen}>✓</div>
           <div>
-            <div style={statLabel}>TOTAL ASSIGNMENTS</div>
-            <div style={statNumberGreen}>{links.length}</div>
+            <div style={statLabel} className="stat-label">TOTAL ASSIGNMENTS</div>
+            <div style={statNumberGreen} className="stat-number">{links.length}</div>
           </div>
-          <div style={statDecorationGreen} />
+          <div style={statDecorationGreen}>
+            <svg width="120" height="40" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" style={{ opacity: 0.6 }} />
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5 L 120 40 L 0 40 Z" fill="url(#green-gradient)" style={{ opacity: 0.15 }} />
+              <defs>
+                <linearGradient id="green-gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
 
-        <div style={statCard}>
+        <div style={statCard} className="ts-stat-card stat-purple">
           <div style={statIconPurple}>◇</div>
           <div>
-            <div style={statLabel}>SCHEDULING ROLE</div>
-            <div style={statNumberPurple}>Teacher ↔ Subject</div>
+            <div style={statLabel} className="stat-label">SCHEDULING ROLE</div>
+            <div style={statNumberPurple} className="stat-number">Teacher ↔ Subject</div>
           </div>
-          <div style={statDecorationPurple} />
+          <div style={statDecorationPurple}>
+            <svg width="120" height="40" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" style={{ opacity: 0.6 }} />
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5 L 120 40 L 0 40 Z" fill="url(#purple-gradient)" style={{ opacity: 0.15 }} />
+              <defs>
+                <linearGradient id="purple-gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#a855f7" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
       </section>
 
@@ -2360,6 +2393,20 @@ export default function TeacherSubjectForm() {
         onCancel={() => setDeleteTarget(null)}
         isDeleting={isDeleting}
       />
+
+      <style>{`
+        /* ── DARK THEME OVERRIDES ── */
+        [data-theme='dark'] .ts-hero { background: #0d1322 !important; border-color: #1a2338 !important; box-shadow: none !important; }
+        [data-theme='dark'] .ts-hero h1 { color: #ffffff !important; }
+        [data-theme='dark'] .hero-subtitle { color: #ffffff !important; }
+        [data-theme='dark'] .eyebrow { color: #a855f7 !important; }
+        [data-theme='dark'] .hero-icon { background: #141d33 !important; border-color: #1e2f57 !important; color: #3b82f6 !important; }
+        [data-theme='dark'] .ts-stat-card { background: #0d1322 !important; border-color: #1a2338 !important; }
+        [data-theme='dark'] .stat-label { color: #8a99ad !important; }
+        [data-theme='dark'] .stat-number { color: #ffffff !important; }
+        [data-theme='dark'] div[style*="background: white"], [data-theme='dark'] div[style*="background: '#FFFFFF'"] { background: #0d1322 !important; border-color: #1a2338 !important; color: #ffffff !important; }
+        [data-theme='dark'] table, [data-theme='dark'] tr, [data-theme='dark'] td { border-color: #1a2338 !important; }
+      `}</style>
 
     </div>
   )

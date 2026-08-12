@@ -242,11 +242,11 @@ export default function ClassForm() {
           HERO HEADER
       ========================================================= */}
 
-      <section style={heroCard}>
+      <section style={heroCard} className="classes-page-hero">
 
         <div style={heroContent}>
 
-          <div style={heroIcon}>
+          <div style={heroIcon} className="classes-page-hero-icon">
             <span style={heroIconBuilding}>▦</span>
           </div>
 
@@ -274,6 +274,7 @@ export default function ClassForm() {
           type="button"
           onClick={openAddModal}
           style={heroButton}
+          className="classes-page-hero-button"
         >
           <span style={heroButtonPlus}>+</span>
           Add Class
@@ -288,60 +289,93 @@ export default function ClassForm() {
 
       <section style={statsGrid}>
 
-        <div style={statCardBlue}>
+        <div style={statCardBlue} className="classes-page-stat-card stat-blue">
           <div style={statIconBlue}>
             ▦
           </div>
 
           <div>
-            <div style={statLabel}>
+            <div style={statLabel} className="stat-label">
               TOTAL CLASSES
             </div>
 
-            <div style={statNumberBlue}>
+            <div style={statNumberBlue} className="stat-value">
               {totalClasses}
             </div>
           </div>
 
-          <div style={statDecorationBlue} />
+          <div style={statDecorationBlue}>
+            <svg width="120" height="40" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <path d="M0 30 Q 15 15, 30 25 T 60 15 T 90 20 T 120 10" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" style={{ opacity: 0.6 }} />
+              <path d="M0 30 Q 15 15, 30 25 T 60 15 T 90 20 T 120 10 L 120 40 L 0 40 Z" fill="url(#blue-gradient)" style={{ opacity: 0.15 }} />
+              <defs>
+                <linearGradient id="blue-gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#2563eb" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
 
 
-        <div style={statCardGreen}>
+        <div style={statCardGreen} className="classes-page-stat-card stat-green">
           <div style={statIconGreen}>
             ✓
           </div>
 
           <div>
-            <div style={statLabel}>
+            <div style={statLabel} className="stat-label">
               CONFIGURATION
             </div>
 
-            <div style={statNumberGreen}>
+            <div style={statNumberGreen} className="stat-value">
               {configured ? 'Ready' : 'Pending'}
             </div>
           </div>
 
-          <div style={statDecorationGreen} />
+          <div style={statDecorationGreen}>
+            <svg width="120" height="40" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" style={{ opacity: 0.6 }} />
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5 L 120 40 L 0 40 Z" fill="url(#green-gradient)" style={{ opacity: 0.15 }} />
+              <defs>
+                <linearGradient id="green-gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
 
 
-        <div style={statCardPurple}>
+        <div style={statCardPurple} className="classes-page-stat-card stat-purple">
           <div style={statIconPurple}>
             ◇
           </div>
 
           <div>
-            <div style={statLabel}>
+            <div style={statLabel} className="stat-label">
               SCHEDULING ROLE
             </div>
 
-            <div style={statNumberPurple}>
+            <div style={statNumberPurple} className="stat-value">
               Class Groups
             </div>
           </div>
 
-          <div style={statDecorationPurple} />
+          <div style={statDecorationPurple}>
+            <svg width="120" height="40" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" style={{ opacity: 0.6 }} />
+              <path d="M0 25 Q 20 10, 40 20 T 80 15 T 120 5 L 120 40 L 0 40 Z" fill="url(#purple-gradient)" style={{ opacity: 0.15 }} />
+              <defs>
+                <linearGradient id="purple-gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#a855f7" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
 
       </section>
@@ -370,7 +404,7 @@ export default function ClassForm() {
           CLASS DIRECTORY
       ========================================================= */}
 
-      <section style={directoryCard}>
+      <section style={directoryCard} className="classes-page-directory-card">
 
         {/* DIRECTORY HEADER */}
 
@@ -378,7 +412,7 @@ export default function ClassForm() {
 
           <div style={directoryHeaderLeft}>
 
-            <div style={directoryIcon}>
+            <div style={directoryIcon} className="classes-page-directory-icon">
               ▦
             </div>
 
@@ -1301,12 +1335,12 @@ const statNumberPurple = {
 
 const statDecorationBlue = {
   position: 'absolute',
-  right: '-20px',
-  bottom: '-35px',
-  width: '120px',
-  height: '80px',
-  borderRadius: '50%',
-  background: 'rgba(37,99,235,0.055)',
+  right: '0',
+  bottom: '0',
+  opacity: 0.8,
+  display: 'flex',
+  alignItems: 'flex-end',
+  justifyContent: 'flex-end',
 }
 
 const statDecorationGreen = {
