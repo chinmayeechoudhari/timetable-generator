@@ -147,7 +147,7 @@ export default function ChatBubble() {
       }
     }
 
-    // 3. Determine target state (Available vs Unavailable with typo tolerance)
+    // 4. Determine target state (Available vs Unavailable with typo tolerance)
     let targetAvailable = null
     const isUnavail = /not available|not availaible|not avialable|unavailable|unavailaible|absent|off|leave|can't teach|cant teach|no class/i.test(lower)
     const isAvail = /make available|set available|is available|is availaible|mark available|available|availaible|avialable|avaiable|availible|free|can teach|present|on duty/i.test(lower)
@@ -160,8 +160,15 @@ export default function ChatBubble() {
       targetAvailable = true
     }
 
+    // 5. Check specific period (e.g. P1, P2, period 1, period 2)
+    let foundPeriod = null
+    const periodMatch = lower.match(/\bp(\d+)\b|period\s*(\d+)/i)
+    if (periodMatch) {
+      foundPeriod = parseInt(periodMatch[1] || periodMatch[2])
+    }
+
     if (foundTeacher && foundDay && targetAvailable !== null) {
-      return { teacher: foundTeacher, day: foundDay, targetAvailable }
+      return { teacher: foundTeacher, day: foundDay, period: foundPeriod, targetAvailable }
     }
     return null
   }
@@ -205,15 +212,21 @@ export default function ChatBubble() {
   }
 
   // Handle setting availability (true or false) in backend
-  async function applyAvailability(teacherId, teacherName, day, targetAvailable) {
+  async function applyAvailability(teacherId, teacherName, day, period, targetAvailable) {
     try {
-      const daySlots = timeslots.filter(s => s.day.toLowerCase() === day.toLowerCase())
-      if (daySlots.length === 0) {
-        return `I couldn't find configured timeslots for ${day}. Please verify timeslot setup first.`
+      let targetSlots = []
+      if (period) {
+        targetSlots = timeslots.filter(s => s.day.toLowerCase() === day.toLowerCase() && s.period_number === period)
+      } else {
+        targetSlots = timeslots.filter(s => s.day.toLowerCase() === day.toLowerCase())
+      }
+
+      if (targetSlots.length === 0) {
+        return `I couldn't find configured timeslots for ${day}${period ? ` Period ${period}` : ''}. Please verify timeslot setup first.`
       }
 
       let updatedCount = 0
-      for (const slot of daySlots) {
+      for (const slot of targetSlots) {
         const existing = availabilities.find(
           a => a.teacher_id === teacherId && a.slot_id === slot.slot_id
         )
@@ -221,36 +234,37 @@ export default function ChatBubble() {
         if (targetAvailable) {
           if (existing) {
             await axios.delete(`${BASE_URL}/teacher-availabilities/${teacherId}/${slot.slot_id}`).catch(async () => {
-              await axios.put(`${BASE_URL}/teacher-availabilities/${teacherId}/${slot.slot_id}`, { is_available: true })
+              await axios.put(`${BASE_URL}/teacher-availabilities/${teacherId}/${slot.slot_id}`, { is_available: true }).catch(() => {})
             })
             updatedCount++
           }
         } else {
-          if (existing) {
+          // Send POST (which now performs idempotent upsert in backend), fallback to PUT if needed
+          await axios.post(`${BASE_URL}/teacher-availabilities`, {
+            teacher_id: teacherId,
+            slot_id: slot.slot_id,
+            is_available: false
+          }).catch(async (err) => {
+            console.warn('POST failed, attempting PUT fallback:', err)
             await axios.put(`${BASE_URL}/teacher-availabilities/${teacherId}/${slot.slot_id}`, {
               is_available: false
-            })
-          } else {
-            await axios.post(`${BASE_URL}/teacher-availabilities`, {
-              teacher_id: teacherId,
-              slot_id: slot.slot_id,
-              is_available: false
-            })
-          }
+            }).catch(putErr => console.error('PUT failed:', putErr))
+          })
           updatedCount++
         }
       }
 
       fetchContextData()
 
+      const periodLabel = period ? ` Period ${period}` : ''
       if (targetAvailable) {
-        return `Done! I have updated **${teacherName}** to be **AVAILABLE** on **${day}**. You can now go to the **Generate** tab to re-run the solver with updated constraints.`
+        return `Done! I have updated **${teacherName}** to be **AVAILABLE** on **${day}${periodLabel}**. You can now go to the **Generate** tab to re-run the solver.`
       } else {
-        return `Done! I have marked **${teacherName}** as **UNAVAILABLE** on **${day}** (${updatedCount} slot rules updated). You can now go to the **Generate** tab to re-run the solver.`
+        return `Done! I have marked **${teacherName}** as **UNAVAILABLE** on **${day}${periodLabel}** (${updatedCount} slot rule updated). You can now go to the **Generate** tab to re-run the solver.`
       }
     } catch (err) {
       console.error('Error applying availability:', err)
-      return `Failed to update availability on backend. Make sure the backend server is running.`
+      return `Failed to update availability on backend. Detail: ${err?.response?.data?.detail || err.message}`
     }
   }
 
@@ -401,6 +415,7 @@ export default function ChatBubble() {
           pendingAction.teacherId,
           pendingAction.teacherName,
           pendingAction.day,
+          pendingAction.period,
           pendingAction.targetAvailable
         )
 
@@ -430,12 +445,13 @@ export default function ChatBubble() {
         setIsTyping(false)
         return
       } else {
+        const periodText = pendingAction.period ? ` Period ${pendingAction.period}` : ''
         setMessages(prev => [
           ...prev,
           {
             id: Date.now() + 1,
             sender: 'bot',
-            text: `I have a pending action: change availability of **${pendingAction.teacherName}** on **${pendingAction.day}** to **${pendingAction.targetAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}**. Please reply **Yes** to confirm or **No** to reconsider and cancel.`,
+            text: `I have a pending action: change availability of **${pendingAction.teacherName}** on **${pendingAction.day}${periodText}** to **${pendingAction.targetAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}**. Please reply **Yes** to confirm or **No** to reconsider and cancel.`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           }
         ])
@@ -479,22 +495,24 @@ export default function ChatBubble() {
     // 4. Availability query
     const parsedQuery = parseAvailabilityQuery(textToSend)
     if (parsedQuery) {
-      const { teacher, day, targetAvailable } = parsedQuery
+      const { teacher, day, period, targetAvailable } = parsedQuery
       setPendingAction({
         type: 'CHANGE_AVAILABILITY',
         teacherId: teacher.teacher_id,
         teacherName: teacher.teacher_name,
         day: day,
+        period: period,
         targetAvailable: targetAvailable
       })
 
       const statusWord = targetAvailable ? 'AVAILABLE' : 'UNAVAILABLE'
+      const periodText = period ? ` Period ${period}` : ''
       setMessages(prev => [
         ...prev,
         {
           id: Date.now() + 1,
           sender: 'bot',
-          text: `Do you want me to change the availability of **${teacher.teacher_name}** on **${day}** to **${statusWord}**?`,
+          text: `Do you want me to change the availability of **${teacher.teacher_name}** on **${day}${periodText}** to **${statusWord}**?`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ])

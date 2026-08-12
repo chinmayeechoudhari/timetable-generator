@@ -51,8 +51,17 @@ def get_teacher_availability(teacher_id: int, slot_id: int, db: Session = Depend
 @router.post("", response_model=TeacherAvailabilityRead, status_code=201)
 def create_teacher_availability(payload: TeacherAvailabilityCreate, db: Session = Depends(get_db)):
     data = _dump_payload(payload)
-    item = TeacherAvailability(**data)
-    db.add(item)
+    item = db.query(TeacherAvailability).filter(
+        TeacherAvailability.teacher_id == data["teacher_id"],
+        TeacherAvailability.slot_id == data["slot_id"],
+    ).first()
+    
+    if item:
+        item.is_available = data.get("is_available", False)
+    else:
+        item = TeacherAvailability(**data)
+        db.add(item)
+        
     db.commit()
     db.refresh(item)
     return TeacherAvailabilityRead(
