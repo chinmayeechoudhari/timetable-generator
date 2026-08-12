@@ -1867,6 +1867,7 @@ export default function TeacherForm() {
 
           .stat-card {
             min-height: 88px;
+          }
         }
 
         /* ── DARK THEME OVERRIDES ── */

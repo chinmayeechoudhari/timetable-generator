@@ -2220,6 +2220,7 @@ export default function RoomForm() {
           .room-table td {
             padding-left: 9px;
             padding-right: 9px;
+          }
         }
 
         /* ── DARK THEME OVERRIDES ── */
