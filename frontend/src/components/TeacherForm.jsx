@@ -1846,9 +1846,45 @@ export default function TeacherForm() {
 
           .stat-card {
             min-height: 88px;
-          }
-
         }
+
+        /* ── DARK THEME OVERRIDES ── */
+        [data-theme='dark'] .teachers-page { color: #ffffff; }
+        [data-theme='dark'] .teachers-hero { background: #0d1322 !important; border-color: #1a2338 !important; box-shadow: none !important; }
+        [data-theme='dark'] .teachers-hero h1 { color: #ffffff !important; }
+        [data-theme='dark'] .hero-subtitle { color: #ffffff !important; }
+        [data-theme='dark'] .hero-left p { color: #8a99ad !important; }
+        [data-theme='dark'] .hero-icon { background: #141d33 !important; border-color: #1e2f57 !important; color: #3b82f6 !important; }
+        [data-theme='dark'] .stat-card { background: #0d1322 !important; border-color: #1a2338 !important; }
+        [data-theme='dark'] .stat-label { color: #8a99ad !important; }
+        [data-theme='dark'] .stat-number { color: #ffffff !important; }
+        [data-theme='dark'] .stat-blue .stat-icon { background: #141d33 !important; color: #3b82f6 !important; }
+        [data-theme='dark'] .stat-purple .stat-icon { background: #23173a !important; color: #a855f7 !important; }
+        [data-theme='dark'] .directory-card { background: #0d1322 !important; border-color: #1a2338 !important; }
+        [data-theme='dark'] .directory-title-row h2 { color: #ffffff !important; }
+        [data-theme='dark'] .directory-title-row p { color: #8a99ad !important; }
+        [data-theme='dark'] .directory-main-icon { background: #141d33 !important; color: #3b82f6 !important; }
+        [data-theme='dark'] .search-wrapper { background: #090d16 !important; border-color: #1f2b45 !important; }
+        [data-theme='dark'] .search-wrapper input { color: #ffffff !important; background: transparent !important; }
+        [data-theme='dark'] .search-wrapper input::placeholder { color: #8a99ad !important; }
+        [data-theme='dark'] .teacher-table-wrapper { border-color: #1a2338 !important; }
+        [data-theme='dark'] .teacher-table th { background: #090d16 !important; color: #8a99ad !important; border-bottom-color: #1f2b45 !important; }
+        [data-theme='dark'] .teacher-table td { background: #0d1322 !important; border-bottom-color: #161e30 !important; color: #ffffff !important; }
+        [data-theme='dark'] .teacher-table tbody tr:hover td { background: #111827 !important; }
+        [data-theme='dark'] .teacher-name { color: #ffffff !important; }
+        [data-theme='dark'] .teacher-role { color: #8a97ab !important; }
+        [data-theme='dark'] .avatar-circle { background: #1a2540 !important; color: #3b82f6 !important; border-color: #233763 !important; }
+        [data-theme='dark'] .load-badge { background: #121b2d !important; color: #3b82f6 !important; border-color: #1e2f4a !important; }
+        [data-theme='dark'] .capacity-text { color: #8a99ad !important; }
+        [data-theme='dark'] .edit-button { background: #16223d !important; color: #3b82f6 !important; border-color: #233763 !important; }
+        [data-theme='dark'] .delete-button { background: #2b141d !important; color: #f43f5e !important; border-color: #4a1c29 !important; }
+        [data-theme='dark'] .info-card { background: #0d1322 !important; border-color: #1a2338 !important; color: #ffffff !important; }
+        [data-theme='dark'] .info-card * { color: #ffffff !important; }
+        [data-theme='dark'] .index-cell { color: #3b82f6 !important; }
+        [data-theme='dark'] .result-count { background: #121b2d !important; color: #3b82f6 !important; border-color: #1e2f4a !important; }
+        [data-theme='dark'] .small-add-button { background: #121b2d !important; color: #3b82f6 !important; border-color: #1e2f4a !important; }
+        [data-theme='dark'] .pagination-bar { border-color: #1a2338 !important; }
+        [data-theme='dark'] .pagination-info { color: #8a99ad !important; }
 
       `}</style>
 

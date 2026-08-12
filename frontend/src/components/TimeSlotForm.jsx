@@ -1062,6 +1062,24 @@ export default function TimeSlotForm() {
           }
         }
 
+        /* ── DARK THEME OVERRIDES ── */
+        [data-theme='dark'] .timeslots-page { color: #ffffff; }
+        [data-theme='dark'] .timeslots-hero { background: #0d1322 !important; border-color: #1a2338 !important; box-shadow: none !important; }
+        [data-theme='dark'] .timeslots-hero h1 { color: #ffffff !important; }
+        [data-theme='dark'] .hero-subtitle { color: #ffffff !important; }
+        [data-theme='dark'] .hero-left p { color: #8a99ad !important; }
+        [data-theme='dark'] .hero-icon { background: #141d33 !important; border-color: #1e2f57 !important; color: #3b82f6 !important; }
+        [data-theme='dark'] .stat-card { background: #0d1322 !important; border-color: #1a2338 !important; }
+        [data-theme='dark'] .stat-label { color: #8a99ad !important; }
+        [data-theme='dark'] .stat-number { color: #ffffff !important; }
+        [data-theme='dark'] .directory-card, [data-theme='dark'] .preview-card, [data-theme='dark'] .config-card { background: #0d1322 !important; border-color: #1a2338 !important; color: #ffffff !important; }
+        [data-theme='dark'] .directory-title-row h2 { color: #ffffff !important; }
+        [data-theme='dark'] .directory-title-row p { color: #8a99ad !important; }
+        [data-theme='dark'] .directory-main-icon { background: #141d33 !important; color: #3b82f6 !important; }
+        [data-theme='dark'] .day-chip, [data-theme='dark'] .period-chip { background: #141d33 !important; color: #8a99ad !important; border-color: #1e2f4a !important; }
+        [data-theme='dark'] .day-chip.active, [data-theme='dark'] .period-chip.active { background: #2563eb !important; color: #ffffff !important; border-color: #2563eb !important; }
+        [data-theme='dark'] .slot-preview-cell { background: #111827 !important; border-color: #1e293b !important; color: #ffffff !important; }
+
       `}</style>
 
     </div>

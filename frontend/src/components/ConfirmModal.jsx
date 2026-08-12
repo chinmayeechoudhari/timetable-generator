@@ -91,13 +91,13 @@ const styles = {
     padding: '16px'
   },
   modal: {
-    background: '#FFFFFF',
+    background: 'var(--bg-card)',
     borderRadius: '16px',
     padding: '28px 24px 24px',
     maxWidth: '420px',
     width: '100%',
-    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-    border: '1px solid #F1F5F9',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+    border: '1px solid var(--border-color)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -111,8 +111,8 @@ const styles = {
     width: '52px',
     height: '52px',
     borderRadius: '50%',
-    background: '#FEF2F2',
-    border: '8px solid #FEE2E2',
+    background: '#2b141d',
+    border: '8px solid #4a1c29',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
@@ -120,14 +120,14 @@ const styles = {
   title: {
     fontSize: '18px',
     fontWeight: '700',
-    color: '#0F172A',
+    color: 'var(--text-main)',
     marginBottom: '8px',
     letterSpacing: '-0.01em'
   },
   itemNameBadge: {
     display: 'inline-block',
-    background: '#F1F5F9',
-    color: '#334155',
+    background: 'var(--bg-page)',
+    color: 'var(--text-main)',
     fontWeight: '600',
     fontSize: '14px',
     padding: '4px 12px',
@@ -140,7 +140,7 @@ const styles = {
   },
   message: {
     fontSize: '13px',
-    color: '#64748B',
+    color: 'var(--text-muted)',
     lineHeight: '1.5',
     marginBottom: '24px'
   },
