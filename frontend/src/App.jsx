@@ -12,6 +12,7 @@ import TeacherAvailabilityForm from './components/TeacherAvailabilityForm.jsx'
 import GenerateTimetable from './components/GenerateTimetable.jsx'
 import TimetableGrid from './components/TimetableGrid.jsx'
 import StatusDashboard from './components/StatusDashboard.jsx'
+import ChatBubble from './components/ChatBubble.jsx'
 
 export default function App() {
   const [enteredApp, setEnteredApp] = useState(false)
@@ -56,6 +57,8 @@ export default function App() {
           </Routes>
         </div>
       </div>
+
+      <ChatBubble />
     </BrowserRouter>
   )
 }
