@@ -15,7 +15,17 @@ export default function TeacherAvailabilityForm() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => {
+    fetchAll()
+    const handleUpdate = (e) => {
+      fetchAll()
+      if (e?.detail?.teacherId) {
+        setTeacherId(String(e.detail.teacherId))
+      }
+    }
+    window.addEventListener('availabilityUpdated', handleUpdate)
+    return () => window.removeEventListener('availabilityUpdated', handleUpdate)
+  }, [])
 
   async function fetchAll() {
     try {

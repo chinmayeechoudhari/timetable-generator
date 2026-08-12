@@ -31,7 +31,12 @@ export default function GenerateTimetable() {
     }
   }
 
-  useEffect(() => { runValidation() }, [])
+  useEffect(() => {
+    runValidation()
+    const handleUpdate = () => runValidation()
+    window.addEventListener('availabilityUpdated', handleUpdate)
+    return () => window.removeEventListener('availabilityUpdated', handleUpdate)
+  }, [])
 
   async function startGenerate() {
     setError(null); setResult(null); setStatus(null)

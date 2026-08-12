@@ -255,6 +255,7 @@ export default function ChatBubble() {
       }
 
       fetchContextData()
+      window.dispatchEvent(new CustomEvent('availabilityUpdated', { detail: { teacherId, day } }))
 
       const periodLabel = period ? ` Period ${period}` : ''
       if (targetAvailable) {
