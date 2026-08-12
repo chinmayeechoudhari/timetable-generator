@@ -109,14 +109,14 @@ export default function GenerateTimetable() {
   const canGenerate  = !isGenerating && (validation?.ready !== false)
 
   return (
-    <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
+    <div style={{ padding: '28px 32px', background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-main)' }}>
 
       {/* Page header */}
       <div style={{ marginBottom: '20px' }}>
-        <div style={{ fontSize: '18px', fontWeight: '700', color: '#1B2A3B' }}>
+        <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-main)' }}>
           Generate Timetable
         </div>
-        <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
           Run the CP-SAT solver to generate a conflict-free timetable
         </div>
       </div>
@@ -125,9 +125,9 @@ export default function GenerateTimetable() {
 
         {/* ── Main card ── */}
         <div style={{
-          background: '#FFFFFF', borderRadius: '10px',
+          background: 'var(--bg-card)', borderRadius: '10px',
           padding: '24px', width: '100%', maxWidth: '520px',
-          border: '1px solid #E2E8F0',
+          border: '1px solid var(--border-color)',
           boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
           display: 'flex', flexDirection: 'column', gap: '16px'
         }}>

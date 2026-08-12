@@ -223,24 +223,24 @@ export default function TimetableGrid() {
   )
 
   if (loading) return (
-    <div style={{ padding: '48px', textAlign: 'center', color: '#64748B', background: '#F0F4F8', minHeight: '100vh' }}>
+    <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-page)', minHeight: '100vh' }}>
       Loading timetable...
     </div>
   )
 
   if (timetable.length === 0) return (
-    <div style={{ padding: '48px', textAlign: 'center', background: '#F0F4F8', minHeight: '100vh' }}>
-      <div style={{ fontSize: '15px', fontWeight: '600', color: '#1B2A3B', marginBottom: '6px' }}>
+    <div style={{ padding: '48px', textAlign: 'center', background: 'var(--bg-page)', minHeight: '100vh' }}>
+      <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '6px' }}>
         No timetable generated yet
       </div>
-      <div style={{ fontSize: '13px', color: '#64748B' }}>
+      <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
         Go to the Generate page and run the solver first
       </div>
     </div>
   )
 
   return (
-    <div style={{ padding: '28px 32px', background: '#F0F4F8', minHeight: '100vh' }}>
+    <div style={{ padding: '28px 32px', background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-main)' }}>
 
       {/* Header */}
       <div style={{

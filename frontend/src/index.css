@@ -284,39 +284,123 @@ code {
   opacity: 1;
 }
 
-/* ─── Global Dark Theme Overrides ([data-theme='dark']) ─── */
+/* ─── Global Dark Theme Overrides for All Pages (Teachers, Rooms, Classes, Subjects, TimeSlots, etc.) ─── */
 [data-theme='dark'] html,
 [data-theme='dark'] body,
-[data-theme='dark'] #root {
-  background: var(--bg-page) !important;
+[data-theme='dark'] #root,
+[data-theme='dark'] main {
+  background-color: var(--bg-page) !important;
   color: var(--text-main) !important;
 }
 
-[data-theme='dark'] div,
-[data-theme='dark'] main,
-[data-theme='dark'] section {
-  border-color: var(--border-color);
+/* Page containers & wrappers across all forms */
+[data-theme='dark'] div[class*="-page"],
+[data-theme='dark'] div[class*="-wrapper"],
+[data-theme='dark'] div[class*="container"] {
+  color: var(--text-main);
 }
 
+/* Hero banners across form pages */
+[data-theme='dark'] div[class*="-hero"],
+[data-theme='dark'] .hero,
+[data-theme='dark'] .header-banner {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme='dark'] div[class*="-hero"] *,
+[data-theme='dark'] .hero * {
+  color: var(--text-main);
+}
+
+[data-theme='dark'] .hero-sub,
+[data-theme='dark'] .subtitle,
+[data-theme='dark'] .description,
+[data-theme='dark'] .eyebrow {
+  color: var(--text-muted) !important;
+}
+
+/* Cards, Panels & Modals across form pages */
+[data-theme='dark'] div[class*="-card"],
+[data-theme='dark'] div[class*="panel"],
+[data-theme='dark'] div[class*="modal"],
+[data-theme='dark'] div[class*="box"],
+[data-theme='dark'] .card,
+[data-theme='dark'] .panel,
+[data-theme='dark'] .box,
+[data-theme='dark'] .section-card,
+[data-theme='dark'] .table-card,
+[data-theme='dark'] .form-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+/* Headings across all pages */
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6,
+[data-theme='dark'] .title,
+[data-theme='dark'] .heading {
+  color: var(--text-main) !important;
+}
+
+/* Inputs, Selects, Buttons, Textareas */
 [data-theme='dark'] input,
-[data-theme='dark'] select {
+[data-theme='dark'] select,
+[data-theme='dark'] textarea {
   background-color: var(--input-bg) !important;
   color: var(--text-main) !important;
   border-color: var(--input-border) !important;
 }
 
+[data-theme='dark'] input::placeholder,
+[data-theme='dark'] textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* Tables, headers & rows across all pages */
 [data-theme='dark'] table {
   background-color: var(--bg-card) !important;
   border-color: var(--border-color) !important;
 }
 
+[data-theme='dark'] thead,
 [data-theme='dark'] th {
   background-color: var(--bg-page) !important;
   color: var(--text-muted) !important;
   border-color: var(--border-color) !important;
 }
 
+[data-theme='dark'] tbody,
+[data-theme='dark'] tr {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+
 [data-theme='dark'] td {
   color: var(--text-main) !important;
   border-color: var(--border-color) !important;
+}
+
+[data-theme='dark'] tr:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Badges, Chips, Pills */
+[data-theme='dark'] span[class*="-badge"],
+[data-theme='dark'] div[class*="-badge"],
+[data-theme='dark'] .chip,
+[data-theme='dark'] .tag {
+  border-color: var(--border-color) !important;
+}
+
+/* Modal overlays */
+[data-theme='dark'] div[style*="rgba(15, 23, 42"] {
+  background-color: rgba(0, 0, 0, 0.75) !important;
 }
