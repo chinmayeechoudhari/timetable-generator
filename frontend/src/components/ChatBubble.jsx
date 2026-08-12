@@ -627,12 +627,12 @@ export default function ChatBubble() {
           <span style={{
             fontSize: '12.5px',
             fontWeight: '600',
-            color: '#64748b',
-            background: '#ffffff',
+            color: 'var(--text-muted)',
+            background: 'var(--bg-card)',
             padding: '6px 12px',
             borderRadius: '20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            border: '1px solid var(--border-color)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
             whiteSpace: 'nowrap',
             pointerEvents: 'none',
           }}>Ask AI Assistant</span>

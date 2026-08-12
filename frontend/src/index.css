@@ -23,7 +23,7 @@
   letter-spacing: 0.18px;
   color-scheme: light;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -31,26 +31,6 @@
 
   @media (max-width: 1024px) {
     font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
   }
 }
 
@@ -62,7 +42,9 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background: #f8fafc;
+  background: var(--bg-page);
+  color: var(--text-main);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 #root {
   width: 100%;
@@ -119,29 +101,93 @@ code {
   background: var(--code-bg);
 }
 
+/* ─── Light Mode (default) ─── */
 :root {
-  --bg-page: #f8fafc;
-  --bg-card: #FFFFFF;
-  --text-main: #1B2A3B;
-  --text-muted: #64748B;
-  --border-color: #E2E8F0;
-  --input-bg: #F8FAFC;
-  --input-border: #CBD5E1;
-  --table-th-bg: #F8FAFC;
+  /* Page & Cards */
+  --bg-page:         #f8fafc;
+  --bg-card:         #ffffff;
+  --text-main:       #1e293b;
+  --text-muted:      #64748b;
+  --border-color:    #e2e8f0;
+  --input-bg:        #f8fafc;
+  --input-border:    #cbd5e1;
+  --table-th-bg:     #f8fafc;
+
+  /* Badge icon backgrounds */
+  --badge-teacher:   #eff6ff;
+  --badge-classroom: #ecfdf5;
+  --badge-lab:       #f3e8ff;
+  --badge-class:     #fff7ed;
+  --badge-subject:   #fdf2f8;
+
+  --badge-val-bg:    #f0fdf4;
+  --badge-val-text:  #1e293b;
+
+  /* Sidebar */
+  --sidebar-bg:           #ffffff;
+  --sidebar-border:       #e2e8f0;
+  --sidebar-text:         #1e293b;
+  --sidebar-muted:        #94a3b8;
+  --sidebar-section:      #94a3b8;
+  --sidebar-hover-bg:     #f8fafc;
+  --sidebar-hover-text:   #1e293b;
+  --nav-active-bg:        #eff6ff;
+  --nav-active-text:      #2563eb;
+  --nav-active-border:    #2563eb;
+  --nav-active-dot:       #2563eb;
+  --nav-inactive-text:    #64748b;
+  --status-card-bg:       #f8fafc;
+  --status-card-border:   #e2e8f0;
+  --status-text:          #1e293b;
+  --status-sub:           #94a3b8;
+  --live-bg:              #dcfce7;
+  --live-text:            #16a34a;
 }
 
+/* ─── Dark Mode (matches reference image) ─── */
 [data-theme='dark'] {
-  --bg-page: #0F172A;
-  --bg-card: #1E293B;
-  --text-main: #F8FAFC;
-  --text-muted: #94A3B8;
-  --border-color: #334155;
-  --input-bg: #0F172A;
-  --input-border: #475569;
-  --table-th-bg: #0F172A;
+  color-scheme: dark;
+  /* Page & Cards */
+  --bg-page:         #090d16;
+  --bg-card:         #0f1524;
+  --text-main:       #ffffff;
+  --text-muted:      #8a99ad;
+  --border-color:    #192236;
+  --input-bg:        #090d16;
+  --input-border:    #1f2b45;
+  --table-th-bg:     #090d16;
+
+  /* Badge icon backgrounds */
+  --badge-teacher:   #152038;
+  --badge-classroom: #0d2820;
+  --badge-lab:       #23173a;
+  --badge-class:     #2b1b14;
+  --badge-subject:   #2c1425;
+
+  --badge-val-bg:    #142324;
+  --badge-val-text:  #e2e8f0;
+
+  /* Sidebar */
+  --sidebar-bg:           #080b13;
+  --sidebar-border:       #151b2b;
+  --sidebar-text:         #ffffff;
+  --sidebar-muted:        #6b7a90;
+  --sidebar-section:      #4b5768;
+  --sidebar-hover-bg:     rgba(255,255,255,0.05);
+  --sidebar-hover-text:   #ffffff;
+  --nav-active-bg:        linear-gradient(135deg, #2563eb, #1d4ed8);
+  --nav-active-text:      #ffffff;
+  --nav-active-border:    transparent;
+  --nav-active-dot:       #ffffff;
+  --nav-inactive-text:    #8a99ad;
+  --status-card-bg:       rgba(255,255,255,0.03);
+  --status-card-border:   rgba(255,255,255,0.07);
+  --status-text:          #ffffff;
+  --status-sub:           #6b7a90;
+  --live-bg:              rgba(34,197,94,0.15);
+  --live-text:            #4ade80;
 }
 
-/* ─── From Uiverse.io by JustCode14 ─── */
 /* Theme Switch */
 .switch {
   font-size: 14px;
@@ -242,8 +288,8 @@ code {
 [data-theme='dark'] html,
 [data-theme='dark'] body,
 [data-theme='dark'] #root {
-  background: #0F172A !important;
-  color: #F8FAFC !important;
+  background: var(--bg-page) !important;
+  color: var(--text-main) !important;
 }
 
 [data-theme='dark'] div,
@@ -254,23 +300,23 @@ code {
 
 [data-theme='dark'] input,
 [data-theme='dark'] select {
-  background-color: #0F172A !important;
-  color: #F8FAFC !important;
-  border-color: #334155 !important;
+  background-color: var(--input-bg) !important;
+  color: var(--text-main) !important;
+  border-color: var(--input-border) !important;
 }
 
 [data-theme='dark'] table {
-  background-color: #1E293B !important;
-  border-color: #334155 !important;
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
 }
 
 [data-theme='dark'] th {
-  background-color: #0F172A !important;
-  color: #94A3B8 !important;
-  border-color: #334155 !important;
+  background-color: var(--bg-page) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
 }
 
 [data-theme='dark'] td {
-  color: #E2E8F0 !important;
-  border-color: #334155 !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-color) !important;
 }

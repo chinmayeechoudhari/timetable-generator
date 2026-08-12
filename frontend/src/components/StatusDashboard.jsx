@@ -148,7 +148,7 @@ export default function StatusDashboard() {
         fontFamily: "'Inter', sans-serif",
         fontSize: '16px',
         fontWeight: '600',
-        color: '#64748b',
+        color: 'var(--text-muted)',
       }}>
         Loading Dashboard...
       </div>
@@ -188,22 +188,26 @@ export default function StatusDashboard() {
   return (
     <div style={{
       padding: '30px 36px 60px',
-      background: '#f8fafc',
+      background: 'var(--bg-page)',
       minHeight: '100vh',
       fontFamily: "'Inter', 'Segoe UI', sans-serif",
-      color: '#0f172a',
+      color: 'var(--text-main)',
+      transition: 'background 0.3s ease, color 0.3s ease',
     }}>
       <style>{`
         .dash-card {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, border-color 0.3s ease;
         }
         .dash-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08) !important;
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+        }
+        .action-card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, border-color 0.3s ease;
         }
         .action-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08) !important;
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
         }
       `}</style>
 
@@ -278,7 +282,7 @@ export default function StatusDashboard() {
           value={teachers.length}
           subtitle="Total Registered Teachers"
           icon={SVG.teacher}
-          badgeBg="#eff6ff"
+          badgeBg="var(--badge-teacher)"
         />
 
         {/* Classrooms */}
@@ -287,7 +291,7 @@ export default function StatusDashboard() {
           value={classroomCount}
           subtitle="Theory Rooms"
           icon={SVG.classroom}
-          badgeBg="#ecfdf5"
+          badgeBg="var(--badge-classroom)"
         />
 
         {/* Labs */}
@@ -296,7 +300,7 @@ export default function StatusDashboard() {
           value={labCount}
           subtitle="Practical Rooms"
           icon={SVG.lab}
-          badgeBg="#f3e8ff"
+          badgeBg="var(--badge-lab)"
         />
 
         {/* Classes */}
@@ -305,7 +309,7 @@ export default function StatusDashboard() {
           value={classes.length}
           subtitle="Configured Classes"
           icon={SVG.classes}
-          badgeBg="#fff7ed"
+          badgeBg="var(--badge-class)"
         />
 
         {/* Subjects */}
@@ -314,7 +318,7 @@ export default function StatusDashboard() {
           value={subjects.length}
           subtitle="Subjects Added"
           icon={SVG.subjects}
-          badgeBg="#fdf2f8"
+          badgeBg="var(--badge-subject)"
         />
       </div>
 
@@ -331,7 +335,7 @@ export default function StatusDashboard() {
             margin: 0,
             fontSize: '18px',
             fontWeight: '800',
-            color: '#0f172a',
+            color: 'var(--text-main)',
             letterSpacing: '-0.2px',
           }}>
             Quick Actions
@@ -345,7 +349,7 @@ export default function StatusDashboard() {
         }}>
           <QuickActionCard
             icon={SVG.teacherAdd}
-            badgeBg="#eff6ff"
+            badgeBg="var(--badge-teacher)"
             title="Add Teacher"
             description="Register a new faculty member."
             linkColor="#2563eb"
@@ -354,7 +358,7 @@ export default function StatusDashboard() {
 
           <QuickActionCard
             icon={SVG.roomDoor}
-            badgeBg="#ecfdf5"
+            badgeBg="var(--badge-classroom)"
             title="Add Room"
             description="Create classrooms and labs."
             linkColor="#10b981"
@@ -363,7 +367,7 @@ export default function StatusDashboard() {
 
           <QuickActionCard
             icon={SVG.classes}
-            badgeBg="#fff7ed"
+            badgeBg="var(--badge-class)"
             title="Add Class"
             description="Configure student classes."
             linkColor="#f97316"
@@ -372,7 +376,7 @@ export default function StatusDashboard() {
 
           <QuickActionCard
             icon={SVG.subjects}
-            badgeBg="#f3e8ff"
+            badgeBg="var(--badge-lab)"
             title="Add Subject"
             description="Create theory & lab subjects."
             linkColor="#8b5cf6"
@@ -383,17 +387,18 @@ export default function StatusDashboard() {
 
       {/* ── SYSTEM STATUS CARD BANNER ── */}
       <div style={{
-        background: '#ffffff',
+        background: 'var(--bg-card)',
         borderRadius: '12px',
         padding: '28px 32px',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)',
+        border: '1px solid var(--border-color)',
+        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
         display: 'grid',
         gridTemplateColumns: '1fr 260px',
         gap: '40px',
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
+        transition: 'background 0.3s ease, border-color 0.3s ease',
       }}>
         {/* Soft decorative background gradient on right */}
         <div style={{
@@ -403,7 +408,7 @@ export default function StatusDashboard() {
           width: '420px',
           height: '420px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(224, 237, 255, 0.6) 0%, rgba(240, 246, 255, 0.0) 70%)',
+          background: 'radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.0) 70%)',
           pointerEvents: 'none',
           zIndex: 0,
         }} />
@@ -415,8 +420,8 @@ export default function StatusDashboard() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            background: validation?.ready !== false ? '#ecfdf5' : '#fef2f2',
-            color: validation?.ready !== false ? '#10b981' : '#ef4444',
+            background: validation?.ready !== false ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            color: validation?.ready !== false ? '#4ade80' : '#f87171',
             padding: '5px 12px',
             borderRadius: '999px',
             fontSize: '12px',
@@ -432,7 +437,7 @@ export default function StatusDashboard() {
             margin: '0 0 6px',
             fontSize: '22px',
             fontWeight: '800',
-            color: '#0f172a',
+            color: 'var(--text-main)',
             letterSpacing: '-0.3px',
           }}>
             {validation?.ready !== false ? 'Everything is configured correctly.' : 'System setup requires attention.'}
@@ -440,7 +445,7 @@ export default function StatusDashboard() {
 
           <p style={{
             margin: '0 0 24px',
-            color: '#94a3b8',
+            color: 'var(--text-muted)',
             fontSize: '13.5px',
             fontWeight: '500',
           }}>
@@ -489,9 +494,9 @@ export default function StatusDashboard() {
             width: '130px',
             height: '130px',
             borderRadius: '50%',
-            background: 'radial-gradient(circle at 35% 35%, #ffffff 0%, #eff6ff 100%)',
-            boxShadow: '0 12px 36px rgba(37, 99, 235, 0.16), inset 0 1px 0 #ffffff',
-            border: '1.5px solid rgba(255, 255, 255, 0.9)',
+            background: 'radial-gradient(circle at 35% 35%, #2563eb 0%, #1d4ed8 100%)',
+            boxShadow: '0 12px 36px rgba(37, 99, 235, 0.35)',
+            border: '1.5px solid rgba(255, 255, 255, 0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -508,15 +513,14 @@ export default function StatusDashboard() {
 function MetricCard({ title, value, subtitle, icon, badgeBg }) {
   return (
     <div className="dash-card" style={{
-      background: '#ffffff',
+      background: 'var(--bg-card)',
       borderRadius: '12px',
       padding: '18px 20px',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)',
+      border: '1px solid var(--border-color)',
+      boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      transition: 'background 0.3s ease, border-color 0.3s ease',
     }}>
       <div>
         <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
@@ -553,16 +557,15 @@ function QuickActionCard({ icon, badgeBg, title, description, linkColor, onClick
       className="action-card"
       onClick={onClick}
       style={{
-        background: '#ffffff',
+        background: 'var(--bg-card)',
         borderRadius: '12px',
         padding: '20px 18px',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)',
+        border: '1px solid var(--border-color)',
+        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        transition: 'background 0.3s ease, border-color 0.3s ease',
       }}
     >
       {/* Top right decorative dots grid */}
@@ -576,7 +579,7 @@ function QuickActionCard({ icon, badgeBg, title, description, linkColor, onClick
         opacity: 0.25,
       }}>
         {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} />
+          <div key={i} style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--text-muted)' }} />
         ))}
       </div>
 
@@ -633,7 +636,7 @@ function ValidationBadge({ ok, label }) {
       display: 'flex',
       alignItems: 'center',
       gap: '9px',
-      background: ok ? '#f0fdf4' : '#fef2f2',
+      background: 'var(--badge-val-bg)',
       padding: '8px 14px',
       borderRadius: '10px',
     }}>
@@ -655,7 +658,7 @@ function ValidationBadge({ ok, label }) {
       <span style={{
         fontSize: '13px',
         fontWeight: '600',
-        color: '#1e293b',
+        color: 'var(--badge-val-text)',
       }}>
         {label}
       </span>
