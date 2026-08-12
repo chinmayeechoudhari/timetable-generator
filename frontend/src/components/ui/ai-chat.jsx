@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Send, X, Sparkles, BarChart3, Users, Building2,
-  Calendar, HelpCircle, Home, Clock, Settings, TrendingUp,
-  AlertTriangle, CheckCircle2, ChevronRight, Bot
+  Send, X, BarChart3, Building2, AlertTriangle,
+  CheckCircle2, ChevronRight, Bot, Zap, Users, Calendar,
+  MessageSquare, ArrowLeft
 } from "lucide-react";
 import axios from "axios";
 import { cn } from "@/lib/utils";
@@ -39,47 +39,49 @@ function editDistance(s1, s2) {
 }
 
 const CAPABILITY_CHIPS = [
-  { icon: "📊", label: "Workload & Conflicts" },
-  { icon: "👩‍🏫", label: "Teacher Availability" },
-  { icon: "🏢", label: "Room Occupancy" },
-  { icon: "📅", label: "Timetable Insights" },
-  { icon: "💬", label: "General Help" },
+  { icon: "📊", label: "Workload & Conflicts", color: "#EEF2FF", text: "#6366F1" },
+  { icon: "👩‍🏫", label: "Teacher Availability", color: "#F0FDF4", text: "#16A34A" },
+  { icon: "🏢", label: "Room Occupancy", color: "#FFF7ED", text: "#EA580C" },
+  { icon: "📅", label: "Timetable Insights", color: "#FDF4FF", text: "#9333EA" },
+  { icon: "💬", label: "General Help", color: "#F0F9FF", text: "#0284C7" },
 ];
 
 const QUICK_ACTIONS = [
   {
     id: "workload",
-    icon: <BarChart3 className="w-4 h-4" style={{ color: "#6366F1" }} />,
+    icon: <BarChart3 style={{ width: "18px", height: "18px", color: "#6366F1" }} />,
     title: "Workload Summary",
-    desc: "View teacher workload",
+    desc: "View teacher workload distribution",
     query: "Teacher workload summary",
-    color: "#EEF2FF",
+    gradient: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)",
+    border: "#C7D2FE",
     accent: "#6366F1",
   },
   {
     id: "rooms",
-    icon: <Building2 className="w-4 h-4" style={{ color: "#10B981" }} />,
+    icon: <Building2 style={{ width: "18px", height: "18px", color: "#10B981" }} />,
     title: "Free Rooms",
-    desc: "Find available rooms",
+    desc: "Find available rooms for a period",
     query: "Which rooms are free on Monday Period 1?",
-    color: "#ECFDF5",
+    gradient: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)",
+    border: "#A7F3D0",
     accent: "#10B981",
   },
   {
     id: "conflicts",
-    icon: <AlertTriangle className="w-4 h-4" style={{ color: "#F59E0B" }} />,
-    title: "Conflicts",
-    desc: "Check scheduling conflicts",
+    icon: <AlertTriangle style={{ width: "18px", height: "18px", color: "#F59E0B" }} />,
+    title: "Check Conflicts",
+    desc: "Detect scheduling conflicts",
     query: "Check for scheduling conflicts",
-    color: "#FFFBEB",
+    gradient: "linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)",
+    border: "#FDE68A",
     accent: "#F59E0B",
   },
 ];
 
 export default function AIChatCard({ className, onClose }) {
-  const [activeTab, setActiveTab] = useState("home");
-  const [messages, setMessages] = useState([]);
   const [showHome, setShowHome] = useState(true);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
@@ -93,6 +95,7 @@ export default function AIChatCard({ className, onClose }) {
   const [classes, setClasses] = useState([]);
 
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => { fetchContextData(); }, []);
   useEffect(() => {
@@ -156,7 +159,7 @@ export default function AIChatCard({ className, onClose }) {
     }
 
     let targetAvailable = null;
-    const isUnavail = /not available|not availaible|not avialable|unavailable|absent|off|leave|can't teach|cant teach|no class/i.test(lower);
+    const isUnavail = /not available|unavailable|absent|off|leave|can't teach|cant teach|no class/i.test(lower);
     const isAvail = /make available|set available|is available|mark available|available|free|can teach|present|on duty/i.test(lower);
 
     if (isUnavail) targetAvailable = false;
@@ -205,7 +208,7 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
         : timeslots.filter(s => s.day.toLowerCase() === day.toLowerCase());
 
       if (targetSlots.length === 0) {
-        return `❌ No timeslots found for ${day}${period ? ` Period ${period}` : ""}. Please verify timeslot setup first.`;
+        return `❌ No timeslots found for ${day}${period ? ` Period ${period}` : ""}. Verify timeslot setup first.`;
       }
 
       let updatedCount = 0;
@@ -220,7 +223,7 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
           }
         } else {
           await axios.post(`${BASE_URL}/teacher-availabilities`, { teacher_id: teacherId, slot_id: slot.slot_id, is_available: false })
-            .catch(async (err) => {
+            .catch(async () => {
               await axios.put(`${BASE_URL}/teacher-availabilities/${teacherId}/${slot.slot_id}`, { is_available: false }).catch(() => {});
             });
           updatedCount++;
@@ -231,10 +234,10 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
       window.dispatchEvent(new CustomEvent("availabilityUpdated", { detail: { teacherId, day } }));
       const periodLabel = period ? ` Period ${period}` : "";
       return targetAvailable
-        ? `✅ Done! ${teacherName} is now **AVAILABLE** on ${day}${periodLabel}.`
-        : `✅ Done! ${teacherName} marked **UNAVAILABLE** on ${day}${periodLabel} (${updatedCount} slot(s) updated).`;
+        ? `✅ Done! ${teacherName} is now AVAILABLE on ${day}${periodLabel}.`
+        : `✅ Done! ${teacherName} marked UNAVAILABLE on ${day}${periodLabel} (${updatedCount} slot(s) updated).`;
     } catch (err) {
-      return `❌ Failed to update. Detail: ${err?.response?.data?.detail || err.message}`;
+      return `❌ Failed to update. ${err?.response?.data?.detail || err.message}`;
     }
   }
 
@@ -257,7 +260,7 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
         const teacherObj = teachers.find(t => t.teacher_id === tId);
         const tName = teacherObj ? teacherObj.teacher_name : `Teacher ${tId}`;
         const slotLabel = slot ? `${slot.day} P${slot.period_number}` : `Slot ${entry.slot_id}`;
-        conflicts.push(`⚠️ ${tName} assigned on ${slotLabel} despite unavailability rule.`);
+        conflicts.push(`⚠️ ${tName} assigned on ${slotLabel} despite unavailability.`);
       }
     });
 
@@ -302,7 +305,7 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
           freeList.push(`🟢 ${r.room_name} (Cap: ${r.capacity || "N/A"})`);
         }
       });
-      return `🏢 ${targetDay} Period ${targetPeriod}:\n\nFree Rooms (${freeList.length}):\n${freeList.join("\n") || "None"}\n\nOccupied (${occupiedList.length}):\n${occupiedList.join("\n") || "None"}`;
+      return `🏢 ${targetDay} Period ${targetPeriod}:\n\nFree (${freeList.length}):\n${freeList.join("\n") || "None"}\n\nOccupied (${occupiedList.length}):\n${occupiedList.join("\n") || "None"}`;
     } else {
       const daySlots = timeslots.filter(s => s.day.toLowerCase() === targetDay.toLowerCase());
       if (daySlots.length === 0) return `🏢 No timeslots configured for ${targetDay}.`;
@@ -317,10 +320,7 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
 
   const switchToChat = (query) => {
     setShowHome(false);
-    setActiveTab("home");
-    if (query) {
-      setTimeout(() => handleSend(query), 100);
-    }
+    if (query) setTimeout(() => handleSend(query), 80);
   };
 
   const handleSend = async (overrideText) => {
@@ -329,39 +329,37 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
     if (showHome) setShowHome(false);
 
     const userMsg = { sender: "user", text: textToSend, id: Date.now() };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages(prev => [...prev, userMsg]);
     if (!overrideText) setInput("");
     setIsTyping(true);
 
     const lower = textToSend.trim().toLowerCase();
 
     if (pendingAction) {
-      const isAffirmative = /^(yes|yeah|yep|sure|ok|okay|confirm|do it|y|correct|please)$/i.test(lower) || lower.includes("yes") || lower.includes("sure");
+      const isAffirmative = /^(yes|yeah|yep|sure|ok|okay|confirm|y|correct|please)$/i.test(lower) || lower.includes("yes") || lower.includes("sure");
       const isNegative = /^(no|nope|nah|cancel|don't|dont|n|stop)$/i.test(lower) || lower.includes("no") || lower.includes("cancel");
 
       if (isAffirmative) {
         const botReplyText = await applyAvailability(pendingAction.teacherId, pendingAction.teacherName, pendingAction.day, pendingAction.period, pendingAction.targetAvailable);
-        setMessages((prev) => [...prev, { sender: "ai", text: botReplyText, id: Date.now() + 1 }]);
+        setMessages(prev => [...prev, { sender: "ai", text: botReplyText, id: Date.now() + 1 }]);
         setPendingAction(null); setIsTyping(false); return;
       } else if (isNegative) {
-        setMessages((prev) => [...prev, { sender: "ai", text: `Action cancelled. ${pendingAction.teacherName}'s availability unchanged. What else can I help with?`, id: Date.now() + 1 }]);
+        setMessages(prev => [...prev, { sender: "ai", text: `Action cancelled. ${pendingAction.teacherName}'s availability unchanged.`, id: Date.now() + 1 }]);
         setPendingAction(null); setIsTyping(false); return;
       } else {
         const periodText = pendingAction.period ? ` Period ${pendingAction.period}` : "";
-        setMessages((prev) => [...prev, { sender: "ai", text: `Pending: Change ${pendingAction.teacherName} on ${pendingAction.day}${periodText} to ${pendingAction.targetAvailable ? "AVAILABLE" : "UNAVAILABLE"}. Reply Yes or No.`, id: Date.now() + 1 }]);
+        setMessages(prev => [...prev, { sender: "ai", text: `Pending: Change ${pendingAction.teacherName} on ${pendingAction.day}${periodText} to ${pendingAction.targetAvailable ? "AVAILABLE" : "UNAVAILABLE"}. Reply Yes or No.`, id: Date.now() + 1 }]);
         setIsTyping(false); return;
       }
     }
 
     if (/workload|teacher load|busiest|check conflict|conflicts|highest load/i.test(lower)) {
-      const summaryText = getWorkloadAndConflictSummary();
-      setMessages((prev) => [...prev, { sender: "ai", text: summaryText, id: Date.now() + 1 }]);
+      setMessages(prev => [...prev, { sender: "ai", text: getWorkloadAndConflictSummary(), id: Date.now() + 1 }]);
       setIsTyping(false); return;
     }
 
     if (/room|occupancy|vacant|free room|empty room/i.test(lower)) {
-      const summaryText = getRoomOccupancySummary(textToSend);
-      setMessages((prev) => [...prev, { sender: "ai", text: summaryText, id: Date.now() + 1 }]);
+      setMessages(prev => [...prev, { sender: "ai", text: getRoomOccupancySummary(textToSend), id: Date.now() + 1 }]);
       setIsTyping(false); return;
     }
 
@@ -369,71 +367,122 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
     if (parsedQuery) {
       const { teacher, day, period, targetAvailable } = parsedQuery;
       setPendingAction({ type: "CHANGE_AVAILABILITY", teacherId: teacher.teacher_id, teacherName: teacher.teacher_name, day, period, targetAvailable });
-      const statusWord = targetAvailable ? "AVAILABLE" : "UNAVAILABLE";
       const periodText = period ? ` Period ${period}` : "";
-      setMessages((prev) => [...prev, { sender: "ai", text: `Change availability of **${teacher.teacher_name}** on **${day}${periodText}** to **${statusWord}**?`, id: Date.now() + 1 }]);
+      setMessages(prev => [...prev, { sender: "ai", text: `Change availability of **${teacher.teacher_name}** on **${day}${periodText}** to **${targetAvailable ? "AVAILABLE" : "UNAVAILABLE"}**?`, id: Date.now() + 1 }]);
       setIsTyping(false); return;
     }
 
     const geminiResponse = await queryGeminiApi(textToSend, messages);
-    const finalBotText = geminiResponse || "I'm here to help manage your timetable! Ask me about teacher availability, workload, or room occupancy.";
-    setMessages((prev) => [...prev, { sender: "ai", text: finalBotText, id: Date.now() + 1 }]);
+    setMessages(prev => [...prev, { sender: "ai", text: geminiResponse || "I'm here to help! Ask me about teacher availability, workload, or room occupancy.", id: Date.now() + 1 }]);
     setIsTyping(false);
   };
 
   return (
     <div
-      className={cn("flex flex-col bg-white border-l border-gray-200 shadow-xl", className)}
-      style={{ width: "320px", height: "100%", fontFamily: "'Inter', 'Segoe UI', sans-serif" }}
+      className={cn(className)}
+      style={{
+        width: "320px",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: "#FFFFFF",
+        borderLeft: "1px solid #E5E7EB",
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        flexShrink: 0,
+      }}
     >
       {/* ── Header ── */}
-      <div style={{ padding: "14px 16px", borderBottom: "1px solid #E5E7EB", background: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Bot style={{ width: "16px", height: "16px", color: "#fff" }} />
+      <div style={{
+        padding: "0 16px",
+        height: "56px",
+        background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexShrink: 0,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Back button — only visible in chat view */}
+          {!showHome && (
+            <button
+              onClick={() => setShowHome(true)}
+              style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "6px", width: "26px", height: "26px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", flexShrink: 0 }}
+            >
+              <ArrowLeft style={{ width: "14px", height: "14px" }} />
+            </button>
+          )}
+          <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Bot style={{ width: "15px", height: "15px", color: "#fff" }} />
           </div>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ fontWeight: 700, fontSize: "13px", color: "#111827" }}>AI Timetable Assistant</span>
-              <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.05em", background: "#EEF2FF", color: "#6366F1", padding: "1px 5px", borderRadius: "4px" }}>BETA</span>
+              <span style={{ fontWeight: 700, fontSize: "13px", color: "#fff" }}>AI Timetable Assistant</span>
+              <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.06em", background: "rgba(255,255,255,0.25)", color: "#fff", padding: "1px 6px", borderRadius: "4px" }}>BETA</span>
             </div>
-            <p style={{ fontSize: "10px", color: "#6B7280", margin: 0 }}>Always here to help you manage your timetable.</p>
+            <p style={{ margin: 0, fontSize: "10px", color: "rgba(255,255,255,0.7)" }}>Powered by Gemini AI</p>
           </div>
         </div>
         {onClose && (
-          <button onClick={onClose} style={{ width: "24px", height: "24px", borderRadius: "6px", border: "1px solid #E5E7EB", background: "#F9FAFB", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7280" }}>
-            <X style={{ width: "12px", height: "12px" }} />
+          <button
+            onClick={onClose}
+            style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "6px", width: "26px", height: "26px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}
+          >
+            <X style={{ width: "13px", height: "13px" }} />
           </button>
         )}
       </div>
 
       {/* ── Body ── */}
-      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", background: "#F8FAFC" }}>
         <AnimatePresence mode="wait">
           {showHome ? (
             /* ── HOME VIEW ── */
-            <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
-              {/* Greeting bubble */}
-              <div style={{ background: "#F3F4F6", borderRadius: "12px", borderTopLeftRadius: "2px", padding: "12px 14px", marginBottom: "14px" }}>
-                <p style={{ margin: 0, fontSize: "12px", color: "#374151", lineHeight: 1.6 }}>
-                  👋 Hello! I'm your <strong>AI Timetable Assistant</strong>.
-                </p>
-                <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#6B7280" }}>I can help you with:</p>
-                <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "6px" }}>
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.2 }}
+              style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: "14px" }}
+            >
+              {/* Greeting Card */}
+              <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid #E5E7EB", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                  <div style={{ fontSize: "22px" }}>👋</div>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 700, fontSize: "13px", color: "#111827" }}>Hello! I'm your AI Assistant.</p>
+                    <p style={{ margin: 0, fontSize: "11px", color: "#6B7280" }}>I can help you with:</p>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", marginTop: "10px" }}>
                   {CAPABILITY_CHIPS.map((c) => (
                     <button
                       key={c.label}
                       onClick={() => switchToChat(c.label)}
-                      style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#fff", cursor: "pointer", textAlign: "left", fontSize: "12px", color: "#374151", fontWeight: 500, transition: "background 0.15s" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "#F9FAFB"}
-                      onMouseLeave={e => e.currentTarget.style.background = "#fff"}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "10px",
+                        padding: "8px 10px", borderRadius: "9px",
+                        border: "1px solid #F3F4F6",
+                        background: c.color,
+                        cursor: "pointer", textAlign: "left",
+                        fontSize: "12px", color: c.text, fontWeight: 600,
+                        transition: "all 0.15s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.border = `1px solid ${c.text}44`; e.currentTarget.style.boxShadow = `0 2px 8px ${c.text}18`; }}
+                      onMouseLeave={e => { e.currentTarget.style.border = "1px solid #F3F4F6"; e.currentTarget.style.boxShadow = "none"; }}
                     >
-                      <span style={{ fontSize: "14px" }}>{c.icon}</span>
+                      <span style={{ fontSize: "15px" }}>{c.icon}</span>
                       {c.label}
                     </button>
                   ))}
                 </div>
-                <p style={{ margin: "12px 0 0", fontSize: "12px", color: "#6B7280" }}>What would you like to know?</p>
+                <p style={{ margin: "12px 0 0", fontSize: "11px", color: "#9CA3AF" }}>What would you like to know?</p>
+              </div>
+
+              {/* Quick Actions Label */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Zap style={{ width: "12px", height: "12px", color: "#6366F1" }} />
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "#6B7280", letterSpacing: "0.05em", textTransform: "uppercase" }}>Quick Actions</span>
               </div>
 
               {/* Quick Action Cards */}
@@ -442,41 +491,82 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
                   <button
                     key={action.id}
                     onClick={() => switchToChat(action.query)}
-                    style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 12px", borderRadius: "10px", border: `1px solid ${action.accent}22`, background: action.color, cursor: "pointer", textAlign: "left", transition: "box-shadow 0.15s", boxShadow: "none" }}
-                    onMouseEnter={e => e.currentTarget.style.boxShadow = `0 2px 8px ${action.accent}33`}
-                    onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "12px",
+                      padding: "12px 14px", borderRadius: "12px",
+                      border: `1px solid ${action.border}`,
+                      background: action.gradient,
+                      cursor: "pointer", textAlign: "left",
+                      transition: "all 0.15s", boxShadow: "none",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 4px 12px ${action.accent}22`; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
                   >
-                    <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#fff", border: `1px solid ${action.accent}33`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#fff", border: `1px solid ${action.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 2px 4px ${action.accent}18` }}>
                       {action.icon}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontSize: "12px", fontWeight: 600, color: "#111827" }}>{action.title}</p>
-                      <p style={{ margin: 0, fontSize: "11px", color: "#6B7280" }}>{action.desc}</p>
+                      <p style={{ margin: 0, fontSize: "12px", fontWeight: 700, color: "#111827" }}>{action.title}</p>
+                      <p style={{ margin: "1px 0 0", fontSize: "11px", color: "#6B7280" }}>{action.desc}</p>
                     </div>
                     <ChevronRight style={{ width: "14px", height: "14px", color: "#9CA3AF" }} />
                   </button>
                 ))}
               </div>
+
+              {/* Bottom CTA */}
+              <div style={{ marginTop: "auto" }}>
+                <button
+                  onClick={() => switchToChat("")}
+                  style={{
+                    width: "100%", padding: "11px", borderRadius: "10px",
+                    border: "none", background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
+                    color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                    boxShadow: "0 4px 12px rgba(99,102,241,0.3)", transition: "opacity 0.15s",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = "0.9"}
+                  onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                >
+                  <MessageSquare style={{ width: "13px", height: "13px" }} />
+                  Open Chat
+                </button>
+              </div>
             </motion.div>
           ) : (
             /* ── CHAT VIEW ── */
-            <motion.div key="chat" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <motion.div
+              key="chat"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 12 }}
+              transition={{ duration: 0.2 }}
+              style={{ flex: 1, overflowY: "auto", padding: "14px", display: "flex", flexDirection: "column", gap: "8px" }}
+            >
+              {messages.length === 0 && (
+                <div style={{ textAlign: "center", color: "#9CA3AF", fontSize: "12px", marginTop: "40px" }}>
+                  <MessageSquare style={{ width: "28px", height: "28px", margin: "0 auto 8px", opacity: 0.4 }} />
+                  <p style={{ margin: 0 }}>Ask me anything about your timetable!</p>
+                </div>
+              )}
+
               {messages.map((msg, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
+                  transition={{ duration: 0.22 }}
                   style={{
                     alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
-                    maxWidth: "88%",
-                    padding: "10px 13px",
-                    borderRadius: msg.sender === "user" ? "14px 14px 2px 14px" : "14px 14px 14px 2px",
-                    background: msg.sender === "user" ? "linear-gradient(135deg, #6366F1, #8B5CF6)" : "#F3F4F6",
+                    maxWidth: "86%",
+                    padding: "9px 13px",
+                    borderRadius: msg.sender === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                    background: msg.sender === "user" ? "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)" : "#fff",
                     color: msg.sender === "user" ? "#fff" : "#374151",
                     fontSize: "12px",
-                    lineHeight: 1.6,
-                    boxShadow: msg.sender === "user" ? "0 2px 8px rgba(99,102,241,0.3)" : "none",
+                    lineHeight: 1.65,
+                    boxShadow: msg.sender === "user" ? "0 3px 10px rgba(99,102,241,0.35)" : "0 1px 4px rgba(0,0,0,0.08)",
+                    border: msg.sender === "ai" ? "1px solid #F3F4F6" : "none",
                     whiteSpace: "pre-line",
                     wordBreak: "break-word",
                   }}
@@ -485,26 +575,41 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
                 </motion.div>
               ))}
 
+              {/* Typing indicator */}
               {isTyping && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ alignSelf: "flex-start", display: "flex", alignItems: "center", gap: "4px", padding: "10px 14px", borderRadius: "14px 14px 14px 2px", background: "#F3F4F6" }}>
-                  {[0, 150, 300].map((delay, i) => (
-                    <motion.span key={i} style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9CA3AF", display: "block" }} animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: delay / 1000 }} />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{ alignSelf: "flex-start", display: "flex", alignItems: "center", gap: "5px", padding: "10px 14px", borderRadius: "16px 16px 16px 4px", background: "#fff", border: "1px solid #F3F4F6", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}
+                >
+                  {[0, 0.15, 0.3].map((delay, i) => (
+                    <motion.span
+                      key={i}
+                      style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#C4B5FD", display: "block" }}
+                      animate={{ y: [0, -4, 0], background: ["#C4B5FD", "#8B5CF6", "#C4B5FD"] }}
+                      transition={{ duration: 0.7, repeat: Infinity, delay }}
+                    />
                   ))}
                 </motion.div>
               )}
 
-              {/* Pending confirmation buttons */}
+              {/* Confirm / Cancel inline buttons */}
               {pendingAction && !isTyping && (
                 <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} style={{ display: "flex", gap: "8px", alignSelf: "flex-start" }}>
-                  <button onClick={() => handleSend("Yes")} style={{ padding: "7px 16px", borderRadius: "8px", border: "none", background: "#10B981", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
-                    <CheckCircle2 style={{ width: "13px", height: "13px" }} /> Yes, update
+                  <button
+                    onClick={() => handleSend("Yes")}
+                    style={{ padding: "7px 16px", borderRadius: "8px", border: "none", background: "linear-gradient(135deg, #10B981, #059669)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", boxShadow: "0 2px 8px rgba(16,185,129,0.35)" }}
+                  >
+                    <CheckCircle2 style={{ width: "12px", height: "12px" }} /> Yes, update
                   </button>
-                  <button onClick={() => handleSend("No")} style={{ padding: "7px 16px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#fff", color: "#374151", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
-                    No, cancel
+                  <button
+                    onClick={() => handleSend("No")}
+                    style={{ padding: "7px 16px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#fff", color: "#6B7280", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}
+                  >
+                    Cancel
                   </button>
                 </motion.div>
               )}
-
               <div ref={messagesEndRef} />
             </motion.div>
           )}
@@ -512,40 +617,27 @@ Help with teacher availability, workload/conflicts, room occupancy, timetable ge
       </div>
 
       {/* ── Input Bar ── */}
-      <div style={{ padding: "10px 12px", borderTop: "1px solid #E5E7EB", background: "#fff", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: "10px", padding: "6px 10px" }}>
+      <div style={{ padding: "12px 12px", borderTop: "1px solid #E5E7EB", background: "#fff", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#F9FAFB", border: "1.5px solid #E5E7EB", borderRadius: "12px", padding: "7px 10px", transition: "border-color 0.15s" }}
+          onFocus={() => {}} /* handled via child focus */
+        >
           <input
-            style={{ flex: 1, border: "none", background: "transparent", fontSize: "12px", color: "#111827", outline: "none" }}
+            ref={inputRef}
+            style={{ flex: 1, border: "none", background: "transparent", fontSize: "12.5px", color: "#111827", outline: "none", lineHeight: 1.5 }}
             placeholder={pendingAction ? "Type Yes or No..." : "Ask me anything..."}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            onFocus={e => e.currentTarget.parentNode.style.borderColor = "#8B5CF6"}
+            onBlur={e => e.currentTarget.parentNode.style.borderColor = "#E5E7EB"}
           />
           <button
             onClick={() => handleSend()}
-            style={{ width: "28px", height: "28px", borderRadius: "8px", border: "none", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+            style={{ width: "30px", height: "30px", borderRadius: "9px", border: "none", background: input.trim() ? "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)" : "#E5E7EB", color: input.trim() ? "#fff" : "#9CA3AF", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s", boxShadow: input.trim() ? "0 2px 8px rgba(99,102,241,0.4)" : "none" }}
           >
             <Send style={{ width: "13px", height: "13px" }} />
           </button>
         </div>
-      </div>
-
-      {/* ── Bottom Tab Bar ── */}
-      <div style={{ display: "flex", borderTop: "1px solid #E5E7EB", background: "#FAFAFA", flexShrink: 0 }}>
-        {[
-          { id: "home", icon: <Home style={{ width: "15px", height: "15px" }} />, label: "Home" },
-          { id: "history", icon: <Clock style={{ width: "15px", height: "15px" }} />, label: "History" },
-          { id: "settings", icon: <Settings style={{ width: "15px", height: "15px" }} />, label: "Settings" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => { setActiveTab(tab.id); if (tab.id === "home") setShowHome(true); }}
-            style={{ flex: 1, padding: "10px 4px 8px", border: "none", background: "transparent", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", color: activeTab === tab.id ? "#6366F1" : "#9CA3AF", transition: "color 0.15s" }}
-          >
-            {tab.icon}
-            <span style={{ fontSize: "10px", fontWeight: activeTab === tab.id ? 600 : 400 }}>{tab.label}</span>
-          </button>
-        ))}
       </div>
     </div>
   );
