@@ -621,23 +621,40 @@ export default function ChatBubble() {
         </div>
       )}
 
-      {/* Floating Action Button */}
-      <button
-        style={{
-          ...S.fab,
-          ...(fabHovered ? S.fabHover : {}),
-          ...(isOpen ? { ...S.fabActive, background: '#0a1633' } : {}),
-        }}
-        onMouseEnter={() => setFabHovered(true)}
-        onMouseLeave={() => setFabHovered(false)}
-        onClick={() => setIsOpen(v => !v)}
-        title="AI Timetable Assistant"
-      >
-        {isOpen
-          ? <CloseIcon />
-          : <SparkIcon />
-        }
-      </button>
+      {/* Floating Action Button with label */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'flex-end' }}>
+        {!isOpen && (
+          <span style={{
+            fontSize: '12.5px',
+            fontWeight: '600',
+            color: '#64748b',
+            background: '#ffffff',
+            padding: '6px 12px',
+            borderRadius: '20px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+          }}>Ask AI Assistant</span>
+        )}
+        <button
+          style={{
+            ...S.fab,
+            ...(fabHovered ? S.fabHover : {}),
+            ...(isOpen ? { ...S.fabActive, background: '#1e293b' } : {}),
+            borderRadius: '50%',
+          }}
+          onMouseEnter={() => setFabHovered(true)}
+          onMouseLeave={() => setFabHovered(false)}
+          onClick={() => setIsOpen(v => !v)}
+          title="AI Timetable Assistant"
+        >
+          {isOpen
+            ? <CloseIcon />
+            : <SparkIcon />
+          }
+        </button>
+      </div>
     </>
   )
 }

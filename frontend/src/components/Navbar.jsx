@@ -105,41 +105,41 @@ export default function Navbar() {
 
   return (
     <aside style={{
-      width: '260px',
-      minWidth: '260px',
+      width: '240px',
+      minWidth: '240px',
       height: '100vh',
-      background: '#0a1633',
+      background: '#ffffff',
       display: 'flex',
       flexDirection: 'column',
-      color: '#ffffff',
+      color: '#1e293b',
       fontFamily: "'Inter', 'Segoe UI', sans-serif",
       userSelect: 'none',
       flexShrink: 0,
-      borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-      boxShadow: '4px 0 20px rgba(0, 0, 0, 0.15)',
+      borderRight: '1px solid #e2e8f0',
+      boxShadow: '2px 0 12px rgba(0, 0, 0, 0.04)',
     }}>
 
       {/* ── Brand Header ── */}
       <div style={{
-        padding: '24px 20px 20px',
+        padding: '20px 18px 18px',
         display: 'flex',
         alignItems: 'center',
-        gap: '14px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+        gap: '12px',
+        borderBottom: '1px solid #e2e8f0',
       }}>
         {/* Blue Logo Box */}
         <div style={{
-          width: '42px',
-          height: '42px',
-          borderRadius: '12px',
+          width: '38px',
+          height: '38px',
+          borderRadius: '10px',
           background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 6px 18px rgba(37, 99, 235, 0.4)',
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
           flexShrink: 0,
         }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
             <rect x="3" y="4" width="18" height="17" rx="3"/>
             <path d="M3 9h18"/>
             <path d="M8 2v4M16 2v4"/>
@@ -151,10 +151,10 @@ export default function Navbar() {
 
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
-            <span style={{ fontSize: '18px', fontWeight: '800', color: '#ffffff', letterSpacing: '-0.3px' }}>Timetable</span>
-            <span style={{ fontSize: '18px', fontWeight: '900', color: '#3b82f6', letterSpacing: '-0.3px' }}>Pro</span>
+            <span style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b', letterSpacing: '-0.3px' }}>Timetable</span>
+            <span style={{ fontSize: '16px', fontWeight: '900', color: '#2563eb', letterSpacing: '-0.3px' }}>Pro</span>
           </div>
-          <div style={{ fontSize: '11px', fontWeight: '500', color: '#64748b', marginTop: '2px' }}>
+          <div style={{ fontSize: '10.5px', fontWeight: '500', color: '#94a3b8', marginTop: '1px' }}>
             CP-SAT Scheduler
           </div>
         </div>
@@ -163,23 +163,23 @@ export default function Navbar() {
       {/* ── Nav Sections ── */}
       <div style={{
         flex: 1,
-        padding: '16px 12px',
+        padding: '14px 10px',
         overflowY: 'auto',
       }}>
         {NAV_GROUPS.map(group => (
-          <div key={group.section} style={{ marginBottom: '22px' }}>
+          <div key={group.section} style={{ marginBottom: '18px' }}>
             <div style={{
-              fontSize: '10.5px',
+              fontSize: '10px',
               fontWeight: '700',
-              color: '#475569',
-              letterSpacing: '0.12em',
-              padding: '6px 12px 10px',
+              color: '#94a3b8',
+              letterSpacing: '0.1em',
+              padding: '4px 10px 8px',
               textTransform: 'uppercase',
             }}>
               {group.section}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {group.items.map(item => {
                 const active = location.pathname === item.to
 
@@ -190,29 +190,27 @@ export default function Navbar() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      padding: '10.5px 14px',
-                      borderRadius: '12px',
+                      gap: '11px',
+                      padding: '9px 12px',
+                      borderRadius: '8px',
                       textDecoration: 'none',
-                      fontSize: '13.5px',
+                      fontSize: '13px',
                       fontWeight: active ? '600' : '500',
-                      background: active
-                        ? 'linear-gradient(135deg, #2563eb, #1d4ed8)'
-                        : 'transparent',
-                      color: active ? '#ffffff' : '#94a3b8',
-                      boxShadow: active ? '0 6px 20px rgba(37, 99, 235, 0.35)' : 'none',
+                      background: active ? '#eff6ff' : 'transparent',
+                      color: active ? '#2563eb' : '#64748b',
+                      borderLeft: active ? '3px solid #2563eb' : '3px solid transparent',
                       transition: 'all 0.15s ease',
                     }}
                     onMouseEnter={e => {
                       if (!active) {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                        e.currentTarget.style.color = '#ffffff'
+                        e.currentTarget.style.background = '#f8fafc'
+                        e.currentTarget.style.color = '#1e293b'
                       }
                     }}
                     onMouseLeave={e => {
                       if (!active) {
                         e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.color = '#94a3b8'
+                        e.currentTarget.style.color = '#64748b'
                       }
                     }}
                   >
@@ -220,8 +218,9 @@ export default function Navbar() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: active ? '#ffffff' : '#64748b',
+                      color: active ? '#2563eb' : '#94a3b8',
                       transition: 'color 0.15s ease',
+                      flexShrink: 0,
                     }}>
                       {item.icon}
                     </span>
@@ -234,8 +233,7 @@ export default function Navbar() {
                         width: '6px',
                         height: '6px',
                         borderRadius: '50%',
-                        background: '#ffffff',
-                        boxShadow: '0 0 8px #ffffff',
+                        background: '#2563eb',
                       }} />
                     )}
                   </Link>
@@ -248,34 +246,34 @@ export default function Navbar() {
 
       {/* ── Bottom System Status Card ── */}
       <div style={{
-        padding: '16px 14px 20px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+        padding: '14px 12px 18px',
+        borderTop: '1px solid #e2e8f0',
       }}>
         <div style={{
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          borderRadius: '12px',
-          padding: '12px 14px',
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: '10px',
+          padding: '11px 13px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
               <span style={{
                 width: '7px',
                 height: '7px',
                 borderRadius: '50%',
                 background: '#22c55e',
-                boxShadow: '0 0 8px #22c55e',
+                boxShadow: '0 0 6px #22c55e',
               }} />
-              <span style={{ fontSize: '12px', fontWeight: '600', color: '#ffffff' }}>
+              <span style={{ fontSize: '12px', fontWeight: '600', color: '#1e293b' }}>
                 System ready
               </span>
             </div>
 
             <span style={{
-              fontSize: '9.5px',
+              fontSize: '9px',
               fontWeight: '700',
-              background: 'rgba(34, 197, 94, 0.15)',
-              color: '#4ade80',
+              background: '#dcfce7',
+              color: '#16a34a',
               padding: '2px 7px',
               borderRadius: '999px',
               letterSpacing: '0.06em',
@@ -284,7 +282,7 @@ export default function Navbar() {
             </span>
           </div>
 
-          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
             All systems operational
           </div>
         </div>

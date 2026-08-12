@@ -62,7 +62,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background: #F0F4F8;
+  background: #f8fafc;
 }
 #root {
   width: 100%;
@@ -120,7 +120,7 @@ code {
 }
 
 :root {
-  --bg-page: #F0F4F8;
+  --bg-page: #f8fafc;
   --bg-card: #FFFFFF;
   --text-main: #1B2A3B;
   --text-muted: #64748B;

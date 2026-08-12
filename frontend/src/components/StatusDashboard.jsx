@@ -187,7 +187,7 @@ export default function StatusDashboard() {
 
   return (
     <div style={{
-      padding: '36px 40px 60px',
+      padding: '30px 36px 60px',
       background: '#f8fafc',
       minHeight: '100vh',
       fontFamily: "'Inter', 'Segoe UI', sans-serif",
@@ -384,10 +384,10 @@ export default function StatusDashboard() {
       {/* ── SYSTEM STATUS CARD BANNER ── */}
       <div style={{
         background: '#ffffff',
-        borderRadius: '20px',
-        padding: '32px 36px',
+        borderRadius: '12px',
+        padding: '28px 32px',
         border: '1px solid #e2e8f0',
-        boxShadow: '0 4px 20px rgba(15, 23, 42, 0.03)',
+        boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)',
         display: 'grid',
         gridTemplateColumns: '1fr 260px',
         gap: '40px',
@@ -508,11 +508,11 @@ export default function StatusDashboard() {
 function MetricCard({ title, value, subtitle, icon, badgeBg }) {
   return (
     <div className="dash-card" style={{
-      background: 'var(--bg-card)',
-      borderRadius: '16px',
-      padding: '20px',
-      border: '1px solid var(--border-color)',
-      boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
+      background: '#ffffff',
+      borderRadius: '12px',
+      padding: '18px 20px',
+      border: '1px solid #e2e8f0',
+      boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -553,11 +553,11 @@ function QuickActionCard({ icon, badgeBg, title, description, linkColor, onClick
       className="action-card"
       onClick={onClick}
       style={{
-        background: 'var(--bg-card)',
-        borderRadius: '16px',
-        padding: '22px 20px',
-        border: '1px solid var(--border-color)',
-        boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
+        background: '#ffffff',
+        borderRadius: '12px',
+        padding: '20px 18px',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
