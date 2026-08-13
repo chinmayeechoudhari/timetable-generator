@@ -49,12 +49,15 @@ def run_preflight_checks(db: Session) -> dict:
             f"Slot capacity OK: each class fits within {total_slots} available timeslots."
         )
 
-    # Check 2: subjects with no teacher linked
+# Check 2: subjects with no teacher linked
     unlinked_subjects = [
         s for s in subjects if s.subject_id not in linked_subject_ids
     ]
     if unlinked_subjects:
-        names = ", ".join(s.subject_name for s in unlinked_subjects)
+        names = ", ".join(
+            f"{s.subject_name} ({s.class_.class_name})" if s.class_ else s.subject_name
+            for s in unlinked_subjects
+        )
         issues.append(
             f"These subjects have no teacher assigned: {names}. "
             f"Go to Teacher-Subject page and link a teacher."
