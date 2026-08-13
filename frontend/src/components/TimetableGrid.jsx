@@ -6,8 +6,8 @@ const BASE = 'http://localhost:8000'
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8]
 
-
-const COLORS = [
+/* ── Light-mode cell colour palette ── */
+const COLORS_LIGHT = [
   { bg: '#EFF6FF', border: '#2563EB', text: '#1D4ED8' },
   { bg: '#F0FDF4', border: '#16A34A', text: '#15803D' },
   { bg: '#FEF3C7', border: '#D97706', text: '#B45309' },
@@ -18,7 +18,39 @@ const COLORS = [
   { bg: '#EEF2FF', border: '#4F46E5', text: '#4338CA' },
 ]
 
+/* ── Dark-mode cell colour palette (vivid text on deep dark bg) ── */
+const COLORS_DARK = [
+  { bg: '#0d1f3c', border: '#3b82f6', text: '#60a5fa' },
+  { bg: '#0d2820', border: '#22c55e', text: '#4ade80' },
+  { bg: '#2b1e0a', border: '#d97706', text: '#fbbf24' },
+  { bg: '#1e0d33', border: '#a855f7', text: '#c084fc' },
+  { bg: '#2b0f18', border: '#f43f5e', text: '#fb7185' },
+  { bg: '#0d2828', border: '#14b8a6', text: '#2dd4bf' },
+  { bg: '#2b1400', border: '#f97316', text: '#fb923c' },
+  { bg: '#111633', border: '#6366f1', text: '#818cf8' },
+]
+
+/* ── Hook: watches document[data-theme] ── */
+function useDarkMode() {
+  const [dark, setDark] = useState(
+    () => document.documentElement.getAttribute('data-theme') === 'dark'
+  )
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => {
+      setDark(el.getAttribute('data-theme') === 'dark')
+    })
+    obs.observe(el, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
+
 export default function TimetableGrid() {
+  const dark = useDarkMode()
+
+  const COLORS = dark ? COLORS_DARK : COLORS_LIGHT
+
   const [timetable, setTimetable] = useState([])
   const [teachers, setTeachers] = useState({})
   const [subjects, setSubjects] = useState({})
@@ -36,6 +68,15 @@ export default function TimetableGrid() {
 
   useEffect(() => { fetchAll() }, [])
 
+  /* Re-compute colors when dark mode changes */
+  useEffect(() => {
+    if (subjectsList.length === 0) return
+    const palette = dark ? COLORS_DARK : COLORS_LIGHT
+    const colors = {}
+    subjectsList.forEach((s, i) => { colors[s.subject_id] = palette[i % palette.length] })
+    setSubjectColors(colors)
+  }, [dark, subjectsList])
+
   async function fetchAll() {
     try {
       const [ttRes, tRes, sRes, rRes, cRes, slRes] = await Promise.all([
@@ -51,7 +92,8 @@ export default function TimetableGrid() {
       setSubjectsList(sRes.data)
       const roomMap = {}; rRes.data.forEach(r => { roomMap[r.room_id] = r.room_number })
       const classMap = {}; cRes.data.forEach(c => { classMap[c.class_id] = c.class_name })
-      const colors = {}; sRes.data.forEach((s, i) => { colors[s.subject_id] = COLORS[i % COLORS.length] })
+      const palette = document.documentElement.getAttribute('data-theme') === 'dark' ? COLORS_DARK : COLORS_LIGHT
+      const colors = {}; sRes.data.forEach((s, i) => { colors[s.subject_id] = palette[i % palette.length] })
 
       setTimetable(ttRes.data); setTeachers(teacherMap); setSubjects(subjectMap)
       setRooms(roomMap); setClasses(classMap); setSubjectColors(colors)
@@ -102,8 +144,52 @@ export default function TimetableGrid() {
       .filter(t => t[filterKey] === selected)
       .map(t => t.subject_id)
   )
-
   const visibleSubjects = subjectsList.filter(s => visibleSubjectIds.has(s.subject_id))
+
+  /* ── theme-dependent style tokens ── */
+  const T = {
+    page:        { padding: '28px 32px', background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-main)', fontFamily: "'Inter','Segoe UI',sans-serif" },
+    titleText:   { fontSize: '22px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.02em' },
+    subText:     { fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' },
+    exportBtn:   dark
+      ? { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #3b82f6', background: '#0d1f3c', color: '#60a5fa', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }
+      : { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #2563EB', background: '#EFF6FF',  color: '#1D4ED8', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
+    exportAllBtn: dark
+      ? { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #22c55e', background: '#0d2820', color: '#4ade80', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }
+      : { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #16A34A', background: '#F0FDF4', color: '#15803D', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
+    tabBar:      dark
+      ? { display: 'inline-flex', gap: '3px', background: '#0d1322', borderRadius: '8px', padding: '3px', marginBottom: '14px', border: '1px solid #1a2338' }
+      : { display: 'inline-flex', gap: '3px', background: '#E2E8F0',   borderRadius: '8px', padding: '3px', marginBottom: '14px' },
+    tabActive:   dark
+      ? { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '700', background: '#1a2338',   color: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', transition: 'all 0.12s' }
+      : { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '600', background: '#FFFFFF',   color: '#1B2A3B', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', transition: 'all 0.12s' },
+    tabInactive: dark
+      ? { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: 'transparent', color: '#6b7a90', transition: 'all 0.12s' }
+      : { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: 'transparent', color: '#64748B', transition: 'all 0.12s' },
+    pillActive:  dark
+      ? { padding: '5px 14px', borderRadius: '20px', border: '1.5px solid #3b82f6', cursor: 'pointer', fontSize: '12px', fontWeight: '700', background: '#0d1f3c', color: '#60a5fa', transition: 'all 0.12s' }
+      : { padding: '5px 14px', borderRadius: '20px', border: '1.5px solid #2563EB', cursor: 'pointer', fontSize: '12px', fontWeight: '600', background: '#EFF6FF',  color: '#1D4ED8', transition: 'all 0.12s' },
+    pillInactive: dark
+      ? { padding: '5px 14px', borderRadius: '20px', border: '1px solid #1f2b45',   cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: '#090d16',   color: '#6b7a90', transition: 'all 0.12s' }
+      : { padding: '5px 14px', borderRadius: '20px', border: '1px solid #CBD5E1',   cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: '#FFFFFF',   color: '#64748B', transition: 'all 0.12s' },
+    gridWrap:    dark
+      ? { background: '#0d1322', borderRadius: '12px', border: '1px solid #1a2338', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }
+      : { background: '#FFFFFF', borderRadius: '10px',  border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
+    thStyle:     dark
+      ? { padding: '10px 12px', fontSize: '10px', fontWeight: '700', color: '#6b7a90',  textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', border: '1px solid #1a2338', whiteSpace: 'nowrap', background: '#090d16' }
+      : { padding: '10px 12px', fontSize: '10px', fontWeight: '700', color: '#64748B',  textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', border: '1px solid #F1F5F9', whiteSpace: 'nowrap', background: '#F8FAFC' },
+    tdStyle:     dark
+      ? { padding: '4px', border: '1px solid #161e30', verticalAlign: 'top', width: 'auto' }
+      : { padding: '3px', border: '1px solid #F1F5F9', verticalAlign: 'top', width: 'auto' },
+    dayStyle:    dark
+      ? { padding: '10px 12px', fontSize: '11px', fontWeight: '700', color: '#8a99ad', textAlign: 'center', border: '1px solid #1a2338', background: '#090d16', whiteSpace: 'nowrap' }
+      : { padding: '10px 12px', fontSize: '11px', fontWeight: '700', color: '#94A3B8', textAlign: 'center', border: '1px solid #F1F5F9', background: '#F8FAFC', whiteSpace: 'nowrap' },
+    rowEven:     dark ? '#0d1322' : '#FFFFFF',
+    rowOdd:      dark ? '#0a1020' : '#FAFAFA',
+    metaColor:   dark ? '#8a99ad' : '#475569',
+    emptyColor:  dark ? '#2a3548' : '#CBD5E1',
+    legendLabel: dark ? '#6b7a90' : '#94A3B8',
+  }
 
   function handleExport() {
     const styleId = 'print-style'
@@ -146,10 +232,10 @@ export default function TimetableGrid() {
 
       {/* HEADER → PERIODS AS COLUMNS */}
       <thead>
-        <tr style={{ background: '#F8FAFC' }}>
-          <th style={thStyle}>Day</th>
+        <tr>
+          <th style={T.thStyle}>Day</th>
           {activePeriods.map(period => (
-            <th key={period} style={thStyle}>P{period}</th>
+            <th key={period} style={T.thStyle}>P{period}</th>
           ))}
         </tr>
       </thead>
@@ -157,10 +243,10 @@ export default function TimetableGrid() {
       {/* BODY → DAYS AS ROWS */}
       <tbody>
         {activeDays.map((day, di) => (
-          <tr key={day} style={{ background: di % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
+          <tr key={day} style={{ background: di % 2 === 0 ? T.rowEven : T.rowOdd }}>
 
             {/* DAY LABEL */}
-            <td style={periodStyle}>{day}</td>
+            <td style={T.dayStyle}>{day}</td>
 
             {/* PERIOD CELLS */}
             {activePeriods.map(period => {
@@ -170,33 +256,33 @@ export default function TimetableGrid() {
                 : null
 
               return (
-                <td key={period} style={tdStyle}>
+                <td key={period} style={T.tdStyle}>
                   {entry ? (
                     <div style={{
                       background: color.bg,
                       borderLeft: `3px solid ${color.border}`,
-                      borderRadius: '5px',
-                      padding: '4px 5px',
-                      minHeight: '44px'
+                      borderRadius: '6px',
+                      padding: '5px 6px',
+                      minHeight: '48px',
                     }}>
                       <SubjectTypeBadge
                         name={subjects[entry.subject_id] || `S${entry.subject_id}`}
                         type={subjectsList.find(s => s.subject_id === entry.subject_id)?.subject_type}
+                        dark={dark}
+                        color={color}
                       />
                       {showTeacher && (
-                        <div style={{ fontSize: '10px', color: '#475569' }}>
+                        <div style={{ fontSize: '10px', color: T.metaColor, marginTop: '2px' }}>
                           👤 {teachers[entry.teacher_id] || `T${entry.teacher_id}`}
                         </div>
                       )}
-
                       {showClass && (
-                        <div style={{ fontSize: '10px', color: '#475569' }}>
+                        <div style={{ fontSize: '10px', color: T.metaColor, marginTop: '2px' }}>
                           🏫 {classes[entry.class_id] || `C${entry.class_id}`}
                         </div>
                       )}
-
                       {showRoom && (
-                        <div style={{ fontSize: '10px', color: '#64748B' }}>
+                        <div style={{ fontSize: '10px', color: T.metaColor, marginTop: '2px' }}>
                           🚪 {rooms[entry.room_id] || `R${entry.room_id}`}
                         </div>
                       )}
@@ -207,7 +293,7 @@ export default function TimetableGrid() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#CBD5E1',
+                      color: T.emptyColor,
                       fontSize: '16px'
                     }}>
                       —
@@ -240,7 +326,7 @@ export default function TimetableGrid() {
   )
 
   return (
-    <div style={{ padding: '28px 32px', background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-main)' }}>
+    <div style={T.page}>
 
       {/* Header */}
       <div style={{
@@ -249,65 +335,39 @@ export default function TimetableGrid() {
         flexWrap: 'wrap', gap: '12px', marginBottom: '20px'
       }}>
         <div>
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#1B2A3B' }}>
-            Timetable
-          </div>
-          <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
-            {timetable.length} slots assigned
-          </div>
+          <div style={T.titleText}>Timetable</div>
+          <div style={T.subText}>{timetable.length} slots assigned</div>
         </div>
 
         <div className="no-print" style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={handleExport} style={{
-            padding: '8px 14px', borderRadius: '7px',
-            border: '1.5px solid #2563EB', background: '#EFF6FF',
-            color: '#1D4ED8', fontSize: '12px', fontWeight: '600', cursor: 'pointer'
-          }}>
+          <button onClick={handleExport} style={T.exportBtn}>
             Export current view
           </button>
-          <button onClick={handleExportAll} style={{
-            padding: '8px 14px', borderRadius: '7px',
-            border: '1.5px solid #16A34A', background: '#F0FDF4',
-            color: '#15803D', fontSize: '12px', fontWeight: '600', cursor: 'pointer'
-          }}>
+          <button onClick={handleExportAll} style={T.exportAllBtn}>
             Export all views
           </button>
         </div>
       </div>
 
       {/* View tabs */}
-      <div className="no-print" style={{
-        display: 'inline-flex', gap: '3px',
-        background: '#E2E8F0', borderRadius: '8px',
-        padding: '3px', marginBottom: '14px'
-      }}>
+      <div className="no-print" style={T.tabBar}>
         {[
           { key: 'class', label: 'Class-wise' },
           { key: 'teacher', label: 'Teacher-wise' },
           { key: 'room', label: 'Room-wise' }
         ].map(v => (
-          <button key={v.key} onClick={() => switchView(v.key)} style={{
-            padding: '7px 16px', borderRadius: '6px', border: 'none',
-            cursor: 'pointer', fontSize: '12px', fontWeight: '600',
-            background: view === v.key ? '#FFFFFF' : 'transparent',
-            color: view === v.key ? '#1B2A3B' : '#64748B',
-            boxShadow: view === v.key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-            transition: 'all 0.12s'
-          }}>{v.label}</button>
+          <button key={v.key} onClick={() => switchView(v.key)} style={view === v.key ? T.tabActive : T.tabInactive}>
+            {v.label}
+          </button>
         ))}
       </div>
 
       {/* Filter pills */}
       <div className="no-print" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
         {filterOptions().map(opt => (
-          <button key={opt.id} onClick={() => setSelected(opt.id)} style={{
-            padding: '5px 14px', borderRadius: '20px',
-            border: `1.5px solid ${selected === opt.id ? '#2563EB' : '#CBD5E1'}`,
-            cursor: 'pointer', fontSize: '12px', fontWeight: '600',
-            background: selected === opt.id ? '#EFF6FF' : '#FFFFFF',
-            color: selected === opt.id ? '#1D4ED8' : '#64748B',
-            transition: 'all 0.12s'
-          }}>{opt.label}</button>
+          <button key={opt.id} onClick={() => setSelected(opt.id)} style={selected === opt.id ? T.pillActive : T.pillInactive}>
+            {opt.label}
+          </button>
         ))}
       </div>
 
@@ -317,11 +377,7 @@ export default function TimetableGrid() {
           <div style={{ display: 'none' }} className="print-title">
             {view === 'class' ? 'Class' : view === 'teacher' ? 'Teacher' : 'Room'}: {getSelectedLabel()}
           </div>
-          <div style={{
-            background: '#FFFFFF', borderRadius: '10px',
-            border: '1px solid #E2E8F0', overflow: 'hidden',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
-          }}>
+          <div style={T.gridWrap}>
             <div style={{ overflowX: 'auto' }}>
               {renderGrid(filterKey, selected, view !== 'teacher', view !== 'class', view !== 'room')}
             </div>
@@ -364,7 +420,7 @@ export default function TimetableGrid() {
       }}>
         <span style={{
           fontSize: '10px',
-          color: '#94A3B8',
+          color: T.legendLabel,
           fontWeight: '700',
           textTransform: 'uppercase',
           letterSpacing: '0.06em'
@@ -397,6 +453,8 @@ export default function TimetableGrid() {
               <SubjectTypeBadge
                 name={s.subject_name}
                 type={s.subject_type}
+                dark={dark}
+                color={color}
               />
             </div>
           )
@@ -404,26 +462,4 @@ export default function TimetableGrid() {
       </div>
     </div>
   )
-}
-
-const thStyle = {
-  padding: '10px 12px', fontSize: '10px', fontWeight: '700',
-  color: '#64748B', textTransform: 'uppercase',
-  letterSpacing: '0.06em', textAlign: 'center',
-  border: '1px solid #F1F5F9', whiteSpace: 'nowrap',
-  background: '#F8FAFC'
-}
-
-const tdStyle = {
-  padding: '3px',
-  border: '1px solid #F1F5F9',
-  verticalAlign: 'top',
-  width: 'auto'
-}
-
-const periodStyle = {
-  padding: '10px 12px', fontSize: '11px', fontWeight: '700',
-  color: '#94A3B8', textAlign: 'center',
-  border: '1px solid #F1F5F9', background: '#F8FAFC',
-  whiteSpace: 'nowrap'
 }

@@ -1586,9 +1586,8 @@ const classAvatar = {
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '12px',
-  background:
-    'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
-  border: '1px solid #BFDBFE',
+  background: 'var(--badge-teacher)',
+  border: '1px solid var(--input-border)',
   color: '#1D4ED8',
   fontSize: '11px',
   fontWeight: '850',
@@ -1597,13 +1596,13 @@ const classAvatar = {
 const className = {
   fontSize: '14px',
   fontWeight: '850',
-  color: '#162A4A',
+  color: 'var(--text-main)',
 }
 
 const classDescription = {
   marginTop: '3px',
   fontSize: '10px',
-  color: '#94A3B8',
+  color: 'var(--text-muted)',
 }
 
 const roleBadge = {
@@ -1612,9 +1611,9 @@ const roleBadge = {
   gap: '7px',
   padding: '7px 11px',
   borderRadius: '999px',
-  background: '#F8FAFC',
-  border: '1px solid #E2E8F0',
-  color: '#52637D',
+  background: 'var(--bg-page)',
+  border: '1px solid var(--border-color)',
+  color: 'var(--text-muted)',
   fontSize: '9px',
   fontWeight: '800',
   letterSpacing: '0.05em',
@@ -1638,8 +1637,8 @@ const actionGroup = {
 const editButton = {
   padding: '8px 13px',
   borderRadius: '8px',
-  border: '1px solid #BFDBFE',
-  background: '#EFF6FF',
+  border: '1px solid var(--input-border)',
+  background: 'var(--badge-teacher)',
   color: '#1D4ED8',
   fontSize: '11px',
   fontWeight: '800',
@@ -1649,8 +1648,8 @@ const editButton = {
 const deleteButton = {
   padding: '8px 13px',
   borderRadius: '8px',
-  border: '1px solid #FECACA',
-  background: '#FEF2F2',
+  border: '1px solid var(--border-color)',
+  background: 'var(--badge-subject)',
   color: '#DC2626',
   fontSize: '11px',
   fontWeight: '800',
@@ -1663,10 +1662,10 @@ const directoryFooter = {
   justifyContent: 'space-between',
   gap: '12px',
   padding: '13px 24px',
-  borderTop: '1px solid #E2E8F0',
+  borderTop: '1px solid var(--border-color)',
   fontSize: '10px',
   fontWeight: '600',
-  color: '#8795AA',
+  color: 'var(--text-muted)',
 }
 
 const footerStatus = {
@@ -1692,19 +1691,18 @@ const stateCard = {
   margin: '0 24px 24px',
   padding: '55px 20px',
   textAlign: 'center',
-  border: '1px dashed #CBD5E1',
+  border: '1px dashed var(--border-color)',
   borderRadius: '13px',
-  background: '#FAFCFF',
+  background: 'var(--bg-card)',
 }
 
 const emptyState = {
   margin: '0 24px 24px',
   padding: '60px 20px',
   textAlign: 'center',
-  border: '1px dashed #CBD5E1',
+  border: '1px dashed var(--border-color)',
   borderRadius: '14px',
-  background:
-    'linear-gradient(135deg, #FAFCFF, #F8FBFF)',
+  background: 'var(--bg-card)',
 }
 
 const emptyVisual = {
@@ -1745,13 +1743,13 @@ const stateTitle = {
   marginBottom: '5px',
   fontSize: '14px',
   fontWeight: '800',
-  color: '#1E293B',
+  color: 'var(--text-main)',
 }
 
 const stateText = {
   fontSize: '12px',
   lineHeight: '1.5',
-  color: '#64748B',
+  color: 'var(--text-muted)',
 }
 
 const secondaryButton = {
@@ -1798,7 +1796,8 @@ const modalCard = {
   maxWidth: '470px',
   overflow: 'hidden',
   borderRadius: '19px',
-  background: '#FFFFFF',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
   boxShadow:
     '0 28px 80px rgba(15, 23, 42, 0.24)',
 }
@@ -1815,7 +1814,7 @@ const modalHeader = {
   justifyContent: 'space-between',
   gap: '16px',
   padding: '24px 25px 21px',
-  borderBottom: '1px solid #E2E8F0',
+  borderBottom: '1px solid var(--border-color)',
 }
 
 const modalEyebrow = {
@@ -1829,24 +1828,24 @@ const modalEyebrow = {
 const modalTitle = {
   fontSize: '19px',
   fontWeight: '850',
-  color: '#0F172A',
+  color: 'var(--text-main)',
 }
 
 const modalSubtitle = {
   marginTop: '5px',
   fontSize: '12px',
   lineHeight: '1.5',
-  color: '#64748B',
+  color: 'var(--text-muted)',
 }
 
 const modalCloseButton = {
   width: '32px',
   height: '32px',
   flexShrink: 0,
-  border: 'none',
+  border: '1px solid var(--border-color)',
   borderRadius: '9px',
-  background: '#F1F5F9',
-  color: '#475569',
+  background: 'var(--bg-page)',
+  color: 'var(--text-muted)',
   fontSize: '21px',
   cursor: 'pointer',
 }
@@ -1861,9 +1860,10 @@ const modalInput = {
   height: '46px',
   boxSizing: 'border-box',
   borderRadius: '10px',
-  background: '#F8FAFC',
-  border: '1px solid #CBD5E1',
+  background: 'var(--input-bg)',
+  border: '1px solid var(--input-border)',
   fontSize: '13px',
+  color: 'var(--text-main)',
 }
 
 const fieldHint = {
@@ -1879,8 +1879,8 @@ const modalError = {
   marginTop: '18px',
   padding: '10px 12px',
   borderRadius: '9px',
-  background: '#FEF2F2',
-  border: '1px solid #FECACA',
+  background: 'var(--badge-subject)',
+  border: '1px solid var(--border-color)',
   color: '#991B1B',
   fontSize: '12px',
   fontWeight: '600',
@@ -1892,15 +1892,15 @@ const modalFooter = {
   alignItems: 'center',
   gap: '9px',
   padding: '16px 25px 21px',
-  borderTop: '1px solid #E2E8F0',
+  borderTop: '1px solid var(--border-color)',
 }
 
 const cancelButton = {
   padding: '11px 18px',
   borderRadius: '9px',
-  border: '1px solid #CBD5E1',
-  background: '#FFFFFF',
-  color: '#475569',
+  border: '1px solid var(--border-color)',
+  background: 'var(--bg-card)',
+  color: 'var(--text-main)',
   fontSize: '12px',
   fontWeight: '750',
   cursor: 'pointer',

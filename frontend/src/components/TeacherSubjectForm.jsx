@@ -1430,14 +1430,15 @@ export default function TeacherSubjectForm() {
                 {selectedTeachers.map(id => (
                   <span
                     key={id}
+                    className="ts-teacher-chip"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '5px',
                       padding: '5px 8px',
                       borderRadius: '7px',
-                      background: '#EFF6FF',
-                      border: '1px solid #BFDBFE',
+                      background: 'var(--badge-teacher)',
+                      border: '1px solid var(--input-border)',
                       color: '#1D4ED8',
                       fontSize: '10px',
                       fontWeight: '700',
@@ -1469,14 +1470,15 @@ export default function TeacherSubjectForm() {
             {teacherDropdownOpen &&
               selectedClass && (
                 <div
+                  className="ts-dropdown"
                   style={{
                     position: 'absolute',
                     top: '72px',
                     left: 0,
                     right: 0,
                     zIndex: 100,
-                    background: '#FFFFFF',
-                    border: '1px solid #CBD5E1',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '10px',
                     boxShadow:
                       '0 12px 30px rgba(15, 35, 66, 0.12)',
@@ -1500,13 +1502,15 @@ export default function TeacherSubjectForm() {
                         )
                       }
                       placeholder="Search teachers..."
+                      className="ts-dropdown-search"
                       style={{
                         width: '100%',
                         boxSizing: 'border-box',
                         padding: '9px 11px',
                         borderRadius: '7px',
-                        border:
-                          '1px solid #CBD5E1',
+                        border: '1px solid var(--input-border)',
+                        background: 'var(--input-bg)',
+                        color: 'var(--text-main)',
                         outline: 'none',
                         fontSize: '12px',
                       }}
@@ -1589,15 +1593,15 @@ export default function TeacherSubjectForm() {
                                 teacher.teacher_id
                               )
                             }
+                            className="ts-dropdown-item"
                             style={{
                               width: '100%',
                               padding: '10px 12px',
                               border: 'none',
-                              borderBottom:
-                                '1px solid #F1F5F9',
+                              borderBottom: '1px solid var(--border-color)',
                               background: selected
-                                ? '#EFF6FF'
-                                : '#FFFFFF',
+                                ? 'var(--badge-teacher)'
+                                : 'var(--bg-card)',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '10px',
@@ -1612,10 +1616,10 @@ export default function TeacherSubjectForm() {
                                 borderRadius: '5px',
                                 border: selected
                                   ? '1px solid #2563EB'
-                                  : '1px solid #CBD5E1',
+                                  : '1px solid var(--border-color)',
                                 background: selected
                                   ? '#2563EB'
-                                  : '#FFFFFF',
+                                  : 'var(--bg-page)',
                                 color: '#FFFFFF',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -1636,7 +1640,7 @@ export default function TeacherSubjectForm() {
                                   : '500',
                                 color: selected
                                   ? '#1D4ED8'
-                                  : '#334155',
+                                  : 'var(--text-main)',
                               }}
                             >
                               {teacher.teacher_name}
@@ -1738,14 +1742,15 @@ export default function TeacherSubjectForm() {
             {subjectDropdownOpen &&
               selectedClass && (
                 <div
+                  className="ts-dropdown"
                   style={{
                     position: 'absolute',
                     top: '72px',
                     left: 0,
                     right: 0,
                     zIndex: 100,
-                    background: '#FFFFFF',
-                    border: '1px solid #CBD5E1',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '10px',
                     boxShadow:
                       '0 12px 30px rgba(15, 35, 66, 0.12)',
@@ -1769,13 +1774,15 @@ export default function TeacherSubjectForm() {
                         )
                       }
                       placeholder="Search subjects..."
+                      className="ts-dropdown-search"
                       style={{
                         width: '100%',
                         boxSizing: 'border-box',
                         padding: '9px 11px',
                         borderRadius: '7px',
-                        border:
-                          '1px solid #CBD5E1',
+                        border: '1px solid var(--input-border)',
+                        background: 'var(--input-bg)',
+                        color: 'var(--text-main)',
                         outline: 'none',
                         fontSize: '12px',
                       }}
@@ -1851,17 +1858,17 @@ export default function TeacherSubjectForm() {
                                 subject.subject_id
                               )
                             }
+                            className="ts-dropdown-item"
                             style={{
                               width: '100%',
                               padding: '10px 12px',
                               border: 'none',
-                              borderBottom:
-                                '1px solid #F1F5F9',
+                              borderBottom: '1px solid var(--border-color)',
                               background: selected
                                 ? assignmentType === 'lab'
-                                  ? '#FFFBEB'
-                                  : '#EFF6FF'
-                                : '#FFFFFF',
+                                  ? 'var(--badge-room)'
+                                  : 'var(--badge-teacher)'
+                                : 'var(--bg-card)',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '10px',
@@ -1878,12 +1885,12 @@ export default function TeacherSubjectForm() {
                                   ? assignmentType === 'lab'
                                     ? '1px solid #D97706'
                                     : '1px solid #2563EB'
-                                  : '1px solid #CBD5E1',
+                                  : '1px solid var(--border-color)',
                                 background: selected
                                   ? assignmentType === 'lab'
                                     ? '#D97706'
                                     : '#2563EB'
-                                  : '#FFFFFF',
+                                  : 'var(--bg-page)',
                                 color: '#FFFFFF',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -1942,6 +1949,7 @@ export default function TeacherSubjectForm() {
 
         {selectedSubjectData && (
           <div
+            className={assignmentType === 'lab' ? 'ts-subject-info-lab' : 'ts-subject-info-theory'}
             style={{
               marginTop: '18px',
               padding: '13px 15px',
@@ -1962,6 +1970,7 @@ export default function TeacherSubjectForm() {
           >
             <div>
               <div
+                className="ts-subject-info-label"
                 style={{
                   fontSize: '10px',
                   fontWeight: '800',
@@ -1974,6 +1983,7 @@ export default function TeacherSubjectForm() {
               </div>
 
               <div
+                className={assignmentType === 'lab' ? 'ts-subject-info-name-lab' : 'ts-subject-info-name-theory'}
                 style={{
                   fontSize: '13px',
                   fontWeight: '800',
@@ -2004,15 +2014,15 @@ export default function TeacherSubjectForm() {
         {selectedTeachers.length > 0 &&
           selectedSubjectData && (
             <div
+              className="ts-summary-box"
               style={{
                 marginTop: '18px',
                 padding: '14px 16px',
                 borderRadius: '10px',
-                background: '#F8FAFC',
-                border:
-                  '1px solid #E2E8F0',
+                background: 'var(--bg-page)',
+                border: '1px solid var(--border-color)',
                 fontSize: '11px',
-                color: '#475569',
+                color: 'var(--text-muted)',
               }}
             >
               <strong
@@ -2137,12 +2147,13 @@ export default function TeacherSubjectForm() {
                 key={filter.key}
                 type="button"
                 onClick={() => setDirectoryFilter(filter.key)}
+                className={`ts-filter-btn${active ? ' active' : ''}`}
                 style={{
                   padding: '8px 15px',
                   borderRadius: '9px',
-                  border: active ? '1px solid #2563EB' : '1px solid #D9E3F0',
-                  background: active ? '#EFF6FF' : '#FFFFFF',
-                  color: active ? '#1D4ED8' : '#64748B',
+                  border: active ? '1px solid #2563EB' : '1px solid var(--border-color)',
+                  background: active ? 'var(--badge-teacher)' : 'var(--bg-card)',
+                  color: active ? '#1D4ED8' : 'var(--text-muted)',
                   fontSize: '11px',
                   fontWeight: '700',
                   cursor: 'pointer',
@@ -2211,7 +2222,7 @@ export default function TeacherSubjectForm() {
                   return (
                     <tr
                       key={`${link.teacher_id}-${link.subject_id}-${index}`}
-                      style={{ background: index % 2 === 0 ? '#FFFFFF' : '#FBFDFF' }}
+                      className={index % 2 === 0 ? 'ts-table-row-even' : 'ts-table-row-odd'}
                     >
                       <td style={{ ...S.td, fontWeight: '700', color: '#1E293B' }}>
                         {teacher?.teacher_name || `Teacher ${link.teacher_id}`}
@@ -2400,12 +2411,130 @@ export default function TeacherSubjectForm() {
         [data-theme='dark'] .ts-hero h1 { color: #ffffff !important; }
         [data-theme='dark'] .hero-subtitle { color: #ffffff !important; }
         [data-theme='dark'] .eyebrow { color: #a855f7 !important; }
-        [data-theme='dark'] .hero-icon { background: #141d33 !important; border-color: #1e2f57 !important; color: #3b82f6 !important; }
         [data-theme='dark'] .ts-stat-card { background: #0d1322 !important; border-color: #1a2338 !important; }
         [data-theme='dark'] .stat-label { color: #8a99ad !important; }
         [data-theme='dark'] .stat-number { color: #ffffff !important; }
-        [data-theme='dark'] div[style*="background: white"], [data-theme='dark'] div[style*="background: '#FFFFFF'"] { background: #0d1322 !important; border-color: #1a2338 !important; color: #ffffff !important; }
-        [data-theme='dark'] table, [data-theme='dark'] tr, [data-theme='dark'] td { border-color: #1a2338 !important; }
+
+        /* ── FORM CARD (assignment panel) ── */
+        [data-theme='dark'] .ts-form-card {
+          background: #0d1322 !important;
+          border-color: #1a2338 !important;
+          box-shadow: none !important;
+        }
+        [data-theme='dark'] .ts-form-card label,
+        [data-theme='dark'] .ts-form-card .field-label { color: #8a99ad !important; }
+
+        /* ── TYPE TOGGLE BUTTONS ── */
+        [data-theme='dark'] .ts-type-btn {
+          background: #111827 !important;
+          border-color: #1f2b45 !important;
+          color: #8a99ad !important;
+        }
+        [data-theme='dark'] .ts-type-btn.active-theory {
+          background: #0d1f3c !important;
+          border-color: #2563eb !important;
+          color: #60a5fa !important;
+        }
+        [data-theme='dark'] .ts-type-btn.active-lab {
+          background: #2b1e0a !important;
+          border-color: #d97706 !important;
+          color: #fbbf24 !important;
+        }
+
+        /* ── CLASS SELECTOR & TEACHER CHIPS ── */
+        [data-theme='dark'] .ts-class-select,
+        [data-theme='dark'] .ts-subject-trigger,
+        [data-theme='dark'] .ts-teacher-trigger {
+          background: #090d16 !important;
+          border-color: #1f2b45 !important;
+          color: #ffffff !important;
+        }
+        [data-theme='dark'] .ts-teacher-chip {
+          background: #111827 !important;
+          border-color: #1f2b45 !important;
+          color: #8a99ad !important;
+        }
+        [data-theme='dark'] .ts-teacher-chip.selected {
+          background: #0d1f3c !important;
+          border-color: #2563eb !important;
+          color: #60a5fa !important;
+        }
+
+        /* ── DROPDOWNS ── */
+        [data-theme='dark'] .ts-dropdown {
+          background: #0d1322 !important;
+          border-color: #1a2338 !important;
+          box-shadow: 0 12px 30px rgba(0,0,0,0.5) !important;
+        }
+        [data-theme='dark'] .ts-dropdown-search {
+          background: #090d16 !important;
+          border-color: #1f2b45 !important;
+          color: #ffffff !important;
+        }
+        [data-theme='dark'] .ts-dropdown-item {
+          background: #0d1322 !important;
+          border-bottom-color: #161e30 !important;
+          color: #ffffff !important;
+        }
+        [data-theme='dark'] .ts-dropdown-item:hover {
+          background: #111827 !important;
+        }
+        [data-theme='dark'] .ts-dropdown-count {
+          background: #090d16 !important;
+          border-bottom-color: #1a2338 !important;
+          color: #8a99ad !important;
+        }
+
+        /* ── SUBJECT INFO / SUMMARY BOXES ── */
+        [data-theme='dark'] .ts-subject-info-theory {
+          background: #0d1f3c !important;
+          border-color: #2563eb !important;
+        }
+        [data-theme='dark'] .ts-subject-info-lab {
+          background: #2b1e0a !important;
+          border-color: #d97706 !important;
+        }
+        [data-theme='dark'] .ts-subject-info-label { color: #8a99ad !important; }
+        [data-theme='dark'] .ts-subject-info-name-theory { color: #60a5fa !important; }
+        [data-theme='dark'] .ts-subject-info-name-lab { color: #fbbf24 !important; }
+
+        [data-theme='dark'] .ts-summary-box {
+          background: #090d16 !important;
+          border-color: #1f2b45 !important;
+          color: #8a99ad !important;
+        }
+        [data-theme='dark'] .ts-summary-box strong { color: #ffffff !important; }
+
+        /* ── DIRECTORY TABLE ROWS ── */
+        [data-theme='dark'] .ts-table-row-even { background: #0d1322 !important; }
+        [data-theme='dark'] .ts-table-row-odd  { background: #090d16 !important; }
+        [data-theme='dark'] .ts-table-td { color: #ffffff !important; border-color: #1a2338 !important; }
+        [data-theme='dark'] .ts-table-td-name { color: #ffffff !important; font-weight: 700; }
+        [data-theme='dark'] .ts-class-pill {
+          background: #0d1f3c !important;
+          border-color: #2563eb !important;
+          color: #60a5fa !important;
+        }
+
+        /* ── FILTER BUTTONS ── */
+        [data-theme='dark'] .ts-filter-btn {
+          background: #111827 !important;
+          border-color: #1f2b45 !important;
+          color: #8a99ad !important;
+        }
+        [data-theme='dark'] .ts-filter-btn.active {
+          background: #0d1f3c !important;
+          border-color: #2563eb !important;
+          color: #60a5fa !important;
+        }
+
+        /* ── ALL TABLE BORDERS ── */
+        [data-theme='dark'] table,
+        [data-theme='dark'] tr,
+        [data-theme='dark'] td,
+        [data-theme='dark'] th { border-color: #1a2338 !important; }
+        [data-theme='dark'] td { background: #0d1322 !important; color: #ffffff !important; }
+        [data-theme='dark'] th { background: #090d16 !important; color: #8a99ad !important; }
       `}</style>
 
     </div>
@@ -2440,10 +2569,9 @@ const heroCard = {
   alignItems: 'center',
   padding: '30px 28px',
   overflow: 'hidden',
-  border: '1px solid rgba(203,213,225,0.82)',
+  border: '1px solid var(--border-color)',
   borderRadius: '20px',
-  background:
-    'linear-gradient(110deg, rgba(255,255,255,0.98) 0%, rgba(248,251,255,0.97) 58%, rgba(239,246,255,0.92) 100%)',
+  background: 'var(--bg-card)',
   boxShadow: '0 12px 35px rgba(15,23,42,0.045)',
   boxSizing: 'border-box',
 }
@@ -2462,8 +2590,8 @@ const heroIcon = {
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '17px',
-  background: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
-  border: '1px solid #BFDBFE',
+  background: 'var(--badge-teacher)',
+  border: '1px solid var(--input-border)',
   boxShadow: '0 8px 22px rgba(37,99,235,0.10)',
 }
 
@@ -2488,20 +2616,20 @@ const heroTitle = {
   lineHeight: 1.05,
   fontWeight: '850',
   letterSpacing: '-0.035em',
-  color: '#10213F',
+  color: 'var(--text-main)',
 }
 
 const heroSubtitle = {
   marginTop: '7px',
   fontSize: '15px',
   fontWeight: '750',
-  color: '#29446F',
+  color: 'var(--text-main)',
 }
 
 const heroDescription = {
   margin: '5px 0 0',
   fontSize: '12px',
-  color: '#71829D',
+  color: 'var(--text-muted)',
 }
 
 
@@ -2523,9 +2651,9 @@ const statCard = {
   gap: '14px',
   overflow: 'hidden',
   padding: '18px 20px',
-  border: '1px solid rgba(203,213,225,0.82)',
+  border: '1px solid var(--border-color)',
   borderRadius: '16px',
-  background: 'rgba(255,255,255,0.94)',
+  background: 'var(--bg-card)',
   boxShadow: '0 8px 25px rgba(15,23,42,0.035)',
   boxSizing: 'border-box',
 }
@@ -2538,23 +2666,21 @@ const statIconBlue = {
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '12px',
-  background: '#EFF6FF',
-  border: '1px solid #DBEAFE',
+  background: 'var(--badge-teacher)',
+  border: '1px solid var(--input-border)',
   color: '#2563EB',
   fontSize: '19px',
 }
 
 const statIconGreen = {
   ...statIconBlue,
-  background: '#ECFDF5',
-  border: '1px solid #D1FAE5',
+  background: 'var(--badge-classroom)',
   color: '#059669',
 }
 
 const statIconPurple = {
   ...statIconBlue,
-  background: '#F5F3FF',
-  border: '1px solid #E9D5FF',
+  background: 'var(--badge-subject)',
   color: '#7C3AED',
 }
 
@@ -2563,7 +2689,7 @@ const statLabel = {
   fontSize: '9px',
   fontWeight: '850',
   letterSpacing: '0.12em',
-  color: '#7A8BA5',
+  color: 'var(--text-muted)',
 }
 
 const statNumberBlue = {
@@ -2615,8 +2741,8 @@ const successBanner = {
   gap: '9px',
   padding: '11px 14px',
   borderRadius: '10px',
-  background: '#F0FDF4',
-  border: '1px solid #BBF7D0',
+  background: 'var(--badge-classroom)',
+  border: '1px solid var(--border-color)',
   color: '#166534',
   fontSize: '12px',
   fontWeight: '600',
@@ -2628,8 +2754,8 @@ const errorBanner = {
   gap: '9px',
   padding: '11px 14px',
   borderRadius: '10px',
-  background: '#FEF2F2',
-  border: '1px solid #FECACA',
+  background: 'var(--badge-subject)',
+  border: '1px solid var(--border-color)',
   color: '#991B1B',
   fontSize: '12px',
   fontWeight: '600',
@@ -2642,7 +2768,7 @@ const successIcon = {
   width: '20px',
   height: '20px',
   borderRadius: '50%',
-  background: '#DCFCE7',
+  background: 'var(--badge-classroom)',
   color: '#15803D',
   fontWeight: '800',
 }
@@ -2654,7 +2780,7 @@ const errorIcon = {
   width: '20px',
   height: '20px',
   borderRadius: '50%',
-  background: '#FEE2E2',
+  background: 'var(--badge-subject)',
   color: '#DC2626',
   fontWeight: '800',
 }
@@ -2696,9 +2822,9 @@ const primaryButtonWide = {
 const directoryCard = {
   position: 'relative',
   overflow: 'hidden',
-  border: '1px solid rgba(203,213,225,0.82)',
+  border: '1px solid var(--border-color)',
   borderRadius: '18px',
-  background: 'rgba(255,255,255,0.96)',
+  background: 'var(--bg-card)',
   boxShadow: '0 12px 35px rgba(15,23,42,0.045)',
 }
 
@@ -2730,8 +2856,8 @@ const directoryIcon = {
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '12px',
-  background: '#EFF6FF',
-  border: '1px solid #DBEAFE',
+  background: 'var(--badge-teacher)',
+  border: '1px solid var(--input-border)',
   color: '#2563EB',
   fontSize: '21px',
 }
@@ -2741,28 +2867,28 @@ const directoryEyebrow = {
   fontSize: '9px',
   fontWeight: '850',
   letterSpacing: '0.13em',
-  color: '#6B8FC5',
+  color: 'var(--text-muted)',
 }
 
 const directoryTitle = {
   margin: 0,
   fontSize: '17px',
   fontWeight: '850',
-  color: '#162A4A',
+  color: 'var(--text-main)',
 }
 
 const directorySubtitle = {
   margin: '4px 0 0',
   fontSize: '11px',
-  color: '#8190A8',
+  color: 'var(--text-muted)',
 }
 
 const countPill = {
   padding: '8px 12px',
   borderRadius: '999px',
-  background: '#F8FBFF',
-  border: '1px solid #BFDBFE',
-  color: '#2563EB',
+  background: 'var(--bg-page)',
+  border: '1px solid var(--input-border)',
+  color: 'var(--text-main)',
   fontSize: '10px',
   fontWeight: '850',
   whiteSpace: 'nowrap',
@@ -2789,10 +2915,10 @@ const searchInput = {
   height: '43px',
   boxSizing: 'border-box',
   padding: '0 42px',
-  border: '1px solid #CBD5E1',
+  border: '1px solid var(--input-border)',
   borderRadius: '10px',
-  background: '#FAFCFF',
-  color: '#172B4D',
+  background: 'var(--input-bg)',
+  color: 'var(--text-main)',
   fontFamily: 'inherit',
   fontSize: '12px',
   outline: 'none',
@@ -2805,8 +2931,8 @@ const clearButton = {
   height: '24px',
   border: 'none',
   borderRadius: '50%',
-  background: '#E2E8F0',
-  color: '#475569',
+  background: 'var(--border-color)',
+  color: 'var(--text-muted)',
   fontSize: '16px',
   cursor: 'pointer',
 }
@@ -2814,7 +2940,7 @@ const clearButton = {
 const tableWrapper = {
   width: '100%',
   overflowX: 'auto',
-  borderTop: '1px solid #E2E8F0',
+  borderTop: '1px solid var(--border-color)',
 }
 
 const actionGroup = {
@@ -2827,8 +2953,8 @@ const actionGroup = {
 const editButton = {
   padding: '8px 13px',
   borderRadius: '8px',
-  border: '1px solid #BFDBFE',
-  background: '#EFF6FF',
+  border: '1px solid var(--input-border)',
+  background: 'var(--badge-teacher)',
   color: '#1D4ED8',
   fontSize: '11px',
   fontWeight: '800',
@@ -2838,8 +2964,8 @@ const editButton = {
 const deleteButton = {
   padding: '8px 13px',
   borderRadius: '8px',
-  border: '1px solid #FECACA',
-  background: '#FEF2F2',
+  border: '1px solid var(--border-color)',
+  background: 'var(--badge-subject)',
   color: '#DC2626',
   fontSize: '11px',
   fontWeight: '800',
@@ -2855,22 +2981,22 @@ const emptyState = {
   margin: '0 24px 24px',
   padding: '55px 20px',
   textAlign: 'center',
-  border: '1px dashed #CBD5E1',
+  border: '1px dashed var(--border-color)',
   borderRadius: '14px',
-  background: 'linear-gradient(135deg, #FAFCFF, #F8FBFF)',
+  background: 'var(--bg-page)',
 }
 
 const stateTitle = {
   marginBottom: '5px',
   fontSize: '14px',
   fontWeight: '800',
-  color: '#1E293B',
+  color: 'var(--text-main)',
 }
 
 const stateText = {
   fontSize: '12px',
   lineHeight: '1.5',
-  color: '#64748B',
+  color: 'var(--text-muted)',
 }
 
 
@@ -2896,7 +3022,8 @@ const modalCard = {
   maxWidth: '470px',
   overflow: 'hidden',
   borderRadius: '19px',
-  background: '#FFFFFF',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
   boxShadow: '0 28px 80px rgba(15, 23, 42, 0.24)',
 }
 
@@ -2911,7 +3038,7 @@ const modalHeader = {
   justifyContent: 'space-between',
   gap: '16px',
   padding: '24px 25px 21px',
-  borderBottom: '1px solid #E2E8F0',
+  borderBottom: '1px solid var(--border-color)',
 }
 
 const modalEyebrow = {
@@ -2925,24 +3052,24 @@ const modalEyebrow = {
 const modalTitle = {
   fontSize: '19px',
   fontWeight: '850',
-  color: '#0F172A',
+  color: 'var(--text-main)',
 }
 
 const modalSubtitle = {
   marginTop: '5px',
   fontSize: '12px',
   lineHeight: '1.5',
-  color: '#64748B',
+  color: 'var(--text-muted)',
 }
 
 const modalCloseButton = {
   width: '32px',
   height: '32px',
   flexShrink: 0,
-  border: 'none',
+  border: '1px solid var(--border-color)',
   borderRadius: '9px',
-  background: '#F1F5F9',
-  color: '#475569',
+  background: 'var(--bg-page)',
+  color: 'var(--text-muted)',
   fontSize: '21px',
   cursor: 'pointer',
 }
@@ -2958,9 +3085,9 @@ const readOnlyField = {
   alignItems: 'center',
   boxSizing: 'border-box',
   borderRadius: '10px',
-  background: '#F1F5F9',
-  border: '1px solid #E2E8F0',
-  color: '#64748B',
+  background: 'var(--bg-page)',
+  border: '1px solid var(--border-color)',
+  color: 'var(--text-muted)',
   fontSize: '13px',
 }
 
@@ -2969,15 +3096,15 @@ const modalSelect = {
   height: '46px',
   boxSizing: 'border-box',
   borderRadius: '10px',
-  background: '#F8FAFC',
-  border: '1px solid #CBD5E1',
+  background: 'var(--input-bg)',
+  border: '1px solid var(--input-border)',
   fontSize: '13px',
 }
 
 const fieldHint = {
   marginTop: '6px',
   fontSize: '10px',
-  color: '#94A3B8',
+  color: 'var(--text-muted)',
 }
 
 const modalError = {
@@ -2987,8 +3114,8 @@ const modalError = {
   marginTop: '18px',
   padding: '10px 12px',
   borderRadius: '9px',
-  background: '#FEF2F2',
-  border: '1px solid #FECACA',
+  background: 'var(--badge-subject)',
+  border: '1px solid var(--border-color)',
   color: '#991B1B',
   fontSize: '12px',
   fontWeight: '600',
@@ -3000,15 +3127,15 @@ const modalFooter = {
   alignItems: 'center',
   gap: '9px',
   padding: '16px 25px 21px',
-  borderTop: '1px solid #E2E8F0',
+  borderTop: '1px solid var(--border-color)',
 }
 
 const cancelButton = {
   padding: '11px 18px',
   borderRadius: '9px',
-  border: '1px solid #CBD5E1',
-  background: '#FFFFFF',
-  color: '#475569',
+  border: '1px solid var(--border-color)',
+  background: 'var(--bg-card)',
+  color: 'var(--text-main)',
   fontSize: '12px',
   fontWeight: '750',
   cursor: 'pointer',

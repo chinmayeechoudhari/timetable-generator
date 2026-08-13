@@ -98,21 +98,21 @@ export const btn = {
 export const successBox = {
   padding: '9px 12px',
   borderRadius: '7px',
-  background: '#F0FDF4',
+  background: 'var(--badge-classroom)',
   color: '#166534',
   fontSize: '12px',
   fontWeight: '600',
-  border: '1px solid #BBF7D0',
+  border: '1px solid var(--border-color)',
 }
 
 export const errorBox = {
   padding: '9px 12px',
   borderRadius: '7px',
-  background: '#FEF2F2',
+  background: 'var(--badge-subject)',
   color: '#991B1B',
   fontSize: '12px',
   fontWeight: '600',
-  border: '1px solid #FECACA',
+  border: '1px solid var(--border-color)',
 }
 
 export const tableWrap = {
@@ -161,14 +161,14 @@ export const toggleActive = {
   flex: 1, padding: '9px', borderRadius: '7px',
   cursor: 'pointer', fontSize: '12px', fontWeight: '600',
   border: '1.5px solid #2563EB',
-  background: '#EFF6FF',
+  background: 'var(--badge-teacher)',
   color: '#1D4ED8',
 }
 
 export const toggleInactive = {
   flex: 1, padding: '9px', borderRadius: '7px',
   cursor: 'pointer', fontSize: '12px', fontWeight: '500',
-  border: '1px solid #CBD5E1',
-  background: '#F8FAFC',
-  color: '#94A3B8',
+  border: '1px solid var(--border-color)',
+  background: 'var(--input-bg)',
+  color: 'var(--text-muted)',
 }
