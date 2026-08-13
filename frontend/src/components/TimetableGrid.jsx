@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import SubjectTypeBadge from './SubjectTypeBadge'
 
@@ -6,8 +6,8 @@ const BASE = 'http://localhost:8000'
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8]
 
-/* ── Light-mode cell colour palette ── */
-const COLORS_LIGHT = [
+/* ── Per-subject cell colour palette ── */
+const COLORS = [
   { bg: '#EFF6FF', border: '#2563EB', text: '#1D4ED8' },
   { bg: '#F0FDF4', border: '#16A34A', text: '#15803D' },
   { bg: '#FEF3C7', border: '#D97706', text: '#B45309' },
@@ -18,39 +18,85 @@ const COLORS_LIGHT = [
   { bg: '#EEF2FF', border: '#4F46E5', text: '#4338CA' },
 ]
 
-/* ── Dark-mode cell colour palette (vivid text on deep dark bg) ── */
-const COLORS_DARK = [
-  { bg: '#0d1f3c', border: '#3b82f6', text: '#60a5fa' },
-  { bg: '#0d2820', border: '#22c55e', text: '#4ade80' },
-  { bg: '#2b1e0a', border: '#d97706', text: '#fbbf24' },
-  { bg: '#1e0d33', border: '#a855f7', text: '#c084fc' },
-  { bg: '#2b0f18', border: '#f43f5e', text: '#fb7185' },
-  { bg: '#0d2828', border: '#14b8a6', text: '#2dd4bf' },
-  { bg: '#2b1400', border: '#f97316', text: '#fb923c' },
-  { bg: '#111633', border: '#6366f1', text: '#818cf8' },
-]
+function Icon({ name, size = 20, stroke = 1.9 }) {
+  const common = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: stroke,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
 
-/* ── Hook: watches document[data-theme] ── */
-function useDarkMode() {
-  const [dark, setDark] = useState(
-    () => document.documentElement.getAttribute('data-theme') === 'dark'
-  )
-  useEffect(() => {
-    const el = document.documentElement
-    const obs = new MutationObserver(() => {
-      setDark(el.getAttribute('data-theme') === 'dark')
-    })
-    obs.observe(el, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => obs.disconnect()
-  }, [])
-  return dark
+  const paths = {
+    grid: (
+      <>
+        <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+        <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+      </>
+    ),
+    user: (
+      <>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+        <circle cx="10" cy="7" r="4" />
+      </>
+    ),
+    door: (
+      <>
+        <path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h9A1.5 1.5 0 0 1 17 4.5V21" />
+        <path d="M3 21h18" />
+        <path d="M13.5 12h.01" />
+      </>
+    ),
+    school: (
+      <>
+        <path d="M3 21h18" />
+        <path d="M5 21V5.5L12 2l7 3.5V21" />
+        <path d="M9 21v-5h6v5" />
+      </>
+    ),
+    download: (
+      <>
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M4.5 19.5h15" />
+      </>
+    ),
+    printer: (
+      <>
+        <path d="M6.5 9V3.5h11V9" />
+        <rect x="4" y="9" width="16" height="8" rx="1.5" />
+        <path d="M6.5 15h11v6h-11z" />
+      </>
+    ),
+    layers: (
+      <>
+        <path d="M12 2 2 7l10 5 10-5-10-5Z" />
+        <path d="m2 17 10 5 10-5" />
+        <path d="m2 12 10 5 10-5" />
+      </>
+    ),
+    calendarOff: (
+      <>
+        <path d="M3.5 5h13" />
+        <path d="M3.5 5v13.5A2.5 2.5 0 0 0 6 21h9" />
+        <path d="M16.5 3.5v3" />
+        <path d="M8 3.5v3" />
+        <path d="m16 16 5 5" />
+        <path d="m21 16-5 5" />
+      </>
+    ),
+  }
+
+  return <svg {...common}>{paths[name]}</svg>
 }
 
 export default function TimetableGrid() {
-  const dark = useDarkMode()
-
-  const COLORS = dark ? COLORS_DARK : COLORS_LIGHT
-
   const [timetable, setTimetable] = useState([])
   const [teachers, setTeachers] = useState({})
   const [subjects, setSubjects] = useState({})
@@ -68,15 +114,6 @@ export default function TimetableGrid() {
 
   useEffect(() => { fetchAll() }, [])
 
-  /* Re-compute colors when dark mode changes */
-  useEffect(() => {
-    if (subjectsList.length === 0) return
-    const palette = dark ? COLORS_DARK : COLORS_LIGHT
-    const colors = {}
-    subjectsList.forEach((s, i) => { colors[s.subject_id] = palette[i % palette.length] })
-    setSubjectColors(colors)
-  }, [dark, subjectsList])
-
   async function fetchAll() {
     try {
       const [ttRes, tRes, sRes, rRes, cRes, slRes] = await Promise.all([
@@ -92,8 +129,7 @@ export default function TimetableGrid() {
       setSubjectsList(sRes.data)
       const roomMap = {}; rRes.data.forEach(r => { roomMap[r.room_id] = r.room_number })
       const classMap = {}; cRes.data.forEach(c => { classMap[c.class_id] = c.class_name })
-      const palette = document.documentElement.getAttribute('data-theme') === 'dark' ? COLORS_DARK : COLORS_LIGHT
-      const colors = {}; sRes.data.forEach((s, i) => { colors[s.subject_id] = palette[i % palette.length] })
+      const colors = {}; sRes.data.forEach((s, i) => { colors[s.subject_id] = COLORS[i % COLORS.length] })
 
       setTimetable(ttRes.data); setTeachers(teacherMap); setSubjects(subjectMap)
       setRooms(roomMap); setClasses(classMap); setSubjectColors(colors)
@@ -146,51 +182,6 @@ export default function TimetableGrid() {
   )
   const visibleSubjects = subjectsList.filter(s => visibleSubjectIds.has(s.subject_id))
 
-  /* ── theme-dependent style tokens ── */
-  const T = {
-    page:        { padding: '28px 32px', background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-main)', fontFamily: "'Inter','Segoe UI',sans-serif" },
-    titleText:   { fontSize: '22px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.02em' },
-    subText:     { fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' },
-    exportBtn:   dark
-      ? { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #3b82f6', background: '#0d1f3c', color: '#60a5fa', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }
-      : { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #2563EB', background: '#EFF6FF',  color: '#1D4ED8', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
-    exportAllBtn: dark
-      ? { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #22c55e', background: '#0d2820', color: '#4ade80', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }
-      : { padding: '8px 14px', borderRadius: '8px', border: '1.5px solid #16A34A', background: '#F0FDF4', color: '#15803D', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
-    tabBar:      dark
-      ? { display: 'inline-flex', gap: '3px', background: '#0d1322', borderRadius: '8px', padding: '3px', marginBottom: '14px', border: '1px solid #1a2338' }
-      : { display: 'inline-flex', gap: '3px', background: '#E2E8F0',   borderRadius: '8px', padding: '3px', marginBottom: '14px' },
-    tabActive:   dark
-      ? { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '700', background: '#1a2338',   color: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', transition: 'all 0.12s' }
-      : { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '600', background: '#FFFFFF',   color: '#1B2A3B', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', transition: 'all 0.12s' },
-    tabInactive: dark
-      ? { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: 'transparent', color: '#6b7a90', transition: 'all 0.12s' }
-      : { padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: 'transparent', color: '#64748B', transition: 'all 0.12s' },
-    pillActive:  dark
-      ? { padding: '5px 14px', borderRadius: '20px', border: '1.5px solid #3b82f6', cursor: 'pointer', fontSize: '12px', fontWeight: '700', background: '#0d1f3c', color: '#60a5fa', transition: 'all 0.12s' }
-      : { padding: '5px 14px', borderRadius: '20px', border: '1.5px solid #2563EB', cursor: 'pointer', fontSize: '12px', fontWeight: '600', background: '#EFF6FF',  color: '#1D4ED8', transition: 'all 0.12s' },
-    pillInactive: dark
-      ? { padding: '5px 14px', borderRadius: '20px', border: '1px solid #1f2b45',   cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: '#090d16',   color: '#6b7a90', transition: 'all 0.12s' }
-      : { padding: '5px 14px', borderRadius: '20px', border: '1px solid #CBD5E1',   cursor: 'pointer', fontSize: '12px', fontWeight: '500', background: '#FFFFFF',   color: '#64748B', transition: 'all 0.12s' },
-    gridWrap:    dark
-      ? { background: '#0d1322', borderRadius: '12px', border: '1px solid #1a2338', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }
-      : { background: '#FFFFFF', borderRadius: '10px',  border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
-    thStyle:     dark
-      ? { padding: '10px 12px', fontSize: '10px', fontWeight: '700', color: '#6b7a90',  textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', border: '1px solid #1a2338', whiteSpace: 'nowrap', background: '#090d16' }
-      : { padding: '10px 12px', fontSize: '10px', fontWeight: '700', color: '#64748B',  textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', border: '1px solid #F1F5F9', whiteSpace: 'nowrap', background: '#F8FAFC' },
-    tdStyle:     dark
-      ? { padding: '4px', border: '1px solid #161e30', verticalAlign: 'top', width: 'auto' }
-      : { padding: '3px', border: '1px solid #F1F5F9', verticalAlign: 'top', width: 'auto' },
-    dayStyle:    dark
-      ? { padding: '10px 12px', fontSize: '11px', fontWeight: '700', color: '#8a99ad', textAlign: 'center', border: '1px solid #1a2338', background: '#090d16', whiteSpace: 'nowrap' }
-      : { padding: '10px 12px', fontSize: '11px', fontWeight: '700', color: '#94A3B8', textAlign: 'center', border: '1px solid #F1F5F9', background: '#F8FAFC', whiteSpace: 'nowrap' },
-    rowEven:     dark ? '#0d1322' : '#FFFFFF',
-    rowOdd:      dark ? '#0a1020' : '#FAFAFA',
-    metaColor:   dark ? '#8a99ad' : '#475569',
-    emptyColor:  dark ? '#2a3548' : '#CBD5E1',
-    legendLabel: dark ? '#6b7a90' : '#94A3B8',
-  }
-
   function handleExport() {
     const styleId = 'print-style'
     let style = document.getElementById(styleId)
@@ -228,14 +219,14 @@ export default function TimetableGrid() {
   }
 
   const renderGrid = (fKey, fVal, showTeacher, showClass, showRoom) => (
-    <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+    <table className="tt-table">
 
       {/* HEADER → PERIODS AS COLUMNS */}
       <thead>
         <tr>
-          <th style={T.thStyle}>Day</th>
+          <th className="tt-th tt-th-day">Day</th>
           {activePeriods.map(period => (
-            <th key={period} style={T.thStyle}>P{period}</th>
+            <th key={period} className="tt-th">P{period}</th>
           ))}
         </tr>
       </thead>
@@ -243,61 +234,54 @@ export default function TimetableGrid() {
       {/* BODY → DAYS AS ROWS */}
       <tbody>
         {activeDays.map((day, di) => (
-          <tr key={day} style={{ background: di % 2 === 0 ? T.rowEven : T.rowOdd }}>
+          <tr key={day}>
 
             {/* DAY LABEL */}
-            <td style={T.dayStyle}>{day}</td>
+            <td className="tt-day-cell">{day}</td>
 
             {/* PERIOD CELLS */}
-            {activePeriods.map(period => {
+            {activePeriods.map((period, pi) => {
               const entry = getCell(fKey, fVal, day, period)
               const color = entry
                 ? (subjectColors[entry.subject_id] || COLORS[0])
                 : null
 
               return (
-                <td key={period} style={T.tdStyle}>
+                <td key={period} className="tt-td">
                   {entry ? (
-                    <div style={{
-                      background: color.bg,
-                      borderLeft: `3px solid ${color.border}`,
-                      borderRadius: '6px',
-                      padding: '5px 6px',
-                      minHeight: '48px',
-                    }}>
+                    <div
+                      className="tt-entry"
+                      style={{
+                        background: color.bg,
+                        borderLeftColor: color.border,
+                        animationDelay: `${(di * activePeriods.length + pi) * 18}ms`,
+                      }}
+                    >
                       <SubjectTypeBadge
                         name={subjects[entry.subject_id] || `S${entry.subject_id}`}
                         type={subjectsList.find(s => s.subject_id === entry.subject_id)?.subject_type}
-                        dark={dark}
-                        color={color}
                       />
                       {showTeacher && (
-                        <div style={{ fontSize: '10px', color: T.metaColor, marginTop: '2px' }}>
-                          👤 {teachers[entry.teacher_id] || `T${entry.teacher_id}`}
+                        <div className="tt-meta">
+                          <Icon name="user" size={11} />
+                          {teachers[entry.teacher_id] || `T${entry.teacher_id}`}
                         </div>
                       )}
                       {showClass && (
-                        <div style={{ fontSize: '10px', color: T.metaColor, marginTop: '2px' }}>
-                          🏫 {classes[entry.class_id] || `C${entry.class_id}`}
+                        <div className="tt-meta">
+                          <Icon name="school" size={11} />
+                          {classes[entry.class_id] || `C${entry.class_id}`}
                         </div>
                       )}
                       {showRoom && (
-                        <div style={{ fontSize: '10px', color: T.metaColor, marginTop: '2px' }}>
-                          🚪 {rooms[entry.room_id] || `R${entry.room_id}`}
+                        <div className="tt-meta">
+                          <Icon name="door" size={11} />
+                          {rooms[entry.room_id] || `R${entry.room_id}`}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div style={{
-                      minHeight: '52px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: T.emptyColor,
-                      fontSize: '16px'
-                    }}>
-                      —
-                    </div>
+                    <div className="tt-empty-cell">—</div>
                   )}
                 </td>
               )
@@ -309,83 +293,207 @@ export default function TimetableGrid() {
   )
 
   if (loading) return (
-    <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-page)', minHeight: '100vh' }}>
-      Loading timetable...
+    <div className="timetable-page">
+      <div className="loading-state">
+        <span className="loading-spinner" />
+        Loading timetable...
+      </div>
+      <style>{loadingStyles}</style>
     </div>
   )
 
   if (timetable.length === 0) return (
-    <div style={{ padding: '48px', textAlign: 'center', background: 'var(--bg-page)', minHeight: '100vh' }}>
-      <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '6px' }}>
-        No timetable generated yet
+    <div className="timetable-page">
+      <div className="empty-state empty-state-standalone">
+        <div className="empty-icon">
+          <Icon name="calendarOff" size={27} />
+        </div>
+        <h3>No timetable generated yet</h3>
+        <p>Go to the Generate page and run the solver first.</p>
       </div>
-      <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-        Go to the Generate page and run the solver first
-      </div>
+      <style>{loadingStyles}</style>
     </div>
   )
 
   return (
-    <div style={T.page}>
+    <div className="timetable-page">
 
-      {/* Header */}
-      <div style={{
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap', gap: '12px', marginBottom: '20px'
-      }}>
-        <div>
-          <div style={T.titleText}>Timetable</div>
-          <div style={T.subText}>{timetable.length} slots assigned</div>
+      {/* =========================================================
+          HERO
+      ========================================================= */}
+
+      <section className="timetable-hero">
+
+        <div className="timetable-watermark" aria-hidden="true">
+          <svg viewBox="0 0 620 220" fill="none">
+            <rect x="70" y="40" width="480" height="140" rx="12" stroke="currentColor" strokeWidth="2" />
+            <path d="M70 85h480" stroke="currentColor" strokeWidth="2" />
+            <path d="M190 40v140" stroke="currentColor" strokeWidth="2" />
+            <path d="M310 40v140" stroke="currentColor" strokeWidth="2" />
+            <path d="M430 40v140" stroke="currentColor" strokeWidth="2" />
+          </svg>
         </div>
 
-        <div className="no-print" style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={handleExport} style={T.exportBtn}>
+        <div className="hero-left">
+          <div className="hero-icon">
+            <Icon name="grid" size={32} stroke={1.7} />
+          </div>
+
+          <div>
+            <div className="eyebrow">ACADEMIC SCHEDULING</div>
+            <h1>Timetable</h1>
+            <div className="hero-subtitle">Generated Schedule</div>
+            <p>Browse the generated schedule by class, teacher, or room.</p>
+          </div>
+        </div>
+
+        <div className="hero-actions no-print">
+          <button type="button" className="secondary-action" onClick={handleExport}>
+            <Icon name="download" size={16} />
             Export current view
           </button>
-          <button onClick={handleExportAll} style={T.exportAllBtn}>
+          <button type="button" className="primary-button" onClick={handleExportAll}>
+            <Icon name="printer" size={16} />
             Export all views
           </button>
         </div>
-      </div>
 
-      {/* View tabs */}
-      <div className="no-print" style={T.tabBar}>
-        {[
-          { key: 'class', label: 'Class-wise' },
-          { key: 'teacher', label: 'Teacher-wise' },
-          { key: 'room', label: 'Room-wise' }
-        ].map(v => (
-          <button key={v.key} onClick={() => switchView(v.key)} style={view === v.key ? T.tabActive : T.tabInactive}>
-            {v.label}
-          </button>
-        ))}
-      </div>
+      </section>
 
-      {/* Filter pills */}
-      <div className="no-print" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
-        {filterOptions().map(opt => (
-          <button key={opt.id} onClick={() => setSelected(opt.id)} style={selected === opt.id ? T.pillActive : T.pillInactive}>
-            {opt.label}
-          </button>
-        ))}
-      </div>
 
-      {/* Grid */}
-      {selected && (
-        <div id="print-area">
-          <div style={{ display: 'none' }} className="print-title">
-            {view === 'class' ? 'Class' : view === 'teacher' ? 'Teacher' : 'Room'}: {getSelectedLabel()}
+      {/* =========================================================
+          STAT CHIPS
+      ========================================================= */}
+
+      <section className="timetable-chip-row">
+        <div className="tt-chip">
+          <Icon name="layers" size={16} />
+          <span>Slots assigned</span>
+          <strong>{timetable.length}</strong>
+        </div>
+        <div className="tt-chip">
+          <Icon name="school" size={16} />
+          <span>Classes</span>
+          <strong>{allClasses.length}</strong>
+        </div>
+        <div className="tt-chip">
+          <Icon name="user" size={16} />
+          <span>Teachers</span>
+          <strong>{allTeachers.length}</strong>
+        </div>
+        <div className="tt-chip">
+          <Icon name="door" size={16} />
+          <span>Rooms</span>
+          <strong>{allRooms.length}</strong>
+        </div>
+      </section>
+
+
+      {/* =========================================================
+          GRID CARD
+      ========================================================= */}
+
+      <section className="directory-card">
+
+        <div className="directory-header">
+          <div className="directory-title-block">
+            <div className="directory-eyebrow">SCHEDULE VIEW</div>
+
+            <div className="directory-title-row">
+              <div className="directory-main-icon">
+                <Icon name="grid" size={22} />
+              </div>
+
+              <div>
+                <h2>{getSelectedLabel() || 'Select a view'}</h2>
+                <p>
+                  {view === 'class'
+                    ? `Class-wise timetable for ${getSelectedLabel()}`
+                    : view === 'teacher'
+                    ? `Teacher-wise timetable for ${getSelectedLabel()}`
+                    : `Room-wise timetable for ${getSelectedLabel()}`}
+                </p>
+              </div>
+            </div>
           </div>
-          <div style={T.gridWrap}>
-            <div style={{ overflowX: 'auto' }}>
+
+          <div className="view-tabs no-print">
+            {[
+              { key: 'class', label: 'Class-wise', icon: 'grid' },
+              { key: 'teacher', label: 'Teacher-wise', icon: 'user' },
+              { key: 'room', label: 'Room-wise', icon: 'door' },
+            ].map(v => (
+              <button
+                key={v.key}
+                type="button"
+                className={`view-tab ${view === v.key ? 'active' : ''}`}
+                onClick={() => switchView(v.key)}
+              >
+                <Icon name={v.icon} size={14} />
+                {v.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="filter-chip-row no-print">
+          {filterOptions().map(opt => (
+            <button
+              key={opt.id}
+              type="button"
+              className={`filter-chip ${selected === opt.id ? 'active' : ''}`}
+              onClick={() => setSelected(opt.id)}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {selected && (
+          <div id="print-area" className="tt-grid-wrapper" key={`${view}-${selected}`}>
+            <div style={{ display: 'none' }} className="print-title">
+              {view === 'class' ? 'Class' : view === 'teacher' ? 'Teacher' : 'Room'}: {getSelectedLabel()}
+            </div>
+            <div className="tt-table-scroll">
               {renderGrid(filterKey, selected, view !== 'teacher', view !== 'class', view !== 'room')}
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Hidden print all */}
+        {/* Legend */}
+        <div className="tt-legend no-print">
+          <span className="tt-legend-label">
+            {view === 'class'
+              ? `Subjects in ${getSelectedLabel()}`
+              : view === 'teacher'
+              ? `Subjects for ${getSelectedLabel()}`
+              : `Subjects in ${getSelectedLabel()}`}
+          </span>
+
+          {visibleSubjects.map((s, i) => {
+            const color = subjectColors[s.subject_id] || COLORS[0]
+            return (
+              <div
+                key={s.subject_id}
+                className="tt-legend-chip"
+                style={{
+                  background: color.bg,
+                  borderColor: color.border,
+                  animationDelay: `${i * 40}ms`,
+                }}
+              >
+                <span className="tt-legend-dot" style={{ background: color.border }} />
+                <SubjectTypeBadge name={s.subject_name} type={s.subject_type} showName={false} />
+                <span className="tt-legend-name">{s.subject_name}</span>
+              </div>
+            )
+          })}
+        </div>
+
+      </section>
+
+
+      {/* Hidden print-all block — unchanged structure */}
       <div id="print-all-area" style={{ display: 'none' }}>
         {allClasses.map(c => (
           <div key={c.class_id} className="print-section">
@@ -410,56 +518,610 @@ export default function TimetableGrid() {
         ))}
       </div>
 
-      {/* Legend */}
-      <div className="no-print" style={{
-        marginTop: '16px',
-        display: 'flex',
-        gap: '8px',
-        flexWrap: 'wrap',
-        alignItems: 'center'
-      }}>
-        <span style={{
-          fontSize: '10px',
-          color: T.legendLabel,
-          fontWeight: '700',
-          textTransform: 'uppercase',
-          letterSpacing: '0.06em'
-        }}>
-          {view === 'class'
-            ? `Subjects in ${getSelectedLabel()}`
-            : view === 'teacher'
-              ? `Subjects for ${getSelectedLabel()}`
-              : `Subjects in ${getSelectedLabel()}`}
-        </span>
+      {/* =========================================================
+          PAGE STYLES
+      ========================================================= */}
 
-        {visibleSubjects.map(s => {
-          const color = subjectColors[s.subject_id] || COLORS[0]
-          return (
-            <div key={s.subject_id} style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              background: color.bg,
-              border: `1px solid ${color.border}`,
-              borderRadius: '20px',
-              padding: '3px 10px'
-            }}>
-              <div style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: color.border
-              }} />
-              <SubjectTypeBadge
-                name={s.subject_name}
-                type={s.subject_type}
-                dark={dark}
-                color={color}
-              />
-            </div>
-          )
-        })}
-      </div>
+      <style>{`
+
+        .timetable-page {
+          width: 100%;
+          min-height: 100%;
+          box-sizing: border-box;
+          padding: 8px 4px 48px;
+          color: #13203a;
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+            BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .timetable-hero {
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
+          min-height: 150px;
+          padding: 26px 30px;
+          margin-bottom: 18px;
+          border: 1px solid #dfe7f4;
+          border-radius: 24px;
+          background: linear-gradient(135deg, #ffffff 0%, #f8faff 58%, #f2f5ff 100%);
+          box-shadow: 0 12px 36px rgba(28, 52, 96, 0.06);
+        }
+
+        .hero-left {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .hero-icon {
+          width: 64px;
+          height: 64px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          color: #2563eb;
+          border: 1px solid #cbdcff;
+          border-radius: 18px;
+          background: linear-gradient(145deg, #eff5ff, #e0eaff);
+          box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+          animation: iconFloat 3.2s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+
+        .eyebrow {
+          margin-bottom: 5px;
+          color: #3564bb;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.16em;
+        }
+
+        .timetable-hero h1 {
+          margin: 0;
+          color: #101b35;
+          font-size: 30px;
+          line-height: 1.08;
+          letter-spacing: -0.035em;
+          font-weight: 800;
+        }
+
+        .hero-subtitle {
+          margin-top: 6px;
+          color: #4a5d84;
+          font-size: 15px;
+          line-height: 1.3;
+          font-weight: 650;
+        }
+
+        .timetable-hero p {
+          margin: 6px 0 0;
+          color: #71809d;
+          font-size: 13px;
+          line-height: 1.5;
+          max-width: 420px;
+        }
+
+        .timetable-watermark {
+          position: absolute;
+          z-index: 1;
+          right: 40px;
+          bottom: -22px;
+          width: min(40%, 520px);
+          color: #8fa8e7;
+          opacity: 0.1;
+          pointer-events: none;
+        }
+
+        .timetable-watermark svg {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+
+        .hero-actions {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          gap: 9px;
+          flex-wrap: wrap;
+        }
+
+        .primary-button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-height: 42px;
+          padding: 0 16px;
+          border: 1px solid #245de8;
+          border-radius: 10px;
+          background: linear-gradient(135deg, #326bf0, #2458db);
+          color: white;
+          font-size: 12.5px;
+          font-weight: 750;
+          cursor: pointer;
+          box-shadow: 0 9px 20px rgba(37, 99, 235, 0.18);
+          transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+        }
+
+        .primary-button:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.03);
+        }
+
+        .secondary-action {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-height: 42px;
+          padding: 0 16px;
+          border: 1px solid #c9d9ff;
+          border-radius: 10px;
+          background: #f4f7ff;
+          color: #245dd6;
+          font-size: 12.5px;
+          font-weight: 750;
+          cursor: pointer;
+          transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        .secondary-action:hover {
+          background: #eaf1ff;
+          transform: translateY(-1px);
+        }
+
+        /* =========================
+           STAT CHIPS
+        ========================= */
+
+        .timetable-chip-row {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 10px;
+          margin-bottom: 18px;
+        }
+
+        .tt-chip {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding: 12px 14px;
+          border-radius: 13px;
+          border: 1px solid #e2e8f0;
+          background: white;
+          box-shadow: 0 6px 18px rgba(30, 48, 87, 0.04);
+          color: #2563eb;
+          animation: chipIn 0.4s ease both;
+        }
+
+        .tt-chip:nth-child(2) { animation-delay: 60ms; }
+        .tt-chip:nth-child(3) { animation-delay: 120ms; }
+        .tt-chip:nth-child(4) { animation-delay: 180ms; }
+
+        @keyframes chipIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tt-chip span {
+          color: #94a3b8;
+          font-size: 9.5px;
+          font-weight: 800;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+        }
+
+        .tt-chip strong {
+          color: #1f2c48;
+          font-size: 18px;
+          font-weight: 800;
+        }
+
+        /* =========================
+           DIRECTORY CARD
+        ========================= */
+
+        .directory-card {
+          overflow: hidden;
+          border: 1px solid #dfe6f1;
+          border-radius: 20px;
+          background: white;
+          box-shadow: 0 10px 30px rgba(28, 48, 90, 0.055);
+        }
+
+        .directory-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          padding: 22px 24px;
+          flex-wrap: wrap;
+          border-bottom: 1px solid #e7ecf3;
+        }
+
+        .directory-eyebrow {
+          margin-bottom: 7px;
+          color: #7483a0;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.16em;
+        }
+
+        .directory-title-row {
+          display: flex;
+          align-items: center;
+          gap: 13px;
+        }
+
+        .directory-main-icon {
+          width: 46px;
+          height: 46px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          color: #2563eb;
+          border-radius: 14px;
+          background: #edf3ff;
+        }
+
+        .directory-title-row h2 {
+          margin: 0;
+          color: #15213d;
+          font-size: 19px;
+          line-height: 1.2;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+        }
+
+        .directory-title-row p {
+          margin: 3px 0 0;
+          color: #71809d;
+          font-size: 11.5px;
+          line-height: 1.5;
+        }
+
+        .view-tabs {
+          display: inline-flex;
+          gap: 4px;
+          padding: 4px;
+          border-radius: 11px;
+          background: #f1f5f9;
+        }
+
+        .view-tab {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 13px;
+          border: none;
+          border-radius: 8px;
+          background: transparent;
+          color: #64748b;
+          font-size: 11.5px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .view-tab:hover {
+          color: #334155;
+        }
+
+        .view-tab.active {
+          background: white;
+          color: #1d4ed8;
+          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+        }
+
+        .filter-chip-row {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          padding: 16px 24px;
+          border-bottom: 1px solid #eef1f6;
+        }
+
+        .filter-chip {
+          padding: 7px 14px;
+          border-radius: 999px;
+          border: 1.5px solid #cbd5e1;
+          background: white;
+          color: #64748b;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.13s ease;
+        }
+
+        .filter-chip:hover {
+          border-color: #93c5fd;
+          background: #f6f9ff;
+        }
+
+        .filter-chip.active {
+          border-color: #2563eb;
+          background: #eff6ff;
+          color: #1d4ed8;
+          box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        /* =========================
+           GRID / TABLE
+        ========================= */
+
+        .tt-grid-wrapper {
+          padding: 18px 24px 8px;
+          animation: gridFadeIn 0.28s ease both;
+        }
+
+        @keyframes gridFadeIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tt-table-scroll {
+          overflow-x: auto;
+          border: 1px solid #e5eaf3;
+          border-radius: 14px;
+        }
+
+        .tt-table {
+          width: 100%;
+          min-width: 760px;
+          border-collapse: collapse;
+          table-layout: fixed;
+        }
+
+        .tt-th {
+          padding: 11px 12px;
+          font-size: 10px;
+          font-weight: 800;
+          color: #62718d;
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
+          text-align: center;
+          border: 1px solid #eef1f6;
+          background: #f8faff;
+          white-space: nowrap;
+        }
+
+        .tt-th-day {
+          width: 100px;
+        }
+
+        .tt-day-cell {
+          padding: 11px 12px;
+          font-size: 11.5px;
+          font-weight: 800;
+          color: #55617a;
+          text-align: center;
+          border: 1px solid #eef1f6;
+          background: #f8faff;
+          white-space: nowrap;
+        }
+
+        .tt-td {
+          padding: 4px;
+          border: 1px solid #eef1f6;
+          vertical-align: top;
+          background: white;
+        }
+
+        .tt-entry {
+          border-left: 3px solid;
+          border-radius: 9px;
+          padding: 8px 9px;
+          min-height: 52px;
+          box-sizing: border-box;
+          animation: entryIn 0.32s ease both;
+          transition: transform 0.14s ease, box-shadow 0.14s ease;
+        }
+
+        .tt-entry:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 18px rgba(15, 23, 42, 0.09);
+        }
+
+        @keyframes entryIn {
+          from { opacity: 0; transform: translateY(5px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .tt-meta {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          margin-top: 4px;
+          color: #55617a;
+          font-size: 10px;
+          font-weight: 600;
+        }
+
+        .tt-empty-cell {
+          min-height: 56px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #cbd5e1;
+          font-size: 15px;
+        }
+
+        /* =========================
+           LEGEND
+        ========================= */
+
+        .tt-legend {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          padding: 16px 24px 22px;
+        }
+
+        .tt-legend-label {
+          color: #94a3b8;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+          margin-right: 4px;
+        }
+
+        .tt-legend-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          border: 1px solid;
+          border-radius: 999px;
+          padding: 5px 12px;
+          animation: chipIn 0.32s ease both;
+        }
+
+        .tt-legend-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .tt-legend-name {
+          font-size: 11px;
+          font-weight: 700;
+          color: #1f2c48;
+        }
+
+        /* =========================
+           LOADING / EMPTY STATE
+        ========================= */
+
+        .empty-state {
+          margin: 14px;
+          padding: 60px 25px;
+          border: 1px dashed #cad5e5;
+          border-radius: 14px;
+          background: linear-gradient(180deg, #fbfcff, #f8faff);
+          text-align: center;
+        }
+
+        .empty-state-standalone {
+          margin: 40px auto;
+          max-width: 480px;
+        }
+
+        .empty-icon {
+          width: 58px;
+          height: 58px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 14px;
+          color: #2563eb;
+          border-radius: 17px;
+          background: #edf3ff;
+        }
+
+        .empty-state h3 {
+          margin: 0;
+          color: #1a2742;
+          font-size: 16px;
+          font-weight: 800;
+        }
+
+        .empty-state p {
+          max-width: 380px;
+          margin: 7px auto 0;
+          color: #7c899f;
+          font-size: 12.5px;
+          line-height: 1.5;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+          .timetable-chip-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 720px) {
+          .timetable-hero {
+            padding: 22px;
+          }
+
+          .timetable-hero h1 {
+            font-size: 26px;
+          }
+
+          .timetable-watermark {
+            display: none;
+          }
+
+          .directory-header {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .hero-actions {
+            width: 100%;
+          }
+
+          .hero-actions button {
+            flex: 1;
+          }
+        }
+
+        @media print {
+          .timetable-hero,
+          .timetable-chip-row {
+            display: none !important;
+          }
+        }
+
+      `}</style>
+
     </div>
   )
 }
+
+const loadingStyles = `
+  .timetable-page { width: 100%; box-sizing: border-box; padding: 8px 4px 48px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+  .loading-state {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 80px 24px; color: #7c899f; font-size: 13px; font-weight: 600;
+  }
+  .loading-spinner {
+    width: 20px; height: 20px; border: 3px solid #dbeafe; border-top-color: #2563eb;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty-state {
+    margin: 40px auto; max-width: 480px; padding: 60px 25px;
+    border: 1px dashed #cad5e5; border-radius: 14px;
+    background: linear-gradient(180deg, #fbfcff, #f8faff); text-align: center;
+  }
+  .empty-icon {
+    width: 58px; height: 58px; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px; color: #2563eb; border-radius: 17px; background: #edf3ff;
+  }
+  .empty-state h3 { margin: 0; color: #1a2742; font-size: 16px; font-weight: 800; }
+  .empty-state p { max-width: 380px; margin: 7px auto 0; color: #7c899f; font-size: 12.5px; line-height: 1.5; }
+`
