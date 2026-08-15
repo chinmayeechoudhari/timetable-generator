@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -23,3 +23,18 @@ class TeacherRead(BaseModel):
     teacher_name: str
     max_periods_per_day: int
 
+
+class TeacherImportRowResult(BaseModel):
+    row: int
+    teacher_name: str
+    max_periods_per_day: Optional[int] = None
+    status: str  # 'imported', 'skipped', 'invalid'
+    reason: Optional[str] = None
+
+
+class TeacherImportResponse(BaseModel):
+    total: int
+    imported: int
+    skipped: int
+    failed: int
+    rows: list[TeacherImportRowResult]

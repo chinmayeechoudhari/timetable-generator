@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import ConfirmModal from './ConfirmModal'
+import TeacherExcelImport from './TeacherExcelImport'
 
 const BASE = 'http://localhost:8000'
 const PAGE_SIZE = 8
@@ -131,6 +132,7 @@ export default function TeacherForm() {
 
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showImportModal, setShowImportModal] = useState(false)
 
   useEffect(() => {
     fetchTeachers()
@@ -380,14 +382,28 @@ export default function TeacherForm() {
 
         </div>
 
-        <button
-          type="button"
-          className="primary-button hero-add-button"
-          onClick={openAddModal}
-        >
-          <Icon name="plus" size={19} />
-          Add Teacher
-        </button>
+        <div className="hero-buttons">
+          <button
+            type="button"
+            className="secondary-button hero-import-button"
+            onClick={() => setShowImportModal(true)}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import Excel
+          </button>
+          <button
+            type="button"
+            className="primary-button hero-add-button"
+            onClick={openAddModal}
+          >
+            <Icon name="plus" size={19} />
+            Add Teacher
+          </button>
+        </div>
 
       </section>
 
@@ -882,6 +898,16 @@ export default function TeacherForm() {
 
 
       {/* =========================================================
+          EXCEL IMPORT MODAL
+      ========================================================= */}
+
+      <TeacherExcelImport
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportComplete={fetchTeachers}
+      />
+
+      {/* =========================================================
           PAGE STYLES
       ========================================================= */}
 
@@ -1029,6 +1055,38 @@ export default function TeacherForm() {
           min-width: 150px;
           min-height: 48px;
           font-size: 14px;
+        }
+
+        .hero-buttons {
+          position: relative;
+          z-index: 3;
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+
+        .hero-import-button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-height: 48px;
+          min-width: 150px;
+          padding: 0 18px;
+          font-size: 14px;
+          border: 1px solid #c9d9ff;
+          border-radius: 11px;
+          background: white;
+          color: #245dd6;
+          font-weight: 750;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.06);
+          transition: background 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .hero-import-button:hover {
+          background: #f4f7ff;
+          box-shadow: 0 6px 18px rgba(37, 99, 235, 0.10);
         }
 
         .secondary-button {
@@ -1801,6 +1859,15 @@ export default function TeacherForm() {
             width: 100%;
           }
 
+          .hero-buttons {
+            width: 100%;
+            flex-direction: column;
+          }
+
+          .hero-import-button {
+            width: 100%;
+          }
+
           .directory-header {
             align-items: flex-start;
             flex-direction: column;
@@ -1909,6 +1976,7 @@ export default function TeacherForm() {
         [data-theme='dark'] .small-add-button { background: #121b2d !important; color: #3b82f6 !important; border-color: #1e2f4a !important; }
         [data-theme='dark'] .pagination-bar { border-color: #1a2338 !important; }
         [data-theme='dark'] .pagination-info { color: #8a99ad !important; }
+        [data-theme='dark'] .hero-import-button { background: #121b2d !important; color: #3b82f6 !important; border-color: #1e2f4a !important; }
 
       `}</style>
 
