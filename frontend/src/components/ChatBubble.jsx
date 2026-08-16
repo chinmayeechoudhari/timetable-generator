@@ -286,8 +286,8 @@ export default function ChatBubble() {
           const entry = occupiedEntries.find(e => e.room_id === r.room_id)
           const subObj = subjects.find(s => s.subject_id === entry?.subject_id)
           const clsObj = classes.find(c => c.class_id === entry?.class_id)
-          occupiedList.push(`🔴 **${r.room_name}**: ${clsObj?.class_name || 'Class'} (${subObj?.subject_name || 'Subject'})`)
-        } else { freeList.push(`🟢 **${r.room_name}** (Cap: ${r.capacity || 'N/A'})`) }
+          occupiedList.push(`🔴 **${r.room_number}**: ${clsObj?.class_name || 'Class'} (${subObj?.subject_name || 'Subject'})`)
+        } else { freeList.push(`🟢 **${r.room_number}** (${r.room_type || 'classroom'})`) }
       })
       return `🏢 **Room Occupancy — ${targetDay} Period ${targetPeriod}**:\n\nFree (${freeList.length}):\n${freeList.join('\n') || 'None'}\n\nOccupied (${occupiedList.length}):\n${occupiedList.join('\n') || 'None'}`
     } else {
@@ -296,7 +296,7 @@ export default function ChatBubble() {
       let text = `🏢 **Room Occupancy — ${targetDay}**:\n\n`
       rooms.forEach(r => {
         const count = timetable.filter(e => e.room_id === r.room_id && daySlots.some(ds => ds.slot_id === e.slot_id)).length
-        text += `• **${r.room_name}**: ${count}/${daySlots.length} periods occupied\n`
+        text += `• **${r.room_number}** (${r.room_type || 'classroom'}): ${count}/${daySlots.length} periods occupied\n`
       })
       text += `\n💡 Try "Which rooms are free on ${targetDay} Period 1?" for details.`
       return text

@@ -340,9 +340,9 @@ export default function AIChatCard({ className, onClose }) {
           const entry = occupiedSlotEntries.find(e => e.room_id === r.room_id);
           const subObj = subjects.find(s => s.subject_id === entry?.subject_id);
           const clsObj = classes.find(c => c.class_id === entry?.class_id);
-          occupiedList.push(`🔴 **${r.room_name}**: ${clsObj?.class_name || "Class"} (${subObj?.subject_name || "Subject"})`);
+          occupiedList.push(`🔴 **${r.room_number}**: ${clsObj?.class_name || "Class"} (${subObj?.subject_name || "Subject"})`);
         } else {
-          freeList.push(`🟢 **${r.room_name}** (Cap: ${r.capacity || "N/A"})`);
+          freeList.push(`🟢 **${r.room_number}** (${r.room_type || 'classroom'})`);
         }
       });
 
@@ -358,7 +358,7 @@ export default function AIChatCard({ className, onClose }) {
       let text = `🏢 **Room Occupancy Overview for ${targetDay}**:\n\n`;
       rooms.forEach(r => {
         const assignedSlots = timetable.filter(e => e.room_id === r.room_id && daySlots.some(ds => ds.slot_id === e.slot_id));
-        text += `• **${r.room_name}**: ${assignedSlots.length} / ${daySlots.length} periods occupied\n`;
+        text += `• **${r.room_number}** (${r.room_type || 'classroom'}): ${assignedSlots.length} / ${daySlots.length} periods occupied\n`;
       });
       text += `\n💡 *Tip: Try asking "Which room is free on ${targetDay} Period 1?" for period availability.*`;
       return text;
