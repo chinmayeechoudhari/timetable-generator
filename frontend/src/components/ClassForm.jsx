@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import ConfirmModal from './ConfirmModal'
+import ClassExcelImport from './ClassExcelImport'
 import * as S from '../styles/formStyles'
 
 const BASE = 'http://localhost:8000'
@@ -22,6 +23,8 @@ export default function ClassForm() {
 
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const [showImportModal, setShowImportModal] = useState(false)
 
   useEffect(() => {
     fetchClasses()
@@ -270,15 +273,30 @@ export default function ClassForm() {
 
         </div>
 
-        <button
-          type="button"
-          onClick={openAddModal}
-          style={heroButton}
-          className="classes-page-hero-button"
-        >
-          <span style={heroButtonPlus}>+</span>
-          Add Class
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={() => setShowImportModal(true)}
+            style={heroImportButton}
+            className="classes-page-import-button"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import Excel
+          </button>
+          <button
+            type="button"
+            onClick={openAddModal}
+            style={heroButton}
+            className="classes-page-hero-button"
+          >
+            <span style={heroButtonPlus}>+</span>
+            Add Class
+          </button>
+        </div>
 
       </section>
 
@@ -889,6 +907,17 @@ export default function ClassForm() {
         isDeleting={isDeleting}
       />
 
+
+      {/* =========================================================
+          EXCEL IMPORT MODAL
+      ========================================================= */}
+
+      <ClassExcelImport
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportComplete={fetchClasses}
+      />
+
     </div>
   )
 }
@@ -1233,6 +1262,26 @@ const heroButton = {
 const heroButtonPlus = {
   fontSize: '18px',
   lineHeight: 1,
+}
+
+const heroImportButton = {
+  position: 'relative',
+  zIndex: 3,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  minHeight: '44px',
+  padding: '0 16px',
+  flexShrink: 0,
+  border: '1px solid #c9d5e4',
+  borderRadius: '10px',
+  background: '#fff',
+  color: '#53627a',
+  fontSize: '12px',
+  fontWeight: '750',
+  cursor: 'pointer',
+  transition: 'all .15s ease',
 }
 
 
@@ -1995,6 +2044,7 @@ if (typeof document !== 'undefined') {
       [data-theme='dark'] .classes-page-delete-btn { background: #2b141d !important; color: #f43f5e !important; border-color: #4a1c29 !important; }
       [data-theme='dark'] .classes-page-footer-note { background: #0d1322 !important; border-color: #1a2338 !important; color: #ffffff !important; }
       [data-theme='dark'] .classes-page-footer-note * { color: #ffffff !important; }
+      [data-theme='dark'] .classes-page-import-button { background: #121b2d !important; color: #3b82f6 !important; border-color: #1e2f4a !important; }
     `
 
     document.head.appendChild(style)
